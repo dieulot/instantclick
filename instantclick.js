@@ -201,7 +201,7 @@ var InstantClick = function() {
 		if (!supported) {
 			return
 		}
-		if (p.length) { // already initialized
+		if (p.length) { // Already initialized
 			return
 		}
 		if (0 in arguments) {
