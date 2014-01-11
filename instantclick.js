@@ -8,6 +8,7 @@ var InstantClick = function() {
 	var pHistory = {} // short for "preloadHistory"
 	var p = [] // short for "preloads"
 	var checkLinkFunction = function() { return true }
+	var supported = 'pushState' in history
 
 	function removeHash(url) {
 		var index = url.indexOf('#')
@@ -197,7 +198,7 @@ var InstantClick = function() {
 	}
 
 	function init() {
-		if (!('pushState' in history)) {
+		if (!supported) {
 			return
 		}
 		if (p.length) { // already initialized
@@ -238,5 +239,5 @@ var InstantClick = function() {
 		})
 	}
 
-	return {init: init, debug: debug}
+	return {init: init, supported: supported, debug: debug}
 }()
