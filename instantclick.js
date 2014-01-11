@@ -23,6 +23,13 @@ var InstantClick = function() {
 		dispatchEvent(event)
 	}
 
+	function getTargetLink(target) {
+		while (target.nodeName != 'A') {
+			target = target.parentNode
+		}
+		return target.href
+	}
+
 	function debug() {
 		return {
 			currentPathname: currentPathname,
@@ -68,7 +75,7 @@ var InstantClick = function() {
 	}
 
 	function queue(e) {
-		preload(e.target.href)
+		preload(getTargetLink(e.target))
 	}
 
 	function preload(url) {
@@ -138,7 +145,7 @@ var InstantClick = function() {
 			return
 		}
 		e.preventDefault()
-		display(e.target.href)
+		display(getTargetLink(e.target))
 	}
 
 	function display(url) {
