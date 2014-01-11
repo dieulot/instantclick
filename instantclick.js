@@ -155,10 +155,7 @@ var InstantClick = function() {
 
 	function display(url) {
 		if (p[pId].url != url) {
-			if (p[pId ^ 1].url != url) {
-				throw new Error('Clicked on a link without hovering on it first')
-			}
-			else {
+			if (p[pId ^ 1].url == url) {
 				pId ^= 1
 			}
 		}
