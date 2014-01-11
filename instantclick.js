@@ -91,6 +91,7 @@ var InstantClick = function() {
 		p[id].state = 'preloading'
 		p[id].url = url
 		p[id].body = false
+		p[id].hasBody = true
 		p[id].timingStart = +new Date
 		p[id].timing = false
 		p[id].xhr.open('GET', url, true)
@@ -109,6 +110,12 @@ var InstantClick = function() {
 		p[id].timing = +new Date - p[id].timingStart
 		// To debug, we know it has been preloaded if `timing` isn't false
 
+		var titleIndex = text.indexOf('<title')
+		if (titleIndex > -1) {
+			p[id].title = text.substr(text.indexOf('>', titleIndex) + 1)
+			p[id].title = p[id].title.substr(0, p[id].title.indexOf('</title'))
+		}
+
 		var bodyIndex = text.indexOf('<body')
 		if (bodyIndex > -1) {
 			p[id].body = text.substr(text.indexOf('>', bodyIndex) + 1)
@@ -119,6 +126,11 @@ var InstantClick = function() {
 
 			/* Removing script[data-no-instant] */
 			p[id].body = p[id].body.replace(/<script[^>]+data-no-instant[^>]*>[\s\S]*<\/script>/ig, '')
+
+			pHistory[removeHash(p[id].url)] = {body: p[id].body, title: p[id].title}
+		}
+		else {
+			p[id].hasBody = false
 		}
 		/* We're only getting the body element's innerHTML, not the
 		   element's attributes such as class etc.
@@ -126,14 +138,6 @@ var InstantClick = function() {
 		   the body element so it's able to also get classes etc., and
 		   doesn't require an explicit body tag in the html. This
 		   should be explored later. */
-
-		var titleIndex = text.indexOf('<title')
-		if (titleIndex > -1) {
-			p[id].title = text.substr(text.indexOf('>', titleIndex) + 1)
-			p[id].title = p[id].title.substr(0, p[id].title.indexOf('</title'))
-		}
-
-		pHistory[removeHash(p[id].url)] = {body: p[id].body, title: p[id].title}
 
 		if (id == pId && p[pId].state == 'waiting') {
 			display(p[pId].url)
@@ -158,6 +162,10 @@ var InstantClick = function() {
 			}
 		}
 		if (!p[pId].body) {
+			if (!p[pId].hasBody) {
+				location.href = p[pId].url
+				return
+			}
 			p[pId].state = 'waiting'
 			return
 		}
@@ -206,6 +214,7 @@ var InstantClick = function() {
 			p[i].xhr.addEventListener('readystatechange', readystatechange)
 			p[i].url = false
 			p[i].body = false
+			p[i].hasBody = true
 			p[i].title = false
 			p[i].state = ''
 			p[i].timingStart = false
