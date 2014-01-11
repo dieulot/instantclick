@@ -109,7 +109,7 @@ var InstantClick = function() {
 		var text = p[id].xhr.responseText
 
 		p[id].timing = +new Date - p[id].timingStart
-		// To debug, we know it has been preloaded if `timing` isn't false
+		// Note: For debugging, we know p[pId] has been preloaded if `timing` isn't false
 
 		var titleIndex = text.indexOf('<title')
 		if (titleIndex > -1) {
