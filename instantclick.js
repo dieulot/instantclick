@@ -7,8 +7,8 @@ var InstantClick = function() {
 	var pId = 0 // short for "preloadId"
 	var pHistory = {} // short for "preloadHistory"
 	var p = [] // short for "preloads"
-	var checkLinkFunction = function() { return true }
 	var supported = 'pushState' in history
+	var useBlacklist = false
 
 	function removeHash(url) {
 		var index = url.indexOf('#')
@@ -37,7 +37,9 @@ var InstantClick = function() {
 			p0: p[0],
 			p1: p[1],
 			pHistory: pHistory,
-			pId: pId
+			pId: pId,
+			supported: supported,
+			useBlacklist: useBlacklist
 		}
 	}
 
@@ -48,8 +50,7 @@ var InstantClick = function() {
 			if (a.target || // target="_blank" etc.
 				a.href.indexOf(domain + '/') != 0 || // another domain
 				a.href.indexOf('#') > -1 && removeHash(a.href) == removeHash(location.href) || // link to an anchor
-				a.hasAttribute('data-no-instant') ||
-				!checkLinkFunction(a.href.substr(domain.length), a)) {
+				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
 				continue
 			}
 			a.addEventListener('mouseover', queue)
@@ -57,8 +58,11 @@ var InstantClick = function() {
 		}
 		if (!initializing) {
 			var scripts = document.getElementsByTagName('script'), script, copy, parentNode, nextSibling
-			for (i = scripts.length - 1; i >= 0; i--) {
+			for (i = 0, j = scripts.length; i < j; i++) {
 				script = scripts[i]
+				if (useBlacklist ? script.hasAttribute('data-no-instant') : !script.hasAttribute('data-instant')) {
+					continue
+				}
 				copy = document.createElement('script')
 				if (script.src) {
 					copy.src = script.src
@@ -124,9 +128,6 @@ var InstantClick = function() {
 			if (closingIndex > -1) {
 				p[id].body = p[id].body.substr(0, closingIndex)
 			}
-
-			/* Removing script[data-no-instant] */
-			p[id].body = p[id].body.replace(/<script[^>]+data-no-instant[^>]*>[\s\S]*<\/script>/ig, '')
 
 			pHistory[removeHash(p[id].url)] = {body: p[id].body, title: p[id].title}
 		}
@@ -194,15 +195,15 @@ var InstantClick = function() {
 		instantanize()
 	}
 
-	function init() {
+	function init(arg_useBlacklist) {
 		if (!supported) {
 			return
 		}
 		if (p.length) { // Already initialized
 			return
 		}
-		if (0 in arguments) {
-			checkLinkFunction = arguments[0]
+		if (arg_useBlacklist) {
+			useBlacklist = true
 		}
 		pHistory[removeHash(location.href)] = {body: document.body.innerHTML, title: document.title}
 		for (var i = 0; i < 2; i++) {
