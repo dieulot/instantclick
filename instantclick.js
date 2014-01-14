@@ -43,7 +43,7 @@ var InstantClick = function() {
 		}
 	}
 
-	function instantanize(initializing) {
+	function instantanize(isInitializing) {
 		var as = document.getElementsByTagName('a'), a, domain = location.protocol + '//' + location.host
 		for (var i = as.length - 1; i >= 0; i--) {
 			a = as[i]
@@ -56,7 +56,7 @@ var InstantClick = function() {
 			a.addEventListener('mouseover', queue)
 			a.addEventListener('click', click)
 		}
-		if (!initializing) {
+		if (!isInitializing) {
 			var scripts = document.getElementsByTagName('script'), script, copy, parentNode, nextSibling
 			for (i = 0, j = scripts.length; i < j; i++) {
 				script = scripts[i]
