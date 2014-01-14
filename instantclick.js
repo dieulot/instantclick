@@ -3,7 +3,7 @@
 // http://instantclick.io/license.html
 
 var InstantClick = function() {
-	var currentPathname = location.pathname
+	var currentLocationWithoutHash
 	var pId = 0 // short for "preloadId"
 	var pHistory = {} // short for "preloadHistory"
 	var p = [] // short for "preloads"
@@ -33,7 +33,7 @@ var InstantClick = function() {
 
 	function debug() {
 		return {
-			currentPathname: currentPathname,
+			currentLocationWithoutHash: currentLocationWithoutHash,
 			p0: p[0],
 			p1: p[1],
 			pHistory: pHistory,
@@ -193,7 +193,7 @@ var InstantClick = function() {
 			}
 			history.pushState(null, null, p[pId].url)
 		}
-		currentPathname = location.pathname
+		currentLocationWithoutHash = removeHash(location.href)
 		instantanize()
 	}
 
@@ -220,6 +220,7 @@ var InstantClick = function() {
 		if (arg_useBlacklist) {
 			useBlacklist = true
 		}
+		currentLocationWithoutHash = removeHash(location.href)
 		pHistory[removeHash(location.href)] = {body: document.body.innerHTML, title: document.title}
 		for (var i = 0; i < 2; i++) {
 			p[i] = {}
@@ -237,15 +238,15 @@ var InstantClick = function() {
 		instantanize(true)
 
 		addEventListener('popstate', function() {
-			if (currentPathname == location.pathname) {
+			var loc = removeHash(location.href)
+			if (loc == currentLocationWithoutHash) {
 				return
 			}
-			var loc = removeHash(location.href)
 			if (!(loc in pHistory)) {
 				location.href = location.href // Reloads the page and makes use of cache for assets, unlike location.reload()
 				return
 			}
-			currentPathname = location.pathname
+			currentLocationWithoutHash = loc
 			document.body.innerHTML = pHistory[loc].body
 			document.title = pHistory[loc].title
 			instantanize()
