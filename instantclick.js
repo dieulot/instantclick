@@ -24,11 +24,11 @@ var InstantClick = function() {
 		dispatchEvent(event)
 	}
 
-	function getTargetLink(target) {
+	function getLinkTarget(target) {
 		while (target.nodeName != 'A') {
 			target = target.parentNode
 		}
-		return target.href
+		return target
 	}
 
 	function debug() {
@@ -80,7 +80,9 @@ var InstantClick = function() {
 	}
 
 	function queue(e) {
-		preload(getTargetLink(e.target))
+		var a = getLinkTarget(e.target)
+		a.addEventListener('mouseout', mouseout)
+		preload(a.href)
 	}
 
 	function preload(url) {
@@ -151,7 +153,7 @@ var InstantClick = function() {
 			return
 		}
 		e.preventDefault()
-		display(getTargetLink(e.target))
+		display(getLinkTarget(e.target).href)
 	}
 
 	function display(url) {
@@ -193,6 +195,19 @@ var InstantClick = function() {
 		}
 		currentPathname = location.pathname
 		instantanize()
+	}
+
+	function mouseout(e) {
+		var target = getLinkTarget(e.target)
+		var id = pId
+		if (p[id].url != target.href && p[id ^ 1].url == target.href) {
+			id ^= 1
+		}
+		if (p[id].state != 'preloading') { // User has clicked the link
+			return
+		}
+		p[id].xhr.abort()
+		p[id].state = ''
 	}
 
 	function init(arg_useBlacklist) {
