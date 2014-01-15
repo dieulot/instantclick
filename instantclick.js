@@ -60,7 +60,7 @@ var InstantClick = function() {
 			var scripts = document.getElementsByTagName('script'), script, copy, parentNode, nextSibling
 			for (i = 0, j = scripts.length; i < j; i++) {
 				script = scripts[i]
-				if (useBlacklist ? script.hasAttribute('data-no-instant') : !script.hasAttribute('data-instant')) {
+				if (script.hasAttribute('data-no-instant')) {
 					continue
 				}
 				copy = document.createElement('script')
