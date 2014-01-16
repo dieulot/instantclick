@@ -1,4 +1,4 @@
-// InstantClick 1.0
+// InstantClick 1.1
 // (C) 2014 Alexandre Dieulot
 // http://instantclick.io/license.html
 
