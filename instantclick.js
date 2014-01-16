@@ -9,6 +9,7 @@ var InstantClick = function() {
 	var p = [] // short for "preloads"
 	var supported = 'pushState' in history
 	var useBlacklist = false
+	var listeners = {change: []}
 
 	function removeHash(url) {
 		var index = url.indexOf('#')
@@ -18,17 +19,21 @@ var InstantClick = function() {
 		return url.substr(0, index)
 	}
 
-	function triggerEvent(name) {
-		var event = document.createEvent('HTMLEvents')
-		event.initEvent(name, true, true)
-		dispatchEvent(event)
-	}
-
 	function getLinkTarget(target) {
 		while (target.nodeName != 'A') {
 			target = target.parentNode
 		}
 		return target
+	}
+
+	function on(type, listener) {
+		listeners[type].push(listener)
+	}
+
+	function triggerEvent(type) {
+		for (var i = 0; i < listeners[type].length; i++) {
+			listeners[type][i]()
+		}
 	}
 
 	function debug() {
@@ -76,7 +81,7 @@ var InstantClick = function() {
 				parentNode.insertBefore(copy, nextSibling)
 			}
 		}
-		triggerEvent('page:change')
+		triggerEvent('change')
 	}
 
 	function queue(e) {
@@ -212,6 +217,7 @@ var InstantClick = function() {
 
 	function init(arg_useBlacklist) {
 		if (!supported) {
+			triggerEvent('change')
 			return
 		}
 		if (p.length) { // Already initialized
@@ -253,5 +259,10 @@ var InstantClick = function() {
 		})
 	}
 
-	return {init: init, supported: supported, debug: debug}
+	return {
+		init: init,
+		supported: supported,
+		on: on,
+		debug: debug
+	}
 }()
