@@ -136,7 +136,11 @@ var InstantClick = function() {
 				p[id].body = p[id].body.substr(0, closingIndex)
 			}
 
-			pHistory[removeHash(p[id].url)] = {body: p[id].body, title: p[id].title}
+			pHistory[removeHash(p[id].url)] = {
+				body: p[id].body,
+				title: p[id].title,
+				scrollY: 0
+			}
 		}
 		else {
 			p[id].hasBody = false
@@ -175,6 +179,7 @@ var InstantClick = function() {
 			p[pId].state = 'waiting'
 			return
 		}
+		pHistory[currentLocationWithoutHash].scrollY = scrollY
 		p[pId].state = 'displayed'
 		document.body.innerHTML = p[pId].body
 		document.title = p[pId].title
@@ -227,7 +232,11 @@ var InstantClick = function() {
 			useBlacklist = true
 		}
 		currentLocationWithoutHash = removeHash(location.href)
-		pHistory[removeHash(location.href)] = {body: document.body.innerHTML, title: document.title}
+		pHistory[removeHash(location.href)] = {
+			body: document.body.innerHTML,
+			title: document.title,
+			scrollY: scrollY
+		}
 		for (var i = 0; i < 2; i++) {
 			p[i] = {}
 			p[i].xhr = new XMLHttpRequest()
@@ -254,6 +263,7 @@ var InstantClick = function() {
 			}
 			currentLocationWithoutHash = loc
 			document.body.innerHTML = pHistory[loc].body
+			scrollTo(0, pHistory[loc].scrollY)
 			document.title = pHistory[loc].title
 			instantanize()
 		})
