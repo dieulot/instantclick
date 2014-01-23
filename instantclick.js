@@ -2,7 +2,7 @@
 // (C) 2014 Alexandre Dieulot
 // http://instantclick.io/license.html
 
-var InstantClick = function() {
+var InstantClick = function(document, location) {
 	var currentLocationWithoutHash
 	var pHistory = {} // short for "preloadHistory"
 	var p = {} // short for "preloads"
@@ -295,4 +295,4 @@ var InstantClick = function() {
 		on: on,
 		debug: debug
 	}
-}()
+}(document, location);
