@@ -51,7 +51,7 @@ var InstantClick = function() {
 			a = as[i]
 			if (a.target || // target="_blank" etc.
 				a.href.indexOf(domain + '/') != 0 || // another domain
-				a.href.indexOf('#') > -1 && removeHash(a.href) == removeHash(location.href) || // link to an anchor
+				a.href.indexOf('#') > -1 && removeHash(a.href) == currentLocationWithoutHash || // link to an anchor
 				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
 				continue
 			}
@@ -256,7 +256,7 @@ var InstantClick = function() {
 			useBlacklist = true
 		}
 		currentLocationWithoutHash = removeHash(location.href)
-		pHistory[removeHash(location.href)] = {
+		pHistory[currentLocationWithoutHash] = {
 			body: document.body.innerHTML,
 			title: document.title,
 			scrollY: scrollY
