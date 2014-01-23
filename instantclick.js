@@ -7,7 +7,7 @@ var InstantClick = function() {
 	var pHistory = {} // short for "preloadHistory"
 	var p = {} // short for "preloads"
 	var supported = 'pushState' in history
-	var useBlacklist = false
+	var useBlacklist
 	var listeners = {change: []}
 
 	function removeHash(url) {
@@ -252,9 +252,7 @@ var InstantClick = function() {
 		if (p.length) { // Already initialized
 			return
 		}
-		if (arg_useBlacklist) {
-			useBlacklist = true
-		}
+		useBlacklist = !!arg_useBlacklist
 		currentLocationWithoutHash = removeHash(location.href)
 		pHistory[currentLocationWithoutHash] = {
 			body: document.body.innerHTML,
