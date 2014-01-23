@@ -29,7 +29,7 @@ var InstantClick = function() {
 		listeners[type].push(listener)
 	}
 
-	function triggerEvent(type) {
+	function triggerPageEvent(type) {
 		for (var i = 0; i < listeners[type].length; i++) {
 			listeners[type][i]()
 		}
@@ -78,7 +78,7 @@ var InstantClick = function() {
 				parentNode.insertBefore(copy, nextSibling)
 			}
 		}
-		triggerEvent('change')
+		triggerPageEvent('change')
 	}
 
 	function queue(e) {
@@ -246,7 +246,7 @@ var InstantClick = function() {
 
 	function init(arg_useBlacklist) {
 		if (!supported) {
-			triggerEvent('change')
+			triggerPageEvent('change')
 			return
 		}
 		if (p.length) { // Already initialized
