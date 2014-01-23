@@ -134,10 +134,11 @@ var InstantClick = function() {
 				p.body = p.body.substr(0, closingIndex)
 			}
 
-			pHistory[removeHash(p.url)] = {
+			var urlWithoutHash = removeHash(p.url)
+			pHistory[urlWithoutHash] = {
 				body: p.body,
 				title: p.title,
-				scrollY: 0
+				scrollY: urlWithoutHash in pHistory ? pHistory[urlWithoutHash].scrollY : 0
 			}
 		}
 		else {
@@ -280,6 +281,8 @@ var InstantClick = function() {
 				location.href = location.href // Reloads the page and makes use of cache for assets, unlike location.reload()
 				return
 			}
+			pHistory[currentLocationWithoutHash].scrollY = scrollY
+
 			currentLocationWithoutHash = loc
 			document.body.innerHTML = pHistory[loc].body
 			scrollTo(0, pHistory[loc].scrollY)
