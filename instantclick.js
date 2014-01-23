@@ -192,11 +192,11 @@ var InstantClick = function(document, location) {
 			location.href = url
 			return
 		}
+		if (!p.hasBody) {
+			location.href = p.url
+			return
+		}
 		if (!p.body) {
-			if (!p.hasBody) {
-				location.href = p.url
-				return
-			}
 			p.isWaitingForCompletion = true
 			return
 		}
@@ -219,8 +219,7 @@ var InstantClick = function(document, location) {
 		instantanize()
 	}
 
-	function mouseout(e) {
-		var target = getLinkTarget(e.target)
+	function mouseout() {
 		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
 			return
 		}
