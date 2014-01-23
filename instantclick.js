@@ -88,15 +88,14 @@ var InstantClick = function(document, location) {
 	}
 
 	function preload(url) {
-		if (p.state == 'waiting') {
-			/* A link has been clicked but has not yet been displayed,
-			   we don't preload another one. */
-
-			return
-		}
 		if (p.state == 'preloading' && url == p.url) {
 			/* The same link is already preloading. */
-
+			return
+		}
+		if (p.state == 'waiting') {
+			/* A link has been clicked but has not yet been displayed
+			   (because it hasn't finished loading), we don't preload
+			   another one. */
 			return
 		}
 		p.state = 'preloading'
@@ -166,9 +165,9 @@ var InstantClick = function(document, location) {
 
 	function display(url) {
 		if (p.state != 'preloading') {
-			/* If the state is '' or 'displayed', the page hasn't been
-			   preloaded. This happens if the user has focused on a link (with
-			   his Tab key) and then pressed Return, which triggered a click.
+			/* If the state is '', the page hasn't been preloaded. This
+			   happens if the user has focused on a link (with his Tab
+			   key) and then pressed Return, which triggered a click.
 			   Because very few people do this, it isn't worth handling this
 			   case and preloading on focus (also, focussing on a link
 			   doesn't mean it's likely that you'll "click" on it), so we just
@@ -208,7 +207,7 @@ var InstantClick = function(document, location) {
 			return
 		}
 		pHistory[currentLocationWithoutHash].scrollY = scrollY
-		p.state = 'displayed'
+		p.state = ''
 		document.body.innerHTML = p.body
 		document.title = p.title
 		var hashIndex = p.url.indexOf('#')
@@ -239,7 +238,7 @@ var InstantClick = function(document, location) {
 			triggerPageEvent('change')
 			return
 		}
-		if (p.length) { // Already initialized
+		if (currentLocationWithoutHash) { // Already initialized
 			return
 		}
 		useBlacklist = !!arg_useBlacklist
