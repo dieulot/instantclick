@@ -88,17 +88,11 @@ var InstantClick = function(document, location) {
 	}
 
 	function preload(url) {
-		if (p.state == 'preloading' && url == p.url) {
-			/* The same link is already preloading. */
+		if ((p.isPreloading && url == p.url) || (p.isPreloading && p.isWaitingForCompletion)) {
 			return
 		}
-		if (p.state == 'waiting') {
-			/* A link has been clicked but has not yet been displayed
-			   (because it hasn't finished loading), we don't preload
-			   another one. */
-			return
-		}
-		p.state = 'preloading'
+		p.isPreloading = true
+		p.isWaitingForCompletion = false
 		p.url = url
 		p.body = false
 		p.hasBody = true
@@ -150,7 +144,7 @@ var InstantClick = function(document, location) {
 		   doesn't require an explicit body tag in the html. This
 		   should be explored later. */
 
-		if (p.state == 'waiting') {
+		if (p.isWaitingForCompletion) {
 			display(p.url)
 		}
 	}
@@ -164,29 +158,29 @@ var InstantClick = function(document, location) {
 	}
 
 	function display(url) {
-		if (p.state != 'preloading') {
-			/* If the state is '', the page hasn't been preloaded. This
-			   happens if the user has focused on a link (with his Tab
+		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
+			/* If the page isn't preloaded, it means
+			   the user has focused on a link (with his Tab
 			   key) and then pressed Return, which triggered a click.
 			   Because very few people do this, it isn't worth handling this
 			   case and preloading on focus (also, focussing on a link
 			   doesn't mean it's likely that you'll "click" on it), so we just
 			   redirect them when they "click".
 
-			   If the state is 'waiting', the user clicked twice on a link
-			   while this link wasn't ready.
-			   Two possibility:
+			   If the page is waiting for completion, the user clicked twice
+			   while the page was preloading.
+			   Two possibilities:
 			   1) He clicks on the same link again, either because it's slow
 			      to load (there's no browser loading indicator with
 			      InstantClick, so he might think his click hasn't registered
 			      if the page isn't loading fast enough) or because he has
-			      a habit of double clicking, and does it on the web;
+			      a habit of double clicking on the web;
 			   2) He clicks on another link.
 
 			   In the first case, we redirect him (send him to the page the old
 			   way) so that he can have the browser's loading indicator back.
 			   In the second case, we redirect him because we haven't preloaded
-			   that link, as we were already preloading the last one.
+			   that link, since we were already preloading the last one.
 
 			   Determining if it's a double click might be overkill as there is
 			   (hopefully) not that many people that double click on the web.
@@ -203,11 +197,12 @@ var InstantClick = function(document, location) {
 				location.href = p.url
 				return
 			}
-			p.state = 'waiting'
+			p.isWaitingForCompletion = true
 			return
 		}
 		pHistory[currentLocationWithoutHash].scrollY = scrollY
-		p.state = ''
+		p.isPreloading = false
+		p.isWaitingForCompletion = false
 		document.body.innerHTML = p.body
 		document.title = p.title
 		var hashIndex = p.url.indexOf('#')
@@ -226,11 +221,12 @@ var InstantClick = function(document, location) {
 
 	function mouseout(e) {
 		var target = getLinkTarget(e.target)
-		if (p.state != 'preloading') { // User has clicked the link
+		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
 			return
 		}
 		p.xhr.abort()
-		p.state = ''
+		p.isPreloading = false
+		p.isWaitingForCompletion = false
 	}
 
 	function init(arg_useBlacklist) {
@@ -254,7 +250,8 @@ var InstantClick = function(document, location) {
 		p.body = false
 		p.hasBody = true
 		p.title = false
-		p.state = ''
+		p.isPreloading = false
+		p.isWaitingForCompletion = false
 		p.timingStart = false
 		p.timing = false
 		instantanize(true)
