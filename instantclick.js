@@ -105,7 +105,7 @@ var InstantClick = function() {
 		p.hasBody = true
 		p.timingStart = +new Date
 		p.timing = false
-		p.xhr.open('GET', url, true)
+		p.xhr.open('GET', url)
 		p.xhr.send()
 	}
 
