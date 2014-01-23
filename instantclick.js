@@ -4,9 +4,8 @@
 
 var InstantClick = function() {
 	var currentLocationWithoutHash
-	var pId = 0 // short for "preloadId"
 	var pHistory = {} // short for "preloadHistory"
-	var p = [] // short for "preloads"
+	var p = {} // short for "preloads"
 	var supported = 'pushState' in history
 	var useBlacklist = false
 	var listeners = {change: []}
@@ -39,10 +38,8 @@ var InstantClick = function() {
 	function debug() {
 		return {
 			currentLocationWithoutHash: currentLocationWithoutHash,
-			p0: p[0],
-			p1: p[1],
+			p: p,
 			pHistory: pHistory,
-			pId: pId,
 			supported: supported,
 			useBlacklist: useBlacklist
 		}
@@ -91,59 +88,60 @@ var InstantClick = function() {
 	}
 
 	function preload(url) {
-		var id = pId
-		/* If the user has clicked on a link but the link's content
-		   has not been received yet, we preload another in parallel,
-		   so that if the first link is taking too much time, the user
-		   can exit by clicking another link, like in a normal browser. */
-		if (p[pId].state == 'waiting') {
-			id ^= 1
-			// The ^ character is used to swap between 0 and 1
+		if (p.state == 'waiting') {
+			/* A link has been clicked but has not yet been displayed,
+			   we don't preload another one. */
+
+			return
 		}
-		p[id].state = 'preloading'
-		p[id].url = url
-		p[id].body = false
-		p[id].hasBody = true
-		p[id].timingStart = +new Date
-		p[id].timing = false
-		p[id].xhr.open('GET', url, true)
-		p[id].xhr.send()
+		if (p.state == 'preloading' && url == p.url) {
+			/* The same link is already preloading. */
+
+			return
+		}
+		p.state = 'preloading'
+		p.url = url
+		p.body = false
+		p.hasBody = true
+		p.timingStart = +new Date
+		p.timing = false
+		p.xhr.open('GET', url, true)
+		p.xhr.send()
 	}
 
 	function readystatechange(e) {
-		var id = e.target.id
-
-		if (p[id].xhr.readyState < 4) {
+		if (p.xhr.readyState < 4) {
 			return
 		}
 
-		var text = p[id].xhr.responseText
+		var text = p.xhr.responseText
 
-		p[id].timing = +new Date - p[id].timingStart
-		// Note: For debugging, we know p[pId] has been preloaded if `timing` isn't false
+		p.timing = +new Date - p.timingStart
+		// Note: For debugging (`InstantClick.debug`), we know the page
+		// has been preloaded if `p.timing` isn't false.
 
 		var titleIndex = text.indexOf('<title')
 		if (titleIndex > -1) {
-			p[id].title = text.substr(text.indexOf('>', titleIndex) + 1)
-			p[id].title = p[id].title.substr(0, p[id].title.indexOf('</title'))
+			p.title = text.substr(text.indexOf('>', titleIndex) + 1)
+			p.title = p.title.substr(0, p.title.indexOf('</title'))
 		}
 
 		var bodyIndex = text.indexOf('<body')
 		if (bodyIndex > -1) {
-			p[id].body = text.substr(text.indexOf('>', bodyIndex) + 1)
-			var closingIndex = p[id].body.indexOf('</body')
+			p.body = text.substr(text.indexOf('>', bodyIndex) + 1)
+			var closingIndex = p.body.indexOf('</body')
 			if (closingIndex > -1) {
-				p[id].body = p[id].body.substr(0, closingIndex)
+				p.body = p.body.substr(0, closingIndex)
 			}
 
-			pHistory[removeHash(p[id].url)] = {
-				body: p[id].body,
-				title: p[id].title,
+			pHistory[removeHash(p.url)] = {
+				body: p.body,
+				title: p.title,
 				scrollY: 0
 			}
 		}
 		else {
-			p[id].hasBody = false
+			p.hasBody = false
 		}
 		/* We're only getting the body element's innerHTML, not the
 		   element's attributes such as class etc.
@@ -152,8 +150,8 @@ var InstantClick = function() {
 		   doesn't require an explicit body tag in the html. This
 		   should be explored later. */
 
-		if (id == pId && p[pId].state == 'waiting') {
-			display(p[pId].url)
+		if (p.state == 'waiting') {
+			display(p.url)
 		}
 	}
 
@@ -166,29 +164,58 @@ var InstantClick = function() {
 	}
 
 	function display(url) {
-		if (p[pId].url != url) {
-			if (p[pId ^ 1].url == url) {
-				pId ^= 1
-			}
+		if (p.state != 'preloading') {
+			/* If the state is '' or 'displayed', the page hasn't been
+			   preloaded. This happens if the user has focused on a link (with
+			   his Tab key) and then pressed Return, which triggered a click.
+			   Because very few people do this, it isn't worth handling this
+			   case and preloading on focus (also, focussing on a link
+			   doesn't mean it's likely that you'll "click" on it), so we just
+			   redirect them when they "click".
+
+			   If the state is 'waiting', the user clicked twice on a link
+			   while this link wasn't ready.
+			   Two possibility:
+			   1) He clicks on the same link again, either because it's slow
+			      to load (there's no browser loading indicator with
+			      InstantClick, so he might think his click hasn't registered
+			      if the page isn't loading fast enough) or because he has
+			      a habit of double clicking, and does it on the web;
+			   2) He clicks on another link.
+
+			   In the first case, we redirect him (send him to the page the old
+			   way) so that he can have the browser's loading indicator back.
+			   In the second case, we redirect him because we haven't preloaded
+			   that link, as we were already preloading the last one.
+
+			   Determining if it's a double click might be overkill as there is
+			   (hopefully) not that many people that double click on the web.
+			   Fighting against the perception that the page is stuck is
+			   interesting though, a seemingly good way to do that would be to
+			   later incorporate a progress bar.
+			*/
+
+			location.href = url
+			return
 		}
-		if (!p[pId].body) {
-			if (!p[pId].hasBody) {
-				location.href = p[pId].url
+		if (!p.body) {
+			if (!p.hasBody) {
+				location.href = p.url
 				return
 			}
-			p[pId].state = 'waiting'
+			p.state = 'waiting'
 			return
 		}
 		pHistory[currentLocationWithoutHash].scrollY = scrollY
-		p[pId].state = 'displayed'
-		document.body.innerHTML = p[pId].body
-		document.title = p[pId].title
-		if (p[pId].url != location.href) {
-			if (p[pId].url.indexOf('#') == -1) {
+		p.state = 'displayed'
+		document.body.innerHTML = p.body
+		document.title = p.title
+		if (p.url != location.href) {
+			if (p.url.indexOf('#') == -1) {
 				scrollTo(0, 0)
 			}
 			else {
-				var elem = p[pId].url.substr(p[pId].url.indexOf('#') + 1)
+				var elem = p.url.substr(p.url.indexOf('#') + 1)
 				if (document.getElementById(elem) || document.getElementsByName(elem).length > 0) {
 					elem = document.getElementById(elem) || document.getElementsByTagName(elem)[0]
 					var offset = 0
@@ -201,7 +228,7 @@ var InstantClick = function() {
 					scrollTo(0, 0)
 				}
 			}
-			history.pushState(null, null, p[pId].url)
+			history.pushState(null, null, p.url)
 		}
 		currentLocationWithoutHash = removeHash(location.href)
 		instantanize()
@@ -209,15 +236,11 @@ var InstantClick = function() {
 
 	function mouseout(e) {
 		var target = getLinkTarget(e.target)
-		var id = pId
-		if (p[id].url != target.href && p[id ^ 1].url == target.href) {
-			id ^= 1
-		}
-		if (p[id].state != 'preloading') { // User has clicked the link
+		if (p.state != 'preloading') { // User has clicked the link
 			return
 		}
-		p[id].xhr.abort()
-		p[id].state = ''
+		p.xhr.abort()
+		p.state = ''
 	}
 
 	function init(arg_useBlacklist) {
@@ -237,19 +260,15 @@ var InstantClick = function() {
 			title: document.title,
 			scrollY: scrollY
 		}
-		for (var i = 0; i < 2; i++) {
-			p[i] = {}
-			p[i].xhr = new XMLHttpRequest()
-			p[i].xhr.id = i
-			p[i].xhr.addEventListener('readystatechange', readystatechange)
-			p[i].url = false
-			p[i].body = false
-			p[i].hasBody = true
-			p[i].title = false
-			p[i].state = ''
-			p[i].timingStart = false
-			p[i].timing = false
-		}
+		p.xhr = new XMLHttpRequest()
+		p.xhr.addEventListener('readystatechange', readystatechange)
+		p.url = false
+		p.body = false
+		p.hasBody = true
+		p.title = false
+		p.state = ''
+		p.timingStart = false
+		p.timing = false
 		instantanize(true)
 
 		addEventListener('popstate', function() {
