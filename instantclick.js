@@ -211,26 +211,16 @@ var InstantClick = function(document, location) {
 		p.state = 'displayed'
 		document.body.innerHTML = p.body
 		document.title = p.title
-		if (p.url != location.href) {
-			if (p.url.indexOf('#') == -1) {
-				scrollTo(0, 0)
+		var hashIndex = p.url.indexOf('#')
+		var hashElem = hashIndex > -1 && document.getElementById(p.url.substr(hashIndex + 1))
+		var offset = 0
+		if (p.url != location.href && hashElem) {
+			for (; hashElem.offsetParent; hashElem = hashElem.offsetParent) {
+				offset += hashElem.offsetTop
 			}
-			else {
-				var elem = p.url.substr(p.url.indexOf('#') + 1)
-				if (document.getElementById(elem) || document.getElementsByName(elem).length > 0) {
-					elem = document.getElementById(elem) || document.getElementsByTagName(elem)[0]
-					var offset = 0
-					for (; elem.offsetParent; elem = elem.offsetParent) {
-						offset += elem.offsetTop
-					}
-					scrollTo(0, offset)
-				}
-				else {
-					scrollTo(0, 0)
-				}
-			}
-			history.pushState(null, null, p.url)
 		}
+		scrollTo(0, offset)
+		history.pushState(null, null, p.url)
 		currentLocationWithoutHash = removeHash(location.href)
 		instantanize()
 	}
