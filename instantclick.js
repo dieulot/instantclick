@@ -35,6 +35,12 @@ var InstantClick = function(document, location) {
 		}
 	}
 
+	function applyBody(body) {
+		var doc = document.implementation.createHTMLDocument('')
+		doc.documentElement.innerHTML = body
+		document.body = doc.body
+	}
+
 	function debug() {
 		return {
 			currentLocationWithoutHash: currentLocationWithoutHash,
@@ -121,7 +127,7 @@ var InstantClick = function(document, location) {
 
 		var bodyIndex = text.indexOf('<body')
 		if (bodyIndex > -1) {
-			p.body = text.substr(text.indexOf('>', bodyIndex) + 1)
+			p.body = text.substr(bodyIndex)
 			var closingIndex = p.body.indexOf('</body')
 			if (closingIndex > -1) {
 				p.body = p.body.substr(0, closingIndex)
@@ -137,12 +143,6 @@ var InstantClick = function(document, location) {
 		else {
 			p.hasBody = false
 		}
-		/* We're only getting the body element's innerHTML, not the
-		   element's attributes such as class etc.
-		   From a superficial look into it, it seems Turbolinks DOMify
-		   the body element so it's able to also get classes etc., and
-		   doesn't require an explicit body tag in the html. This
-		   should be explored later. */
 
 		if (p.isWaitingForCompletion) {
 			display(p.url)
@@ -203,7 +203,7 @@ var InstantClick = function(document, location) {
 		pHistory[currentLocationWithoutHash].scrollY = scrollY
 		p.isPreloading = false
 		p.isWaitingForCompletion = false
-		document.body.innerHTML = p.body
+		applyBody(p.body)
 		document.title = p.title
 		var hashIndex = p.url.indexOf('#')
 		var hashElem = hashIndex > -1 && document.getElementById(p.url.substr(hashIndex + 1))
@@ -239,7 +239,7 @@ var InstantClick = function(document, location) {
 		useBlacklist = !!arg_useBlacklist
 		currentLocationWithoutHash = removeHash(location.href)
 		pHistory[currentLocationWithoutHash] = {
-			body: document.body.innerHTML,
+			body: document.body.outerHTML,
 			title: document.title,
 			scrollY: scrollY
 		}
@@ -267,7 +267,7 @@ var InstantClick = function(document, location) {
 			pHistory[currentLocationWithoutHash].scrollY = scrollY
 
 			currentLocationWithoutHash = loc
-			document.body.innerHTML = pHistory[loc].body
+			applyBody(pHistory[loc].body)
 			scrollTo(0, pHistory[loc].scrollY)
 			document.title = pHistory[loc].title
 			instantanize()
