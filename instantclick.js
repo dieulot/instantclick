@@ -145,6 +145,7 @@ var InstantClick = function(document, location) {
 		}
 
 		if (p.isWaitingForCompletion) {
+			p.isWaitingForCompletion = false
 			display(p.url)
 		}
 	}
