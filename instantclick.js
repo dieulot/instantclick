@@ -6,9 +6,10 @@ var InstantClick = function(document, location) {
 	var currentLocationWithoutHash
 	var pHistory = {} // short for "preloadHistory"
 	var p = {} // short for "preloads"
-	var supported = 'pushState' in history
 	var useBlacklist
 	var listeners = {change: []}
+
+	////////// HELPERS //////////
 
 	function removeHash(url) {
 		var index = url.indexOf('#')
@@ -25,10 +26,6 @@ var InstantClick = function(document, location) {
 		return target
 	}
 
-	function on(type, listener) {
-		listeners[type].push(listener)
-	}
-
 	function triggerPageEvent(type) {
 		for (var i = 0; i < listeners[type].length; i++) {
 			listeners[type][i]()
@@ -41,71 +38,30 @@ var InstantClick = function(document, location) {
 		document.body = doc.body
 	}
 
-	function debug() {
-		return {
-			currentLocationWithoutHash: currentLocationWithoutHash,
-			p: p,
-			pHistory: pHistory,
-			supported: supported,
-			useBlacklist: useBlacklist
-		}
-	}
+	////////// EVENT HANDLERS //////////
 
-	function instantanize(isInitializing) {
-		var as = document.getElementsByTagName('a'), a, domain = location.protocol + '//' + location.host
-		for (var i = as.length - 1; i >= 0; i--) {
-			a = as[i]
-			if (a.target || // target="_blank" etc.
-				a.href.indexOf(domain + '/') != 0 || // another domain (or no href attribute)
-				a.href.indexOf('#') > -1 && removeHash(a.href) == currentLocationWithoutHash || // link to an anchor
-				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
-				continue
-			}
-			a.addEventListener('mouseover', queue)
-			a.addEventListener('click', click)
-		}
-		if (!isInitializing) {
-			var scripts = document.getElementsByTagName('script'), script, copy, parentNode, nextSibling
-			for (i = 0, j = scripts.length; i < j; i++) {
-				script = scripts[i]
-				if (script.hasAttribute('data-no-instant')) {
-					continue
-				}
-				copy = document.createElement('script')
-				if (script.src) {
-					copy.src = script.src
-				}
-				if (script.innerHTML) {
-					copy.innerHTML = script.innerHTML
-				}
-				parentNode = script.parentNode
-				nextSibling = script.nextSibling
-				parentNode.removeChild(script)
-				parentNode.insertBefore(copy, nextSibling)
-			}
-		}
-		triggerPageEvent('change')
-	}
-
+	// On mouseover
 	function queue(e) {
 		var a = getLinkTarget(e.target)
 		a.addEventListener('mouseout', mouseout)
 		preload(a.href)
 	}
 
-	function preload(url) {
-		if ((p.isPreloading && url == p.url) || (p.isPreloading && p.isWaitingForCompletion)) {
+	function click(e) {
+		if (e.which > 1 || e.metaKey || e.ctrlKey) { // Opening in new tab
 			return
 		}
-		p.isPreloading = true
+		e.preventDefault()
+		display(getLinkTarget(e.target).href)
+	}
+
+	function mouseout() {
+		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
+			return
+		}
+		p.xhr.abort()
+		p.isPreloading = false
 		p.isWaitingForCompletion = false
-		p.url = url
-		p.body = false
-		p.hasBody = true
-		p.timingStart = +new Date
-		p.timing = false
-		p.xhr.open('GET', url)
-		p.xhr.send()
 	}
 
 	function readystatechange(e) {
@@ -150,12 +106,57 @@ var InstantClick = function(document, location) {
 		}
 	}
 
-	function click(e) {
-		if (e.which > 1 || e.metaKey || e.ctrlKey) { // Opening in new tab
+	////////// MAIN FUNCTIONS //////////
+
+	function instantanize(isInitializing) {
+		var as = document.getElementsByTagName('a'), a, domain = location.protocol + '//' + location.host
+		for (var i = as.length - 1; i >= 0; i--) {
+			a = as[i]
+			if (a.target || // target="_blank" etc.
+				a.href.indexOf(domain + '/') != 0 || // another domain (or no href attribute)
+				a.href.indexOf('#') > -1 && removeHash(a.href) == currentLocationWithoutHash || // link to an anchor
+				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
+				continue
+			}
+			a.addEventListener('mouseover', queue)
+			a.addEventListener('click', click)
+		}
+		if (!isInitializing) {
+			var scripts = document.getElementsByTagName('script'), script, copy, parentNode, nextSibling
+			for (i = 0, j = scripts.length; i < j; i++) {
+				script = scripts[i]
+				if (script.hasAttribute('data-no-instant')) {
+					continue
+				}
+				copy = document.createElement('script')
+				if (script.src) {
+					copy.src = script.src
+				}
+				if (script.innerHTML) {
+					copy.innerHTML = script.innerHTML
+				}
+				parentNode = script.parentNode
+				nextSibling = script.nextSibling
+				parentNode.removeChild(script)
+				parentNode.insertBefore(copy, nextSibling)
+			}
+		}
+		triggerPageEvent('change')
+	}
+
+	function preload(url) {
+		if ((p.isPreloading && url == p.url) || (p.isPreloading && p.isWaitingForCompletion)) {
 			return
 		}
-		e.preventDefault()
-		display(getLinkTarget(e.target).href)
+		p.isPreloading = true
+		p.isWaitingForCompletion = false
+		p.url = url
+		p.body = false
+		p.hasBody = true
+		p.timingStart = +new Date
+		p.timing = false
+		p.xhr.open('GET', url)
+		p.xhr.send()
 	}
 
 	function display(url) {
@@ -220,14 +221,9 @@ var InstantClick = function(document, location) {
 		instantanize()
 	}
 
-	function mouseout() {
-		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
-			return
-		}
-		p.xhr.abort()
-		p.isPreloading = false
-		p.isWaitingForCompletion = false
-	}
+	////////// PUBLIC FUNCTIONS AND VARIABLE //////////
+
+	var supported = 'pushState' in history
 
 	function init(arg_useBlacklist) {
 		if (!supported) {
@@ -275,10 +271,28 @@ var InstantClick = function(document, location) {
 		})
 	}
 
+	function on(type, listener) {
+		// Add a function that will be executed with `triggerPageEvent`
+		listeners[type].push(listener)
+	}
+
+	function debug() {
+		return {
+			currentLocationWithoutHash: currentLocationWithoutHash,
+			p: p,
+			pHistory: pHistory,
+			supported: supported,
+			useBlacklist: useBlacklist
+		}
+	}
+
+	////////////////////
+
 	return {
-		init: init,
 		supported: supported,
+		init: init,
 		on: on,
 		debug: debug
 	}
+
 }(document, location);
