@@ -4,9 +4,14 @@
 
 var InstantClick = function(document, location) {
 	var currentLocationWithoutHash
+	var urlToPreload
+	var preloadTimer
+
 	var pHistory = {} // short for "preloadHistory"
 	var p = {} // short for "preloads"
+
 	var useBlacklist
+	var delayBeforePreload
 	var listeners = {change: []}
 
 	////////// HELPERS //////////
@@ -40,11 +45,17 @@ var InstantClick = function(document, location) {
 
 	////////// EVENT HANDLERS //////////
 
-	// On mouseover
-	function queue(e) {
+	function mouseover(e) {
 		var a = getLinkTarget(e.target)
 		a.addEventListener('mouseout', mouseout)
-		preload(a.href)
+
+		if (!delayBeforePreload) {
+			preload(a.href)
+		}
+		else {
+			urlToPreload = a.href
+			preloadTimer = setTimeout(preload, delayBeforePreload)
+		}
 	}
 
 	function click(e) {
@@ -56,6 +67,12 @@ var InstantClick = function(document, location) {
 	}
 
 	function mouseout() {
+		if (preloadTimer) {
+			clearTimeout(preloadTimer)
+			preloadTimer = false
+			return
+		}
+
 		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
 			return
 		}
@@ -118,7 +135,7 @@ var InstantClick = function(document, location) {
 				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
 				continue
 			}
-			a.addEventListener('mouseover', queue)
+			a.addEventListener('mouseover', mouseover)
 			a.addEventListener('click', click)
 		}
 		if (!isInitializing) {
@@ -145,11 +162,21 @@ var InstantClick = function(document, location) {
 	}
 
 	function preload(url) {
+		if (preloadTimer) {
+			clearTimeout(preloadTimer)
+			preloadTimer = false
+		}
+
+		if (!url) {
+			url = urlToPreload
+		}
+
 		if ((p.isPreloading && url == p.url) || (p.isPreloading && p.isWaitingForCompletion)) {
 			return
 		}
 		p.isPreloading = true
 		p.isWaitingForCompletion = false
+
 		p.url = url
 		p.body = false
 		p.hasBody = true
@@ -160,6 +187,23 @@ var InstantClick = function(document, location) {
 	}
 
 	function display(url) {
+		if (preloadTimer) {
+			/* Happens when there’s a delay before preloading and that delay
+			   hasn't expired (preloading didn't kick in).
+			*/
+
+			if (p.url && p.url != url) {
+				/* Happens when the user clicks on a link before preloading
+				   kicks in while another link is already preloading.
+				*/
+
+				location.href = url
+				return
+			}
+			preload(url)
+			p.isWaitingForCompletion = true
+			return
+		}
 		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
 			/* If the page isn't preloaded, it means
 			   the user has focused on a link (with his Tab
@@ -225,7 +269,7 @@ var InstantClick = function(document, location) {
 
 	var supported = 'pushState' in history
 
-	function init(arg_useBlacklist) {
+	function init() {
 		if (!supported) {
 			triggerPageEvent('change')
 			return
@@ -233,7 +277,15 @@ var InstantClick = function(document, location) {
 		if (currentLocationWithoutHash) { // Already initialized
 			return
 		}
-		useBlacklist = !!arg_useBlacklist
+		for (var i = 0; i < arguments.length; i++) {
+			var arg = arguments[i]
+			if (arg === true) {
+				useBlacklist = true
+			}
+			else if (typeof arg == 'number') {
+				delayBeforePreload = arg
+			}
+		}
 		currentLocationWithoutHash = removeHash(location.href)
 		pHistory[currentLocationWithoutHash] = {
 			body: document.body.outerHTML,
