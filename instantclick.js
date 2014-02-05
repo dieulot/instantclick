@@ -85,12 +85,13 @@ var InstantClick = function(document, location) {
 		if (p.xhr.readyState < 4) {
 			return
 		}
+		if (p.xhr.status == 0) { // Aborted
+			return
+		}
+
+		p.timing.ready = +new Date - p.timing.start
 
 		var text = p.xhr.responseText
-
-		p.timing = +new Date - p.timingStart
-		// Note: For debugging (`InstantClick.debug`), we know the page
-		// has been preloaded if `p.timing` isn't false.
 
 		var titleIndex = text.indexOf('<title')
 		if (titleIndex > -1) {
@@ -162,6 +163,26 @@ var InstantClick = function(document, location) {
 	}
 
 	function preload(url) {
+		if ('display' in p.timing && +new Date - (p.timing.start + p.timing.display) < 100) {
+			/* After a page is displayed, if the user's cursor happens to be above a link
+			   a mouseover event will be in most browsers triggered automatically, and in
+			   other browsers it will be triggered when the user moves his mouse by 1px.
+
+			   Here are the behavior I noticed, all on Windows:
+			   - Safari 5.1: auto-triggers after 0 ms
+			   - IE 11: auto-triggers after 30-80 ms (looks like it depends on page's size)
+			   - Firefox: auto-triggers after 10 ms
+			   - Opera 18: auto-triggers after 10 ms
+
+			   - Chrome: triggers when cursor moved
+			   - Opera 12.16: triggers when cursor moved
+
+			   To remedy to this, we do not start preloading if last display occured less than
+			   100 ms ago. If they happen to click on the link, they will be redirected.
+			*/
+
+			return
+		}
 		if (preloadTimer) {
 			clearTimeout(preloadTimer)
 			preloadTimer = false
@@ -180,13 +201,16 @@ var InstantClick = function(document, location) {
 		p.url = url
 		p.body = false
 		p.hasBody = true
-		p.timingStart = +new Date
-		p.timing = false
+		p.timing = {}
+		p.timing.start = +new Date
 		p.xhr.open('GET', url)
 		p.xhr.send()
 	}
 
 	function display(url) {
+		if (!('display' in p.timing)) {
+			p.timing.display = +new Date - p.timing.start
+		}
 		if (preloadTimer) {
 			/* Happens when there’s a delay before preloading and that delay
 			   hasn't expired (preloading didn't kick in).
@@ -205,13 +229,16 @@ var InstantClick = function(document, location) {
 			return
 		}
 		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
-			/* If the page isn't preloaded, it means
+			/* If the page isn't preloaded, it likely means
 			   the user has focused on a link (with his Tab
 			   key) and then pressed Return, which triggered a click.
 			   Because very few people do this, it isn't worth handling this
 			   case and preloading on focus (also, focussing on a link
 			   doesn't mean it's likely that you'll "click" on it), so we just
 			   redirect them when they "click".
+			   It could also mean the user hovered over a link less than 100 ms
+			   after a page display, thus we didn't start the preload (see
+			   comments in `preload()` for the rationale behind this.)
 
 			   If the page is waiting for completion, the user clicked twice
 			   while the page was preloading.
@@ -300,8 +327,7 @@ var InstantClick = function(document, location) {
 		p.title = false
 		p.isPreloading = false
 		p.isWaitingForCompletion = false
-		p.timingStart = false
-		p.timing = false
+		p.timing = {}
 		instantanize(true)
 
 		addEventListener('popstate', function() {
