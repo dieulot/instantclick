@@ -11,6 +11,7 @@ var InstantClick = function(document, location) {
 	var p = {} // short for "preloads"
 
 	var useBlacklist
+	var preloadOnMousedown
 	var delayBeforePreload
 	var listeners = {change: []}
 
@@ -44,6 +45,10 @@ var InstantClick = function(document, location) {
 	}
 
 	////////// EVENT HANDLERS //////////
+
+	function mousedown(e) {
+		preload(getLinkTarget(e.target).href)
+	}
 
 	function mouseover(e) {
 		var a = getLinkTarget(e.target)
@@ -136,7 +141,12 @@ var InstantClick = function(document, location) {
 				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
 				continue
 			}
-			a.addEventListener('mouseover', mouseover)
+			if (preloadOnMousedown) {
+				a.addEventListener('mousedown', mousedown)
+			}
+			else {
+				a.addEventListener('mouseover', mouseover)
+			}
 			a.addEventListener('click', click)
 		}
 		if (!isInitializing) {
@@ -163,7 +173,7 @@ var InstantClick = function(document, location) {
 	}
 
 	function preload(url) {
-		if ('display' in p.timing && +new Date - (p.timing.start + p.timing.display) < 100) {
+		if (!preloadOnMousedown && 'display' in p.timing && +new Date - (p.timing.start + p.timing.display) < 100) {
 			/* After a page is displayed, if the user's cursor happens to be above a link
 			   a mouseover event will be in most browsers triggered automatically, and in
 			   other browsers it will be triggered when the user moves his mouse by 1px.
@@ -308,6 +318,9 @@ var InstantClick = function(document, location) {
 			var arg = arguments[i]
 			if (arg === true) {
 				useBlacklist = true
+			}
+			else if (arg == 'mousedown') {
+				preloadOnMousedown = true
 			}
 			else if (typeof arg == 'number') {
 				delayBeforePreload = arg
