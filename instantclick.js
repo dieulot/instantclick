@@ -136,6 +136,7 @@ var InstantClick = function(document, location) {
 		for (var i = as.length - 1; i >= 0; i--) {
 			a = as[i]
 			if (a.target || // target="_blank" etc.
+				a.hasAttribute('download') ||
 				a.href.indexOf(domain + '/') != 0 || // another domain (or no href attribute)
 				a.href.indexOf('#') > -1 && removeHash(a.href) == currentLocationWithoutHash || // link to an anchor
 				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
