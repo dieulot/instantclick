@@ -1,7 +1,4 @@
-// InstantClick 1.1
-// (C) 2014 Alexandre Dieulot
-// http://instantclick.io/license.html
-
+/* InstantClick 2.0 | (C) 2014 Alexandre Dieulot | http://instantclick.io/license.html */
 var InstantClick = function(document, location) {
 	var currentLocationWithoutHash
 	var urlToPreload
