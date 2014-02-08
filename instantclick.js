@@ -41,7 +41,7 @@ var InstantClick = function(document, location) {
 	function applyBody(body) {
 		var doc = document.implementation.createHTMLDocument('')
 		doc.documentElement.innerHTML = body
-		document.body = doc.body
+		document.documentElement.replaceChild(doc.body, document.body)
 	}
 
 	////////// EVENT HANDLERS //////////
