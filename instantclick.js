@@ -284,7 +284,7 @@ var InstantClick = function(document, location) {
 			p.isWaitingForCompletion = true
 			return
 		}
-		pHistory[currentLocationWithoutHash].scrollY = scrollY
+		pHistory[currentLocationWithoutHash].scrollY = pageYOffset
 		p.isPreloading = false
 		p.isWaitingForCompletion = false
 		applyBody(p.body)
@@ -331,7 +331,7 @@ var InstantClick = function(document, location) {
 		pHistory[currentLocationWithoutHash] = {
 			body: document.body.outerHTML,
 			title: document.title,
-			scrollY: scrollY
+			scrollY: pageYOffset
 		}
 		p.xhr = new XMLHttpRequest()
 		p.xhr.addEventListener('readystatechange', readystatechange)
@@ -353,7 +353,7 @@ var InstantClick = function(document, location) {
 				location.href = location.href // Reloads the page and makes use of cache for assets, unlike location.reload()
 				return
 			}
-			pHistory[currentLocationWithoutHash].scrollY = scrollY
+			pHistory[currentLocationWithoutHash].scrollY = pageYOffset
 
 			currentLocationWithoutHash = loc
 			applyBody(pHistory[loc].body)
