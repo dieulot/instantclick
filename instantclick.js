@@ -30,7 +30,7 @@ var InstantClick = function(document, location) {
 	}
 
 	function triggerPageEvent(type) {
-		for (var i = 0; i < listeners[type].length; i++) {
+		for (var i = 0, j = listeners[type].length; i < j; i++) {
 			listeners[type][i]()
 		}
 	}
@@ -315,7 +315,7 @@ var InstantClick = function(document, location) {
 		if (currentLocationWithoutHash) { // Already initialized
 			return
 		}
-		for (var i = 0; i < arguments.length; i++) {
+		for (var i = 0, j = arguments.length; i < j; i++) {
 			var arg = arguments[i]
 			if (arg === true) {
 				useBlacklist = false
