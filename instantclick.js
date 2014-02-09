@@ -35,10 +35,14 @@ var InstantClick = function(document, location) {
 		}
 	}
 
-	function applyBody(body) {
+	function changePage(title, body) {
 		var doc = document.implementation.createHTMLDocument('')
 		doc.documentElement.innerHTML = body
 		document.documentElement.replaceChild(doc.body, document.body)
+
+		var elem = document.createElement('i')
+		elem.innerHTML = title
+		document.title = elem.textContent
 	}
 
 	////////// EVENT HANDLERS //////////
@@ -284,8 +288,7 @@ var InstantClick = function(document, location) {
 		pHistory[currentLocationWithoutHash].scrollY = pageYOffset
 		p.isPreloading = false
 		p.isWaitingForCompletion = false
-		applyBody(p.body)
-		document.title = p.title
+		changePage(p.title, p.body)
 		var hashIndex = p.url.indexOf('#')
 		var hashElem = hashIndex > -1 && document.getElementById(p.url.substr(hashIndex + 1))
 		var offset = 0
@@ -353,9 +356,8 @@ var InstantClick = function(document, location) {
 			pHistory[currentLocationWithoutHash].scrollY = pageYOffset
 
 			currentLocationWithoutHash = loc
-			applyBody(pHistory[loc].body)
+			changePage(pHistory[loc].title, pHistory[loc].body)
 			scrollTo(0, pHistory[loc].scrollY)
-			document.title = pHistory[loc].title
 			instantanize()
 		})
 	}
