@@ -7,7 +7,7 @@ var InstantClick = function(document, location) {
 	var pHistory = {} // short for "preloadHistory"
 	var p = {} // short for "preloads"
 
-	var useBlacklist = true
+	var useWhitelist
 	var preloadOnMousedown
 	var delayBeforePreload
 	var listeners = {change: []}
@@ -166,7 +166,7 @@ var InstantClick = function(document, location) {
 				a.hasAttribute('download') ||
 				a.href.indexOf(domain + '/') != 0 || // another domain (or no href attribute)
 				a.href.indexOf('#') > -1 && removeHash(a.href) == currentLocationWithoutHash || // link to an anchor
-				(useBlacklist ? a.hasAttribute('data-no-instant') : !a.hasAttribute('data-instant'))) {
+				(useWhitelist ? !a.hasAttribute('data-instant') : a.hasAttribute('data-no-instant'))) {
 				continue
 			}
 			if (preloadOnMousedown) {
@@ -331,7 +331,7 @@ var InstantClick = function(document, location) {
 		for (var i = 0; i < arguments.length; i++) {
 			var arg = arguments[i]
 			if (arg === true) {
-				useBlacklist = false
+				useWhitelist = true
 			}
 			else if (arg == 'mousedown') {
 				preloadOnMousedown = true
@@ -387,7 +387,7 @@ var InstantClick = function(document, location) {
 			p: p,
 			pHistory: pHistory,
 			supported: supported,
-			useBlacklist: useBlacklist
+			useWhitelist: useWhitelist
 		}
 	}
 
