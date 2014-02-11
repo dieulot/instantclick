@@ -1,22 +1,29 @@
 /* InstantClick 2.1 | (C) 2014 Alexandre Dieulot | http://instantclick.io/license.html */
 var InstantClick = function(document, location) {
+	// Internal variables
 	var currentLocationWithoutHash
 	var urlToPreload
 	var preloadTimer
 
+	// Preloading-related variables
 	var pHistory = {} // short for "preloadHistory"
 	var p = {} // short for "preloads"
 
+	// Variables defined by public functions
 	var useWhitelist
 	var preloadOnMousedown
 	var delayBeforePreload
-	var listeners = {change: []}
+	var listeners = {
+		change: []
+	}
+
 
 	////////// HELPERS //////////
 
+
 	function removeHash(url) {
 		var index = url.indexOf('#')
-		if (index == -1) {
+		if (index < 0) {
 			return url
 		}
 		return url.substr(0, index)
@@ -29,9 +36,9 @@ var InstantClick = function(document, location) {
 		return target
 	}
 
-	function triggerPageEvent(type) {
-		for (var i = 0; i < listeners[type].length; i++) {
-			listeners[type][i]()
+	function triggerPageEvent(eventType) {
+		for (var i = 0; i < listeners[eventType].length; i++) {
+			listeners[eventType][i]()
 		}
 	}
 
@@ -53,7 +60,7 @@ var InstantClick = function(document, location) {
 			var hashIndex = newUrl.indexOf('#')
 			var hashElem = hashIndex > -1 && document.getElementById(newUrl.substr(hashIndex + 1))
 			var offset = 0
-			if (newUrl != location.href && hashElem) {
+			if (hashElem) {
 				for (; hashElem.offsetParent; hashElem = hashElem.offsetParent) {
 					offset += hashElem.offsetTop
 				}
@@ -71,7 +78,14 @@ var InstantClick = function(document, location) {
 		triggerPageEvent('change')
 	}
 
+	function setPreloadingAsHalted() {
+		p.isPreloading = false
+		p.isWaitingForCompletion = false
+	}
+
+
 	////////// EVENT HANDLERS //////////
+
 
 	function mousedown(e) {
 		preload(getLinkTarget(e.target).href)
@@ -105,19 +119,19 @@ var InstantClick = function(document, location) {
 			return
 		}
 
-		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
+		if (!p.isPreloading || p.isWaitingForCompletion) {
 			return
 		}
 		p.xhr.abort()
-		p.isPreloading = false
-		p.isWaitingForCompletion = false
+		setPreloadingAsHalted()
 	}
 
-	function readystatechange(e) {
+	function readystatechange() {
 		if (p.xhr.readyState < 4) {
 			return
 		}
-		if (p.xhr.status == 0) { // Aborted
+		if (p.xhr.status == 0) {
+			/* Request aborted */
 			return
 		}
 
@@ -156,7 +170,9 @@ var InstantClick = function(document, location) {
 		}
 	}
 
+
 	////////// MAIN FUNCTIONS //////////
+
 
 	function instantanize(isInitializing) {
 		var as = document.getElementsByTagName('a'), a, domain = location.protocol + '//' + location.host
@@ -229,7 +245,7 @@ var InstantClick = function(document, location) {
 			url = urlToPreload
 		}
 
-		if ((p.isPreloading && url == p.url) || (p.isPreloading && p.isWaitingForCompletion)) {
+		if (p.isPreloading && (url == p.url || p.isWaitingForCompletion)) {
 			return
 		}
 		p.isPreloading = true
@@ -265,7 +281,7 @@ var InstantClick = function(document, location) {
 			p.isWaitingForCompletion = true
 			return
 		}
-		if (!p.isPreloading || (p.isPreloading && p.isWaitingForCompletion)) {
+		if (!p.isPreloading || p.isWaitingForCompletion) {
 			/* If the page isn't preloaded, it likely means
 			   the user has focused on a link (with his Tab
 			   key) and then pressed Return, which triggered a click.
@@ -311,24 +327,26 @@ var InstantClick = function(document, location) {
 			return
 		}
 		pHistory[currentLocationWithoutHash].scrollY = pageYOffset
-		p.isPreloading = false
-		p.isWaitingForCompletion = false
+		setPreloadingAsHalted()
 		changePage(p.title, p.body, p.url)
 	}
 
-	////////// PUBLIC FUNCTIONS AND VARIABLE //////////
+
+	////////// PUBLIC VARIABLE AND FUNCTIONS //////////
+
 
 	var supported = 'pushState' in history
 
 	function init() {
+		if (currentLocationWithoutHash) {
+			/* Already initialized */
+			return
+		}
 		if (!supported) {
 			triggerPageEvent('change')
 			return
 		}
-		if (currentLocationWithoutHash) { // Already initialized
-			return
-		}
-		for (var i = 0; i < arguments.length; i++) {
+		for (var i = arguments.length - 1; i >= 0; i--) {
 			var arg = arguments[i]
 			if (arg === true) {
 				useWhitelist = true
@@ -352,8 +370,7 @@ var InstantClick = function(document, location) {
 		p.body = false
 		p.hasBody = true
 		p.title = false
-		p.isPreloading = false
-		p.isWaitingForCompletion = false
+		setPreloadingAsHalted()
 		p.timing = {}
 
 		instantanize(true)
@@ -370,28 +387,27 @@ var InstantClick = function(document, location) {
 				return
 			}
 			pHistory[currentLocationWithoutHash].scrollY = pageYOffset
-
 			currentLocationWithoutHash = loc
 			changePage(pHistory[loc].title, pHistory[loc].body, false, pHistory[loc].scrollY)
 		})
 	}
 
-	function on(type, listener) {
-		// Add a function that will be executed with `triggerPageEvent`
-		listeners[type].push(listener)
+	function on(eventType, callback) {
+		/* Add a callback that will be executed with `triggerPageEvent` */
+		listeners[eventType].push(callback)
 	}
 
 	function debug() {
 		return {
 			currentLocationWithoutHash: currentLocationWithoutHash,
 			p: p,
-			pHistory: pHistory,
-			supported: supported,
-			useWhitelist: useWhitelist
+			pHistory: pHistory
 		}
 	}
 
+
 	////////////////////
+
 
 	return {
 		supported: supported,
