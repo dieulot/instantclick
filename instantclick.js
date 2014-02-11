@@ -237,7 +237,7 @@ var InstantClick = function(document, location) {
 			   - Chrome: triggers when cursor moved
 			   - Opera 12.16: triggers when cursor moved
 
-			   To remedy to this, we do not start preloading if last display occured less than
+			   To remedy to this, we do not start preloading if last display occurred less than
 			   100 ms ago. If they happen to click on the link, they will be redirected.
 			*/
 
@@ -294,7 +294,7 @@ var InstantClick = function(document, location) {
 			   the user has focused on a link (with his Tab
 			   key) and then pressed Return, which triggered a click.
 			   Because very few people do this, it isn't worth handling this
-			   case and preloading on focus (also, focussing on a link
+			   case and preloading on focus (also, focusing on a link
 			   doesn't mean it's likely that you'll "click" on it), so we just
 			   redirect them when they "click".
 			   It could also mean the user hovered over a link less than 100 ms
