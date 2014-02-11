@@ -35,14 +35,40 @@ var InstantClick = function(document, location) {
 		}
 	}
 
-	function changePage(title, body) {
+	function changePage(title, body, newUrl, scrollY_) {
 		var doc = document.implementation.createHTMLDocument('')
 		doc.documentElement.innerHTML = body
 		document.documentElement.replaceChild(doc.body, document.body)
+		/* We cannot just use `document.body = doc.body` as it causes Safari 5.1, 6.0,
+		   and Mobile 7.0 to execute script tags directly.
+		*/
 
 		var elem = document.createElement('i')
 		elem.innerHTML = title
 		document.title = elem.textContent
+
+		if (newUrl) {
+			history.pushState(null, null, newUrl)
+
+			var hashIndex = newUrl.indexOf('#')
+			var hashElem = hashIndex > -1 && document.getElementById(newUrl.substr(hashIndex + 1))
+			var offset = 0
+			if (newUrl != location.href && hashElem) {
+				for (; hashElem.offsetParent; hashElem = hashElem.offsetParent) {
+					offset += hashElem.offsetTop
+				}
+			}
+			scrollTo(0, offset)
+
+			currentLocationWithoutHash = removeHash(newUrl)
+		}
+		else {
+			scrollTo(0, scrollY_)
+		}
+
+		instantanize()
+
+		triggerPageEvent('change')
 	}
 
 	////////// EVENT HANDLERS //////////
@@ -171,7 +197,6 @@ var InstantClick = function(document, location) {
 				parentNode.insertBefore(copy, nextSibling)
 			}
 		}
-		triggerPageEvent('change')
 	}
 
 	function preload(url) {
@@ -288,19 +313,7 @@ var InstantClick = function(document, location) {
 		pHistory[currentLocationWithoutHash].scrollY = pageYOffset
 		p.isPreloading = false
 		p.isWaitingForCompletion = false
-		changePage(p.title, p.body)
-		var hashIndex = p.url.indexOf('#')
-		var hashElem = hashIndex > -1 && document.getElementById(p.url.substr(hashIndex + 1))
-		var offset = 0
-		if (p.url != location.href && hashElem) {
-			for (; hashElem.offsetParent; hashElem = hashElem.offsetParent) {
-				offset += hashElem.offsetTop
-			}
-		}
-		scrollTo(0, offset)
-		history.pushState(null, null, p.url)
-		currentLocationWithoutHash = removeHash(location.href)
-		instantanize()
+		changePage(p.title, p.body, p.url)
 	}
 
 	////////// PUBLIC FUNCTIONS AND VARIABLE //////////
@@ -342,7 +355,10 @@ var InstantClick = function(document, location) {
 		p.isPreloading = false
 		p.isWaitingForCompletion = false
 		p.timing = {}
+
 		instantanize(true)
+
+		triggerPageEvent('change')
 
 		addEventListener('popstate', function() {
 			var loc = removeHash(location.href)
@@ -356,9 +372,7 @@ var InstantClick = function(document, location) {
 			pHistory[currentLocationWithoutHash].scrollY = pageYOffset
 
 			currentLocationWithoutHash = loc
-			changePage(pHistory[loc].title, pHistory[loc].body)
-			scrollTo(0, pHistory[loc].scrollY)
-			instantanize()
+			changePage(pHistory[loc].title, pHistory[loc].body, false, pHistory[loc].scrollY)
 		})
 	}
 
