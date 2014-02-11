@@ -397,6 +397,12 @@ var InstantClick = function(document, location) {
 		listeners[eventType].push(callback)
 	}
 
+	/* The debug function isn't included by default to reduce file size.
+	   To enable it, add a slash at the beginning of the comment englobing
+	   the debug function, and uncomment "debug: debug," in the return
+	   statement below the function. */
+
+	/*
 	function debug() {
 		return {
 			currentLocationWithoutHash: currentLocationWithoutHash,
@@ -404,16 +410,17 @@ var InstantClick = function(document, location) {
 			pHistory: pHistory
 		}
 	}
+	//*/
 
 
 	////////////////////
 
 
 	return {
+		// debug: debug,
 		supported: supported,
 		init: init,
-		on: on,
-		debug: debug
+		on: on
 	}
 
 }(document, location);
