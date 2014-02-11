@@ -1,19 +1,26 @@
 /* InstantClick 2.1 | (C) 2014 Alexandre Dieulot | http://instantclick.io/license.html */
 var InstantClick = function(document, location) {
 	// Internal variables
-	var currentLocationWithoutHash
-	var urlToPreload
-	var preloadTimer
+	var $currentLocationWithoutHash
+	var $urlToPreload
+	var $preloadTimer
 
 	// Preloading-related variables
-	var pHistory = {} // short for "preloadHistory"
-	var p = {} // short for "preloads"
+	var $history = {}
+	var $xhr
+	var $url = false
+	var $title = false
+	var $hasBody = true
+	var $body = false
+	var $timing = {}
+	var $isPreloading = false
+	var $isWaitingForCompletion = false
 
 	// Variables defined by public functions
-	var useWhitelist
-	var preloadOnMousedown
-	var delayBeforePreload
-	var listeners = {
+	var $useWhitelist
+	var $preloadOnMousedown
+	var $delayBeforePreload
+	var $eventsCallbacks = {
 		change: []
 	}
 
@@ -37,8 +44,8 @@ var InstantClick = function(document, location) {
 	}
 
 	function triggerPageEvent(eventType) {
-		for (var i = 0; i < listeners[eventType].length; i++) {
-			listeners[eventType][i]()
+		for (var i = 0; i < $eventsCallbacks[eventType].length; i++) {
+			$eventsCallbacks[eventType][i]()
 		}
 	}
 
@@ -67,7 +74,7 @@ var InstantClick = function(document, location) {
 			}
 			scrollTo(0, offset)
 
-			currentLocationWithoutHash = removeHash(newUrl)
+			$currentLocationWithoutHash = removeHash(newUrl)
 		}
 		else {
 			scrollTo(0, scrollY_)
@@ -79,8 +86,8 @@ var InstantClick = function(document, location) {
 	}
 
 	function setPreloadingAsHalted() {
-		p.isPreloading = false
-		p.isWaitingForCompletion = false
+		$isPreloading = false
+		$isWaitingForCompletion = false
 	}
 
 
@@ -95,12 +102,12 @@ var InstantClick = function(document, location) {
 		var a = getLinkTarget(e.target)
 		a.addEventListener('mouseout', mouseout)
 
-		if (!delayBeforePreload) {
+		if (!$delayBeforePreload) {
 			preload(a.href)
 		}
 		else {
-			urlToPreload = a.href
-			preloadTimer = setTimeout(preload, delayBeforePreload)
+			$urlToPreload = a.href
+			$preloadTimer = setTimeout(preload, $delayBeforePreload)
 		}
 	}
 
@@ -113,60 +120,60 @@ var InstantClick = function(document, location) {
 	}
 
 	function mouseout() {
-		if (preloadTimer) {
-			clearTimeout(preloadTimer)
-			preloadTimer = false
+		if ($preloadTimer) {
+			clearTimeout($preloadTimer)
+			$preloadTimer = false
 			return
 		}
 
-		if (!p.isPreloading || p.isWaitingForCompletion) {
+		if (!$isPreloading || $isWaitingForCompletion) {
 			return
 		}
-		p.xhr.abort()
+		$xhr.abort()
 		setPreloadingAsHalted()
 	}
 
 	function readystatechange() {
-		if (p.xhr.readyState < 4) {
+		if ($xhr.readyState < 4) {
 			return
 		}
-		if (p.xhr.status == 0) {
+		if ($xhr.status == 0) {
 			/* Request aborted */
 			return
 		}
 
-		p.timing.ready = +new Date - p.timing.start
+		$timing.ready = +new Date - $timing.start
 
-		var text = p.xhr.responseText
+		var text = $xhr.responseText
 
 		var titleIndex = text.indexOf('<title')
 		if (titleIndex > -1) {
-			p.title = text.substr(text.indexOf('>', titleIndex) + 1)
-			p.title = p.title.substr(0, p.title.indexOf('</title'))
+			$title = text.substr(text.indexOf('>', titleIndex) + 1)
+			$title = $title.substr(0, $title.indexOf('</title'))
 		}
 
 		var bodyIndex = text.indexOf('<body')
 		if (bodyIndex > -1) {
-			p.body = text.substr(bodyIndex)
-			var closingIndex = p.body.indexOf('</body')
+			$body = text.substr(bodyIndex)
+			var closingIndex = $body.indexOf('</body')
 			if (closingIndex > -1) {
-				p.body = p.body.substr(0, closingIndex)
+				$body = $body.substr(0, closingIndex)
 			}
 
-			var urlWithoutHash = removeHash(p.url)
-			pHistory[urlWithoutHash] = {
-				body: p.body,
-				title: p.title,
-				scrollY: urlWithoutHash in pHistory ? pHistory[urlWithoutHash].scrollY : 0
+			var urlWithoutHash = removeHash($url)
+			$history[urlWithoutHash] = {
+				body: $body,
+				title: $title,
+				scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
 			}
 		}
 		else {
-			p.hasBody = false
+			$hasBody = false
 		}
 
-		if (p.isWaitingForCompletion) {
-			p.isWaitingForCompletion = false
-			display(p.url)
+		if ($isWaitingForCompletion) {
+			$isWaitingForCompletion = false
+			display($url)
 		}
 	}
 
@@ -181,11 +188,11 @@ var InstantClick = function(document, location) {
 			if (a.target || // target="_blank" etc.
 				a.hasAttribute('download') ||
 				a.href.indexOf(domain + '/') != 0 || // another domain (or no href attribute)
-				a.href.indexOf('#') > -1 && removeHash(a.href) == currentLocationWithoutHash || // link to an anchor
-				(useWhitelist ? !a.hasAttribute('data-instant') : a.hasAttribute('data-no-instant'))) {
+				a.href.indexOf('#') > -1 && removeHash(a.href) == $currentLocationWithoutHash || // link to an anchor
+				($useWhitelist ? !a.hasAttribute('data-instant') : a.hasAttribute('data-no-instant'))) {
 				continue
 			}
-			if (preloadOnMousedown) {
+			if ($preloadOnMousedown) {
 				a.addEventListener('mousedown', mousedown)
 			}
 			else {
@@ -216,7 +223,7 @@ var InstantClick = function(document, location) {
 	}
 
 	function preload(url) {
-		if (!preloadOnMousedown && 'display' in p.timing && +new Date - (p.timing.start + p.timing.display) < 100) {
+		if (!$preloadOnMousedown && 'display' in $timing && +new Date - ($timing.start + $timing.display) < 100) {
 			/* After a page is displayed, if the user's cursor happens to be above a link
 			   a mouseover event will be in most browsers triggered automatically, and in
 			   other browsers it will be triggered when the user moves his mouse by 1px.
@@ -236,40 +243,41 @@ var InstantClick = function(document, location) {
 
 			return
 		}
-		if (preloadTimer) {
-			clearTimeout(preloadTimer)
-			preloadTimer = false
+		if ($preloadTimer) {
+			$clearTimeout($preloadTimer)
+			$preloadTimer = false
 		}
 
 		if (!url) {
-			url = urlToPreload
+			url = $urlToPreload
 		}
 
-		if (p.isPreloading && (url == p.url || p.isWaitingForCompletion)) {
+		if ($isPreloading && (url == $url || $isWaitingForCompletion)) {
 			return
 		}
-		p.isPreloading = true
-		p.isWaitingForCompletion = false
+		$isPreloading = true
+		$isWaitingForCompletion = false
 
-		p.url = url
-		p.body = false
-		p.hasBody = true
-		p.timing = {}
-		p.timing.start = +new Date
-		p.xhr.open('GET', url)
-		p.xhr.send()
+		$url = url
+		$body = false
+		$hasBody = true
+		$timing = {
+			start: +new Date
+		}
+		$xhr.open('GET', url)
+		$xhr.send()
 	}
 
 	function display(url) {
-		if (!('display' in p.timing)) {
-			p.timing.display = +new Date - p.timing.start
+		if (!('display' in $timing)) {
+			$timing.display = +new Date - $timing.start
 		}
-		if (preloadTimer) {
+		if ($preloadTimer) {
 			/* Happens when there’s a delay before preloading and that delay
 			   hasn't expired (preloading didn't kick in).
 			*/
 
-			if (p.url && p.url != url) {
+			if ($url && $url != url) {
 				/* Happens when the user clicks on a link before preloading
 				   kicks in while another link is already preloading.
 				*/
@@ -278,10 +286,10 @@ var InstantClick = function(document, location) {
 				return
 			}
 			preload(url)
-			p.isWaitingForCompletion = true
+			$isWaitingForCompletion = true
 			return
 		}
-		if (!p.isPreloading || p.isWaitingForCompletion) {
+		if (!$isPreloading || $isWaitingForCompletion) {
 			/* If the page isn't preloaded, it likely means
 			   the user has focused on a link (with his Tab
 			   key) and then pressed Return, which triggered a click.
@@ -318,17 +326,17 @@ var InstantClick = function(document, location) {
 			location.href = url
 			return
 		}
-		if (!p.hasBody) {
-			location.href = p.url
+		if (!$hasBody) {
+			location.href = $url
 			return
 		}
-		if (!p.body) {
-			p.isWaitingForCompletion = true
+		if (!$body) {
+			$isWaitingForCompletion = true
 			return
 		}
-		pHistory[currentLocationWithoutHash].scrollY = pageYOffset
+		$history[$currentLocationWithoutHash].scrollY = pageYOffset
 		setPreloadingAsHalted()
-		changePage(p.title, p.body, p.url)
+		changePage($title, $body, $url)
 	}
 
 
@@ -338,7 +346,7 @@ var InstantClick = function(document, location) {
 	var supported = 'pushState' in history
 
 	function init() {
-		if (currentLocationWithoutHash) {
+		if ($currentLocationWithoutHash) {
 			/* Already initialized */
 			return
 		}
@@ -349,29 +357,23 @@ var InstantClick = function(document, location) {
 		for (var i = arguments.length - 1; i >= 0; i--) {
 			var arg = arguments[i]
 			if (arg === true) {
-				useWhitelist = true
+				$useWhitelist = true
 			}
 			else if (arg == 'mousedown') {
-				preloadOnMousedown = true
+				$preloadOnMousedown = true
 			}
 			else if (typeof arg == 'number') {
-				delayBeforePreload = arg
+				$delayBeforePreload = arg
 			}
 		}
-		currentLocationWithoutHash = removeHash(location.href)
-		pHistory[currentLocationWithoutHash] = {
+		$currentLocationWithoutHash = removeHash(location.href)
+		$history[$currentLocationWithoutHash] = {
 			body: document.body.outerHTML,
 			title: document.title,
 			scrollY: pageYOffset
 		}
-		p.xhr = new XMLHttpRequest()
-		p.xhr.addEventListener('readystatechange', readystatechange)
-		p.url = false
-		p.body = false
-		p.hasBody = true
-		p.title = false
-		setPreloadingAsHalted()
-		p.timing = {}
+		$xhr = new XMLHttpRequest()
+		$xhr.addEventListener('readystatechange', readystatechange)
 
 		instantanize(true)
 
@@ -379,22 +381,21 @@ var InstantClick = function(document, location) {
 
 		addEventListener('popstate', function() {
 			var loc = removeHash(location.href)
-			if (loc == currentLocationWithoutHash) {
+			if (loc == $currentLocationWithoutHash) {
 				return
 			}
-			if (!(loc in pHistory)) {
+			if (!(loc in $history)) {
 				location.href = location.href // Reloads the page and makes use of cache for assets, unlike location.reload()
 				return
 			}
-			pHistory[currentLocationWithoutHash].scrollY = pageYOffset
-			currentLocationWithoutHash = loc
-			changePage(pHistory[loc].title, pHistory[loc].body, false, pHistory[loc].scrollY)
+			$history[$currentLocationWithoutHash].scrollY = pageYOffset
+			$currentLocationWithoutHash = loc
+			changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
 		})
 	}
 
 	function on(eventType, callback) {
-		/* Add a callback that will be executed with `triggerPageEvent` */
-		listeners[eventType].push(callback)
+		$eventsCallbacks[eventType].push(callback)
 	}
 
 	/* The debug function isn't included by default to reduce file size.
@@ -405,9 +406,16 @@ var InstantClick = function(document, location) {
 	/*
 	function debug() {
 		return {
-			currentLocationWithoutHash: currentLocationWithoutHash,
-			p: p,
-			pHistory: pHistory
+			currentLocationWithoutHash: $currentLocationWithoutHash,
+			history: $history,
+			xhr: $xhr,
+			url: $url,
+			title: $title,
+			hasBody: $hasBody,
+			body: $body,
+			timing: $timing,
+			isPreloading: $isPreloading,
+			isWaitingForCompletion: $isWaitingForCompletion
 		}
 	}
 	//*/
