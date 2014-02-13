@@ -15,6 +15,7 @@ var InstantClick = function(document, location) {
 	var $timing = {}
 	var $isPreloading = false
 	var $isWaitingForCompletion = false
+	var $completed = []
 
 	// Variables defined by public functions
 	var $useWhitelist
@@ -103,11 +104,11 @@ var InstantClick = function(document, location) {
 		a.addEventListener('mouseout', mouseout)
 
 		if (!$delayBeforePreload) {
-			preload(a.href)
+			preloadOnlyOnce(a.href)
 		}
 		else {
 			$urlToPreload = a.href
-			$preloadTimer = setTimeout(preload, $delayBeforePreload)
+			$preloadTimer = setTimeout(preloadOnlyOnce, $delayBeforePreload)
 		}
 	}
 
@@ -266,6 +267,7 @@ var InstantClick = function(document, location) {
 		}
 		$xhr.open('GET', url)
 		$xhr.send()
+		return true
 	}
 
 	function display(url) {
@@ -285,7 +287,7 @@ var InstantClick = function(document, location) {
 				location.href = url
 				return
 			}
-			preload(url)
+			preloadOnlyOnce(url)
 			$isWaitingForCompletion = true
 			return
 		}
@@ -337,6 +339,20 @@ var InstantClick = function(document, location) {
 		$history[$currentLocationWithoutHash].scrollY = pageYOffset
 		setPreloadingAsHalted()
 		changePage($title, $body, $url)
+	}
+
+	function preloadOnlyOnce(url) {
+		console.log($completed)
+
+		if ($completed.indexOf(url) >= 0) {
+			return
+		}
+
+		var result = preload(url)
+
+		if (result) {
+			$completed.push(url)
+		}
 	}
 
 
