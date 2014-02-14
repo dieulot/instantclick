@@ -244,7 +244,7 @@ var InstantClick = function(document, location) {
 			return
 		}
 		if ($preloadTimer) {
-			$clearTimeout($preloadTimer)
+			clearTimeout($preloadTimer)
 			$preloadTimer = false
 		}
 
