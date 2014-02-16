@@ -154,7 +154,7 @@ var InstantClick = function(document, location) {
 
 		var bodyIndex = text.indexOf('<body')
 		if (bodyIndex > -1) {
-			$body = text.substr(bodyIndex)
+			$body = text.substr(text.indexOf('>', bodyIndex) + 1)
 			var closingIndex = $body.indexOf('</body')
 			if (closingIndex > -1) {
 				$body = $body.substr(0, closingIndex)
