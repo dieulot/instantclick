@@ -1,6 +1,6 @@
 {
   "name": "instantclick",
-  "version": "2.1",
+  "version": "2.1.0",
   "main": [
     "./instantclick.js"
   ]
