@@ -1,0 +1,28 @@
+a {
+	color: midnightblue; /* because there's lots of links, default blue is too aggressive */
+}
+
+a:visited {
+	color: purple;
+}
+
+
+body {
+	font: 18px/1.4 sans-serif;
+	margin-left: 20px;
+}
+
+.selected {
+	background: #ccf;
+}
+
+#divDebug {
+	border: 1px solid grey;
+	color: #333;
+	font-size: 14px;
+	padding: .5em;
+}
+
+#divDebug hr {
+	margin: .2em 0;
+}

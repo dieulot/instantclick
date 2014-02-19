@@ -43,10 +43,12 @@ var InstantClick = function(document, location) {
 		return target
 	}
 
-	function triggerPageEvent(eventType) {
+	function triggerPageEvent(eventType, arg1) {
 		for (var i = 0; i < $eventsCallbacks[eventType].length; i++) {
-			$eventsCallbacks[eventType][i]()
+			$eventsCallbacks[eventType][i](arg1)
 		}
+
+		/* The `change` event takes one argument: (boolean) is it the initial load? */
 	}
 
 	function changePage(title, body, newUrl, scrollY_) {
@@ -82,7 +84,7 @@ var InstantClick = function(document, location) {
 
 		instantanize()
 
-		triggerPageEvent('change')
+		triggerPageEvent('change', false)
 	}
 
 	function setPreloadingAsHalted() {
@@ -351,7 +353,7 @@ var InstantClick = function(document, location) {
 			return
 		}
 		if (!supported) {
-			triggerPageEvent('change')
+			triggerPageEvent('change', true)
 			return
 		}
 		for (var i = arguments.length - 1; i >= 0; i--) {
@@ -377,7 +379,7 @@ var InstantClick = function(document, location) {
 
 		instantanize(true)
 
-		triggerPageEvent('change')
+		triggerPageEvent('change', true)
 
 		addEventListener('popstate', function() {
 			var loc = removeHash(location.href)
