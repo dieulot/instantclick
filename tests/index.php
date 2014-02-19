@@ -2,8 +2,14 @@
 $pages = array(
   'Index page' => '',
   'First test page' => '1',
-  'Second test page' => '2'
+  'Second test page' => '2',
+  'Page without title' => 'no-title',
 );
+
+$page = 'welcome';
+if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
+  $page = $_GET['page'];
+}
 
 $preload_on = 'hover';
 if (isset($_GET['on'])) {
@@ -29,7 +35,9 @@ if (isset($_GET['wait'])) {
 ?>
 <!doctype html>
 <meta charset="utf-8">
+<?php if ($page != 'no-title'): ?>
 <title><?php echo date('H : i : s') ?> . <?php printf("%03d", microtime() * 1000) ?></title>
+<?php endif ?>
 <link rel="stylesheet" href="style.css">
 <meta name="viewport" content="width=600">
 <body>
@@ -58,11 +66,11 @@ endforeach ?>
 
 <hr>
 
-<?php include (isset($_GET['page']) && in_array($_GET['page'], $pages) ? $_GET['page'] : 'welcome') . '.html' ?>
+<?php include $page . '.html' ?>
 
 <div id="divDebug"></div>
 
-<script src="../instantclick.js" data-no-instant></script>
+<script src="../instantclick.js?<?php echo $nocache ?>" data-no-instant></script>
 <script data-no-instant>
 var $debugMessages = '';
 

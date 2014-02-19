@@ -148,6 +148,7 @@ var InstantClick = function(document, location) {
 
 		var text = $xhr.responseText
 
+		$title = ''
 		var titleIndex = text.indexOf('<title')
 		if (titleIndex > -1) {
 			$title = text.substr(text.indexOf('>', titleIndex) + 1)
