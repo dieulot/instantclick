@@ -36,6 +36,7 @@ var InstantClick = function(document, location) {
 		return url.substr(0, index)
 	}
 
+  // Find the <a href="..."> Tag and assign it to 'target'
 	function getLinkTarget(target) {
 		while (target.nodeName != 'A') {
 			target = target.parentNode
