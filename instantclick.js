@@ -21,7 +21,8 @@ var InstantClick = function(document, location) {
 	var $preloadOnMousedown
 	var $delayBeforePreload
 	var $eventsCallbacks = {
-		change: []
+		change: [],
+		click: []
 	}
 
 
@@ -118,6 +119,7 @@ var InstantClick = function(document, location) {
 			return
 		}
 		e.preventDefault()
+		triggerPageEvent('click')
 		display(getLinkTarget(e.target).href)
 	}
 

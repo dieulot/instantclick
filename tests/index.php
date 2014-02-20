@@ -4,6 +4,7 @@ $pages = array(
   'First test page' => '1',
   'Second test page' => '2',
   'Page without title' => 'no-title',
+  'NProgress' => 'nprogress',
 );
 
 $page = 'welcome';
@@ -40,6 +41,13 @@ if (isset($_GET['wait'])) {
 <?php endif ?>
 <link rel="stylesheet" href="style.css">
 <meta name="viewport" content="width=600">
+
+<?php if ($page == 'nprogress'): ?>
+<link rel="stylesheet" href="vendors/nprogress/nprogress-0.1.2.css">
+<script src="vendors/jquery/jquery-2.1.0.js"></script>
+<script src="vendors/nprogress/nprogress-0.1.2.js"></script>
+<?php endif ?>
+
 <body>
 <div id="preloading-level">
   <a data-no-instant href="?<?php echo $nocache ?>" class="<?php if ($preload_on == 'hover') echo 'selected' ?>">↻ On hover</a>
@@ -49,7 +57,7 @@ if (isset($_GET['wait'])) {
 
 <hr>
 
-<?php $cols = array(100, 200, 300, 400, 500, 1000, 1500, 2000) ?>
+<?php $cols = array(100, 200, 300, 400, 500, 1000, 1500, 2000, 10000) ?>
 <table>
   <tr>
     <th>Page</th>
@@ -58,6 +66,9 @@ if (isset($_GET['wait'])) {
 <?php foreach ($pages as $name => $row): ?>
   <tr>
     <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . $append ?>"><?php echo $name ?></a>
+<?php if ($row == 'nprogress'): ?>
+        <a data-no-instant href="?page=nprogress<?php echo $append ?>">↻</a>
+<?php endif ?>
 <?php foreach ($cols as $col): ?>
     <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . '&amp;wait=' . $col . $append ?>"><small><?php echo $col ?></small></a>
 <?php endforeach;
@@ -70,9 +81,28 @@ endforeach ?>
 
 <div id="divDebug"></div>
 
+
+
 <script src="../instantclick.js?<?php echo $nocache ?>" data-no-instant></script>
+
+
+<?php if ($page == 'nprogress'): ?>
 <script data-no-instant>
-var $debugMessages = '';
+InstantClick.on('click', function() {
+  NProgress.start()
+})
+
+InstantClick.on('change', function(isInitialLoad) {
+  if (isInitialLoad) {
+    addDebugMessage('NProgress on')
+  }
+  NProgress.done()
+})
+</script>
+<?php endif ?>
+
+<script data-no-instant>
+var $debugMessages = ''
 
 function addDebugMessage(message) {
   var divDebug = document.getElementById('divDebug')
