@@ -1,8 +1,8 @@
 <?php
 $pages = array(
   'Index page' => '',
-  'First test page' => '1',
-  'Second test page' => '2',
+  'Page with anchors #1' => 'anchor1',
+  'Page with anchors #2' => 'anchor2',
   'Page without title' => 'no-title',
   'Minimal markup' => 'minimal',
   'NProgress' => 'nprogress',
@@ -12,6 +12,8 @@ $page = 'welcome';
 if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
   $page = $_GET['page'];
 }
+
+$delays = array(100, 200, 300, 400, 500, 1000, 1500, 2000, 10000);
 
 $preload_on = 'hover';
 if (isset($_GET['on'])) {
@@ -61,11 +63,10 @@ if (isset($_GET['wait'])) {
 
 <hr>
 
-<?php $cols = array(100, 200, 300, 400, 500, 1000, 1500, 2000, 10000) ?>
 <table>
   <tr>
     <th>Page</th>
-    <th colspan="<?php echo count($cols) ?>">Delays (in milliseconds)</th>
+    <th colspan="<?php echo count($delays) ?>">Delays (in milliseconds)</th>
 
 <?php foreach ($pages as $name => $row): ?>
   <tr>
@@ -73,8 +74,8 @@ if (isset($_GET['wait'])) {
 <?php if ($row == 'nprogress'): ?>
         <a data-no-instant href="?page=nprogress<?php echo $append ?>">↻</a>
 <?php endif ?>
-<?php foreach ($cols as $col): ?>
-    <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . '&amp;wait=' . $col . $append ?>"><small><?php echo $col ?></small></a>
+<?php foreach ($delays as $delay): ?>
+    <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . '&amp;wait=' . $delay . $append ?>"><small><?php echo $delay ?></small></a>
 <?php endforeach;
 endforeach ?>
 </table>

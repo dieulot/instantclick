@@ -1,30 +1,31 @@
 /* InstantClick 2.1 | (C) 2014 Alexandre Dieulot | http://instantclick.io/license.html */
+
 var InstantClick = function(document, location) {
   // Internal variables
-  var $ua = navigator.userAgent
-  var $currentLocationWithoutHash
-  var $urlToPreload
-  var $preloadTimer
+  var $ua = navigator.userAgent,
+      $currentLocationWithoutHash,
+      $urlToPreload,
+      $preloadTimer,
 
   // Preloading-related variables
-  var $history = {}
-  var $xhr
-  var $url = false
-  var $title = false
-  var $hasBody = true
-  var $body = false
-  var $timing = {}
-  var $isPreloading = false
-  var $isWaitingForCompletion = false
+      $history = {},
+      $xhr,
+      $url = false,
+      $title = false,
+      $hasBody = true,
+      $body = false,
+      $timing = {},
+      $isPreloading = false,
+      $isWaitingForCompletion = false,
 
   // Variables defined by public functions
-  var $useWhitelist
-  var $preloadOnMousedown
-  var $delayBeforePreload
-  var $eventsCallbacks = {
-    change: [],
-    click: []
-  }
+      $useWhitelist,
+      $preloadOnMousedown,
+      $delayBeforePreload,
+      $eventsCallbacks = {
+        change: [],
+        click: []
+      }
 
 
   ////////// HELPERS //////////
@@ -50,10 +51,10 @@ var InstantClick = function(document, location) {
       $eventsCallbacks[eventType][i](arg1)
     }
 
-    /* The `change` event takes one argument: (boolean) is it the initial load? */
+    /* The `change` event takes one boolean argument: "isInitialLoad" */
   }
 
-  function changePage(title, body, newUrl, scrollY_) {
+  function changePage(title, body, newUrl, scrollY) {
     var doc = document.implementation.createHTMLDocument('')
     doc.documentElement.innerHTML = body
     document.documentElement.replaceChild(doc.body, document.body)
@@ -68,12 +69,16 @@ var InstantClick = function(document, location) {
     if (newUrl) {
       history.pushState(null, null, newUrl)
 
-      var hashIndex = newUrl.indexOf('#')
-      var hashElem = hashIndex > -1 && document.getElementById(newUrl.substr(hashIndex + 1))
-      var offset = 0
+      var hashIndex = newUrl.indexOf('#'),
+          hashElem = hashIndex > -1
+                     && document.getElementById(newUrl.substr(hashIndex + 1)),
+          offset = 0
+
       if (hashElem) {
-        for (; hashElem.offsetParent; hashElem = hashElem.offsetParent) {
+        while (hashElem.offsetParent) {
           offset += hashElem.offsetTop
+
+          hashElem = hashElem.offsetParent
         }
       }
       scrollTo(0, offset)
@@ -81,7 +86,7 @@ var InstantClick = function(document, location) {
       $currentLocationWithoutHash = removeHash(newUrl)
     }
     else {
-      scrollTo(0, scrollY_)
+      scrollTo(0, scrollY)
     }
 
     instantanize()
@@ -188,14 +193,22 @@ var InstantClick = function(document, location) {
 
 
   function instantanize(isInitializing) {
-    var as = document.getElementsByTagName('a'), a, domain = location.protocol + '//' + location.host
+    var as = document.getElementsByTagName('a'),
+        a,
+        domain = location.protocol + '//' + location.host
+
     for (var i = as.length - 1; i >= 0; i--) {
       a = as[i]
-      if (a.target || // target="_blank" etc.
-        a.hasAttribute('download') ||
-        a.href.indexOf(domain + '/') != 0 || // another domain (or no href attribute)
-        a.href.indexOf('#') > -1 && removeHash(a.href) == $currentLocationWithoutHash || // link to an anchor
-        ($useWhitelist ? !a.hasAttribute('data-instant') : a.hasAttribute('data-no-instant'))) {
+      if (a.target // target="_blank" etc.
+          || a.hasAttribute('download')
+          || a.href.indexOf(domain + '/') != 0 // Another domain, or no href
+                                               // attribute
+          || (a.href.indexOf('#') > -1
+              && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
+          || ($useWhitelist
+              ? !a.hasAttribute('data-instant')
+              : a.hasAttribute('data-no-instant'))
+         ) {
         continue
       }
       if ($preloadOnMousedown) {
@@ -207,7 +220,12 @@ var InstantClick = function(document, location) {
       a.addEventListener('click', click)
     }
     if (!isInitializing) {
-      var scripts = document.getElementsByTagName('script'), script, copy, parentNode, nextSibling
+      var scripts = document.getElementsByTagName('script'),
+          script,
+          copy,
+          parentNode,
+          nextSibling
+
       for (i = 0, j = scripts.length; i < j; i++) {
         script = scripts[i]
         if (script.hasAttribute('data-no-instant')) {
@@ -229,22 +247,26 @@ var InstantClick = function(document, location) {
   }
 
   function preload(url) {
-    if (!$preloadOnMousedown && 'display' in $timing && +new Date - ($timing.start + $timing.display) < 100) {
-      /* After a page is displayed, if the user's cursor happens to be above a link
-         a mouseover event will be in most browsers triggered automatically, and in
-         other browsers it will be triggered when the user moves his mouse by 1px.
+    if (!$preloadOnMousedown
+        && 'display' in $timing
+        && +new Date - ($timing.start + $timing.display) < 100) {
+      /* After a page is displayed, if the user's cursor happens to be above
+         a link a mouseover event will be in most browsers triggered
+         automatically, and in other browsers it will be triggered when the
+         user moves his mouse by 1px.
 
          Here are the behavior I noticed, all on Windows:
          - Safari 5.1: auto-triggers after 0 ms
-         - IE 11: auto-triggers after 30-80 ms (looks like it depends on page's size)
+         - IE 11: auto-triggers after 30-80 ms (depends on page's size?)
          - Firefox: auto-triggers after 10 ms
          - Opera 18: auto-triggers after 10 ms
 
          - Chrome: triggers when cursor moved
          - Opera 12.16: triggers when cursor moved
 
-         To remedy to this, we do not start preloading if last display occurred less than
-         100 ms ago. If they happen to click on the link, they will be redirected.
+         To remedy to this, we do not start preloading if last display
+         occurred less than 100 ms ago. If they happen to click on the link,
+         they will be redirected.
       */
 
       return
@@ -296,26 +318,26 @@ var InstantClick = function(document, location) {
       return
     }
     if (!$isPreloading || $isWaitingForCompletion) {
-      /* If the page isn't preloaded, it likely means
-         the user has focused on a link (with his Tab
-         key) and then pressed Return, which triggered a click.
-         Because very few people do this, it isn't worth handling this
-         case and preloading on focus (also, focusing on a link
-         doesn't mean it's likely that you'll "click" on it), so we just
-         redirect them when they "click".
+      /* If the page isn't preloaded, it likely means the user has focused
+         on a link (with his Tab key) and then pressed Return, which
+         triggered a click.
+         Because very few people do this, it isn't worth handling this case
+         and preloading on focus (also, focusing on a link doesn't mean it's
+         likely that you'll "click" on it), so we just redirect them when
+         they "click".
          It could also mean the user hovered over a link less than 100 ms
          after a page display, thus we didn't start the preload (see
          comments in `preload()` for the rationale behind this.)
 
-         If the page is waiting for completion, the user clicked twice
-         while the page was preloading.
+         If the page is waiting for completion, the user clicked twice while
+         the page was preloading.
          Two possibilities:
-         1) He clicks on the same link again, either because it's slow
-            to load (there's no browser loading indicator with
-            InstantClick, so he might think his click hasn't registered
-            if the page isn't loading fast enough) or because he has
-            a habit of double clicking on the web;
-         2) He clicks on another link.
+         1) He clicks on the same link again, either because it's slow to
+            load (there's no browser loading indicator with InstantClick,
+            so he might think his click hasn't registered if the page
+            isn't loading fast enough) or because he has a habit of
+            double clicking on the web
+         2) He clicks on another link
 
          In the first case, we redirect him (send him to the page the old
          way) so that he can have the browser's loading indicator back.
@@ -379,7 +401,7 @@ var InstantClick = function(document, location) {
      All androids tested with Android SDK's Emulator.
      Version numbers are from the browser's user agent.
 
-     Because of all of this mess, the only whitelisted browser on Android is Chrome.
+     Because of this mess, the only whitelisted browser on Android is Chrome.
   */
 
   function init() {
@@ -421,10 +443,14 @@ var InstantClick = function(document, location) {
       if (loc == $currentLocationWithoutHash) {
         return
       }
+
       if (!(loc in $history)) {
-        location.href = location.href // Reloads the page and makes use of cache for assets, unlike location.reload()
+        location.href = location.href
+        /* Reloads the page while using cache for scripts, styles and images,
+           unlike `location.reload()` */
         return
       }
+
       $history[$currentLocationWithoutHash].scrollY = pageYOffset
       $currentLocationWithoutHash = loc
       changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
@@ -434,6 +460,7 @@ var InstantClick = function(document, location) {
   function on(eventType, callback) {
     $eventsCallbacks[eventType].push(callback)
   }
+
 
   /* The debug function isn't included by default to reduce file size.
      To enable it, add a slash at the beginning of the comment englobing

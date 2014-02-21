@@ -1,0 +1,57 @@
+<h2>Page with anchors #<?php echo $us ?></h2>
+
+<table>
+<?php for ($i = 1; $i <= 3; $i++): ?>
+  <tr>
+    <td><a href="?page=anchor<?php echo $they ?><?php echo $append ?>#<?php echo $i ?>">Page <b><?php echo $they ?></b>, anchor <?php echo $i ?></a>
+<?php foreach ($delays as $delay): ?>
+    <td><a href="?page=anchor<?php echo $they ?><?php echo '&amp;wait=' . $delay . $append ?>#<?php echo $i ?>"><small><?php echo $delay ?></small></a>
+<?php endforeach;
+endfor ?>
+</table>
+
+<h3 id="1"><em><a href="#1">this is anchor #1</a></em></h3>
+
+<h1>This</h1>
+<h1>is</h1>
+<h1>a</h1>
+<h1>long</h1>
+
+<table>
+<?php for ($i = 1; $i <= 3; $i++): ?>
+  <tr>
+    <td><a href="?page=anchor<?php echo $they ?><?php echo $append ?>#<?php echo $i ?>">Page <b><?php echo $they ?></b>, anchor <?php echo $i ?></a>
+<?php foreach ($delays as $delay): ?>
+    <td><a href="?page=anchor<?php echo $they ?><?php echo '&amp;wait=' . $delay . $append ?>#<?php echo $i ?>"><small><?php echo $delay ?></small></a>
+<?php endforeach;
+endfor ?>
+</table>
+
+<h3 id="2"><em><a href="#2">this is anchor #2</a></em></h3>
+
+<h1>page</h1>
+<h1>so</h1>
+<h1>we</h1>
+<h1>can</h1>
+<h1>test</h1>
+<h1>anchors</h1>
+
+<table>
+<?php for ($i = 1; $i <= 3; $i++): ?>
+  <tr>
+    <td><a href="?page=anchor<?php echo $they ?><?php echo $append ?>#<?php echo $i ?>">Page <b><?php echo $they ?></b>, anchor <?php echo $i ?></a>
+<?php foreach ($delays as $delay): ?>
+    <td><a href="?page=anchor<?php echo $they ?><?php echo '&amp;wait=' . $delay . $append ?>#<?php echo $i ?>"><small><?php echo $delay ?></small></a>
+<?php endforeach;
+endfor ?>
+</table>
+
+<h3 id="3"><em><a href="#3">this is anchor #3</a></em></h3>
+
+<h1>more</h1>
+<h1>text</h1>
+<h1>just</h1>
+<h1>for</h1>
+<h1>your</h1>
+<h1>convenience</h1>
+
