@@ -378,6 +378,8 @@ var InstantClick = function(document, location) {
 
 	   All androids tested with Android SDK's Emulator.
 	   Version numbers are from the browser's user agent.
+
+	   Because of all of this mess, the only whitelisted browser on Android is Chrome.
 	*/
 
 	function init() {
