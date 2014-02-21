@@ -1,6 +1,7 @@
 /* InstantClick 2.1 | (C) 2014 Alexandre Dieulot | http://instantclick.io/license.html */
 var InstantClick = function(document, location) {
 	// Internal variables
+	var $ua = navigator.userAgent
 	var $currentLocationWithoutHash
 	var $urlToPreload
 	var $preloadTimer
@@ -348,7 +349,36 @@ var InstantClick = function(document, location) {
 	////////// PUBLIC VARIABLE AND FUNCTIONS //////////
 
 
-	var supported = 'pushState' in history
+	var supported = !!(
+		'pushState' in history && (
+			!$ua.match('Android') ||
+			$ua.match('Chrome/')
+		)
+	)
+	/* The state of Android's AOSP browsers:
+
+	   2.3.7: pushState appears to work correctly, but
+	          `doc.documentElement.innerHTML = body` is buggy.
+	          See details here: http://stackoverflow.com/q/21918564
+
+	   3.0:   pushState appears to work correctly (though the URL bar is only
+	          updated on focus), but
+	          `document.documentElement.replaceChild(doc.body, document.body)`
+			  throws DOMException: WRONG_DOCUMENT_ERR.
+
+	   4.0.2: Doesn't support pushState.
+
+	   4.0.4,
+	   4.1.1,
+	   4.2,
+	   4.3:   pushState is here, but it doesn't update the URL bar.
+	          (Great logic there.)
+
+	   4.4:   Works correctly. Claims to be 'Chrome/30.0.0.0'.
+
+	   All androids tested with Android SDK's Emulator.
+	   Version numbers are from the browser's user agent.
+	*/
 
 	function init() {
 		if ($currentLocationWithoutHash) {

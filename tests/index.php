@@ -4,6 +4,7 @@ $pages = array(
   'First test page' => '1',
   'Second test page' => '2',
   'Page without title' => 'no-title',
+  'Minimal markup' => 'minimal',
   'NProgress' => 'nprogress',
 );
 
@@ -48,7 +49,10 @@ if (isset($_GET['wait'])) {
 <script src="vendors/nprogress/nprogress-0.1.2.js"></script>
 <?php endif ?>
 
+<?php if ($page == 'minimal'): ?><body>Hiya.<?php exit; endif ?>
+
 <body>
+
 <div id="preloading-level">
   <a data-no-instant href="?<?php echo $nocache ?>" class="<?php if ($preload_on == 'hover') echo 'selected' ?>">↻ On hover</a>
   <a data-no-instant href="?on=100<?php echo $nocache ?>" class="<?php if ($preload_on === (int)$preload_on) echo 'selected' ?>">↻ On hover + 100 ms delay</a>
@@ -106,6 +110,9 @@ var $debugMessages = ''
 
 function addDebugMessage(message) {
   var divDebug = document.getElementById('divDebug')
+  if (!divDebug) {
+    return
+  }
   $debugMessages = message + '<br>' + (!divDebug.innerHTML && $debugMessages ? '<hr>' : '') + $debugMessages
   divDebug.innerHTML = $debugMessages
 }
