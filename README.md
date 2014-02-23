@@ -1,10 +1,10 @@
 # InstantClick
 
-InstantClick is a JavaScript library that dramatically speeds up your website, making navigation effectively instant in most cases.
+[InstantClick](http://instantclick.io/) is a JavaScript library that dramatically speeds up your website, making navigation effectively instant in most cases.
 
 ## Why
 
-Despite the huge bandwidth increases, websites don’t get much faster. This is because the biggest botteneck in loading web pages is latency.
+Despite the huge bandwidth increases, websites don’t get much faster. This is because the biggest botteneck in loading web pages is latency.<sup>1</sup>
 
 ## How does it work
 
