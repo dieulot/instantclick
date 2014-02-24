@@ -6,6 +6,8 @@ $pages = array(
   'Page without title' => 'no-title',
   'Minimal markup' => 'minimal',
   'NProgress' => 'nprogress',
+  'Orange progress bar' => 'orange-pb',
+  'No progress bar' => 'no-pb',
 );
 
 $page = 'welcome';
@@ -71,8 +73,12 @@ if (isset($_GET['wait'])) {
 <?php foreach ($pages as $name => $row): ?>
   <tr>
     <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . $append ?>"><?php echo $name ?></a>
-<?php if ($row == 'nprogress'): ?>
-        <a data-no-instant href="?page=nprogress<?php echo $append ?>">↻</a>
+<?php if (in_array($row, array(
+ 'nprogress',
+ 'orange-pb',
+ 'no-pb',
+))): ?>
+        <a data-no-instant href="?page=<?php echo $row . $append ?>">↻</a>
 <?php endif ?>
 <?php foreach ($delays as $delay): ?>
     <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . '&amp;wait=' . $delay . $append ?>"><small><?php echo $delay ?></small></a>
@@ -123,7 +129,21 @@ InstantClick.on('change', function(isInitialLoad) {
 })
 
 InstantClick.init(<?php
-if ($preload_on == 'mousedown') echo "'mousedown'";
-elseif ((int)$preload_on != 0) echo $preload_on;
+$comma = false;
+if ($preload_on == 'mousedown') {
+  echo "'mousedown'";
+  $comma = true;
+}
+elseif ((int)$preload_on != 0) {
+  echo $preload_on;
+  $comma = true;
+}
+
+if (in_array($page, array('orange-pb', 'no-pb'))) {
+   if ($comma) {
+     echo ", ";
+   }
+   echo "{progressBar: " . ($page == 'no-pb' ? "false" : "'orange'") . "}";
+}
 ?>);
 </script>

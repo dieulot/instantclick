@@ -55,6 +55,9 @@ var InstantClick = function(document, location) {
   }
 
   function changePage(title, body, newUrl, scrollY) {
+    if (bar.enabled) {
+      body += $barContainer.outerHTML
+    }
     var doc = document.implementation.createHTMLDocument('')
     doc.documentElement.innerHTML = body
     document.documentElement.replaceChild(doc.body, document.body)
@@ -90,7 +93,7 @@ var InstantClick = function(document, location) {
     }
 
     instantanize()
-
+    bar.done()
     triggerPageEvent('change', false)
   }
 
@@ -314,6 +317,7 @@ var InstantClick = function(document, location) {
         return
       }
       preload(url)
+      bar.start(0, true)
       $isWaitingForCompletion = true
       return
     }
@@ -359,6 +363,7 @@ var InstantClick = function(document, location) {
       return
     }
     if (!$body) {
+      bar.start(0, true)
       $isWaitingForCompletion = true
       return
     }
@@ -366,6 +371,138 @@ var InstantClick = function(document, location) {
     setPreloadingAsHalted()
     changePage($title, $body, $url)
   }
+
+
+  ////////// PROGRESS BAR FUNCTIONS //////////
+
+
+  var bar = function() {
+    var $barContainer,
+        $barElement,
+        $barTransformProperty,
+        $barProgress,
+    $barTimer,
+    $barIncTo
+
+    function init(color) {
+      if (!color) {
+        return
+      }
+      /* Some colors:
+         Default  : #29f
+         NProgress: #29d (2px)
+         zprogress: #1c88ff (3px)
+         Chrome on iPhone (iOS 6): #4e90fe (4px)
+         Safari on iPad, iOS 7: #007aff (2.5px)
+      */
+
+      enabled = true
+
+      $barContainer = document.createElement('div')
+      $barContainer.id = 'ic-progress'
+      $barElement = document.createElement('div')
+      $barElement.id = 'ic-progress-bar'
+      $barContainer.appendChild($barElement)
+
+      var vendors = ['Webkit', 'Moz', 'O']
+
+      $barTransformProperty = 'transform'
+      if (!($barTransformProperty in $barElement.style)) {
+        for (var i = 0; i < 3; i++) {
+          if (vendors[i] + 'Transform' in $barElement.style) {
+            $barTransformProperty = vendors[i] + 'Transform'
+          }
+        }
+      }
+
+      var transitionProperty = 'transition'
+      if (!(transitionProperty in $barElement.style)) {
+        for (var i = 0; i < 3; i++) {
+          if (vendors[i] + 'Transition' in $barElement.style) {
+            transitionProperty = '-' + vendors[i].toLowerCase() + '-' + transitionProperty
+          }
+        }
+      }
+
+      var style = document.createElement('style')
+      style.innerHTML = '#ic-progress { position:fixed; top:0; left:0; width: 100%; pointer-events:none; z-index:3000; ' + transitionProperty + ':opacity .25s .1s; }'
+        + '#ic-progress-bar { background:' + color + '; width:100%; margin-left:-100%; height:3px; ' + transitionProperty + ':all .25s; }'
+      document.head.appendChild(style)
+    }
+
+    function start(at, jump) {
+      if (!enabled) {
+        return
+      }
+      $barProgress = at
+      if (document.getElementById($barContainer.id)) {
+        document.body.removeChild($barContainer)
+      }
+      $barContainer.style.opacity = '1'
+      if (document.getElementById($barContainer.id)) {
+        document.body.removeChild($barContainer)
+        /* So there's no CSS animation if already done once and it goes from 1 to 0 */
+      }
+      update()
+      if (jump) {
+        setTimeout(jumpStart, 0)
+      /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
+      }
+      clearTimeout($barTimer)
+      $barTimer = setTimeout(inc, 500)
+    }
+
+    function jumpStart() {
+      $barProgress = 10
+      update()
+    }
+
+    function inc() {
+      $barProgress += 1 + (Math.random() * 2)
+      if ($barProgress >= 98) {
+        $barProgress = 98
+      }
+      else {
+        $barTimer = setTimeout(inc, 500)
+      }
+      update()
+    }
+
+    function update() {
+      $barElement.style[$barTransformProperty] = 'translate(' + $barProgress + '%)'
+      if (!document.getElementById($barContainer.id)) {
+        document.body.appendChild($barContainer)
+      }
+    }
+
+    function done() {
+      if (!enabled) {
+        return
+      }
+      if (document.getElementById($barContainer.id)) {
+        clearTimeout($barTimer)
+        $barProgress = 100
+        update()
+        $barContainer.style.opacity = '0'
+        return
+      }
+
+      /* The bar container hasn't been appended: It's a new page. */
+      start($barProgress == 100 ? 0 : $barProgress)
+      /* $barProgress is 100 on popstate, usually. */
+      setTimeout(done, 0)
+      /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
+    }
+
+    var enabled = false
+
+    return {
+      init: init,
+      start: start,
+      done: done,
+      enabled: enabled
+    }
+  }()
 
 
   ////////// PUBLIC VARIABLE AND FUNCTIONS //////////
@@ -413,6 +550,7 @@ var InstantClick = function(document, location) {
       triggerPageEvent('change', true)
       return
     }
+    var barColor = '#29f'
     for (var i = arguments.length - 1; i >= 0; i--) {
       var arg = arguments[i]
       if (arg === true) {
@@ -423,6 +561,11 @@ var InstantClick = function(document, location) {
       }
       else if (typeof arg == 'number') {
         $delayBeforePreload = arg
+      }
+      else if (typeof arg == 'object') {
+        if ('progressBar' in arg) {
+          barColor = arg.progressBar
+        }
       }
     }
     $currentLocationWithoutHash = removeHash(location.href)
@@ -435,6 +578,8 @@ var InstantClick = function(document, location) {
     $xhr.addEventListener('readystatechange', readystatechange)
 
     instantanize(true)
+
+    bar.init(barColor)
 
     triggerPageEvent('change', true)
 
