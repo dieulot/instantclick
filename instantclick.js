@@ -193,10 +193,6 @@ var InstantClick = function(document, location) {
 
 
   function instantanize(isInitializing) {
-    if(location.protocol == "file:") {
-        return; // Don't start when using file:// urls. It just makes links glitch out, and local links are fast enough
-    }
-
     var as = document.getElementsByTagName('a'),
         a,
         domain = location.protocol + '//' + location.host
@@ -379,7 +375,7 @@ var InstantClick = function(document, location) {
     'pushState' in history && (
       !$ua.match('Android') ||
       $ua.match('Chrome/')
-    )
+    ) && (location.protocol != "file:") // Don't start when using file:// urls. It just makes links glitch out, and local links are fast enough
   )
   /* The state of Android's AOSP browsers:
 
