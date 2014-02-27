@@ -484,18 +484,17 @@ var InstantClick = function(document, location) {
 
   ////////// PUBLIC VARIABLE AND FUNCTIONS //////////
 
+  var supported = 'pushState' in history
+                  && (!$ua.match('Android') || $ua.match('Chrome/'))
+                  && location.protocol != "file:"
 
-  var supported = !!(
-    'pushState' in history && (
-      !$ua.match('Android') ||
-      $ua.match('Chrome/')
-    ) && (location.protocol != "file:") // Don't start when using file:// urls. It just makes links glitch out, and local links are fast enough
-  )
   /* The state of Android's AOSP browsers:
 
      2.3.7: pushState appears to work correctly, but
             `doc.documentElement.innerHTML = body` is buggy.
             See details here: http://stackoverflow.com/q/21918564
+            Note an issue anymore, but it may fail where 3.0 do, this needs
+            testing again.
 
      3.0:   pushState appears to work correctly (though the URL bar is only
             updated on focus), but
@@ -541,7 +540,7 @@ var InstantClick = function(document, location) {
     }
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
-      body: document.body.outerHTML,
+      body: document.body,
       title: document.title,
       scrollY: pageYOffset
     }
