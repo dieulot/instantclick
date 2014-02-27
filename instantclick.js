@@ -55,9 +55,6 @@ var InstantClick = function(document, location) {
   }
 
   function changePage(title, body, newUrl, scrollY) {
-    if (bar.enabled) {
-      body += $barContainer.outerHTML
-    }
     var doc = document.implementation.createHTMLDocument('')
     doc.documentElement.innerHTML = body
     document.documentElement.replaceChild(doc.body, document.body)
@@ -381,27 +378,14 @@ var InstantClick = function(document, location) {
         $barElement,
         $barTransformProperty,
         $barProgress,
-    $barTimer,
-    $barIncTo
+        $barTimer
 
-    function init(color) {
-      if (!color) {
-        return
-      }
-      /* Some colors:
-         Default  : #29f
-         NProgress: #29d (2px)
-         zprogress: #1c88ff (3px)
-         Chrome on iPhone (iOS 6): #4e90fe (4px)
-         Safari on iPad, iOS 7: #007aff (2.5px)
-      */
-
-      enabled = true
-
+    function init() {
       $barContainer = document.createElement('div')
-      $barContainer.id = 'ic-progress'
+      $barContainer.id = 'instantclick'
       $barElement = document.createElement('div')
-      $barElement.id = 'ic-progress-bar'
+      $barElement.id = 'instantclick-bar'
+      $barElement.className = 'instantclick-bar'
       $barContainer.appendChild($barElement)
 
       var vendors = ['Webkit', 'Moz', 'O']
@@ -425,15 +409,22 @@ var InstantClick = function(document, location) {
       }
 
       var style = document.createElement('style')
-      style.innerHTML = '#ic-progress { position:fixed; top:0; left:0; width: 100%; pointer-events:none; z-index:3000; ' + transitionProperty + ':opacity .25s .1s; }'
-        + '#ic-progress-bar { background:' + color + '; width:100%; margin-left:-100%; height:3px; ' + transitionProperty + ':all .25s; }'
+      style.innerHTML = '#instantclick{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:3000;' + transitionProperty + ':opacity .25s .1s}'
+        + '.instantclick-bar{background:#29f;width:100%;margin-left:-100%;height:3px;' + transitionProperty + ':all .25s}'
+      /* We set the bar's background in `.instantclick-bar` so that it can be
+         overriden in CSS with `#instantclick-bar`, as IDs have higher priority.
+      */
       document.head.appendChild(style)
+
+      if ('orientation' in window) {
+        updatePositionAndScale()
+        addEventListener('resize', updatePositionAndScale)
+        addEventListener('scroll', updatePositionAndScale)
+      }
+
     }
 
     function start(at, jump) {
-      if (!enabled) {
-        return
-      }
       $barProgress = at
       if (document.getElementById($barContainer.id)) {
         document.body.removeChild($barContainer)
@@ -476,14 +467,12 @@ var InstantClick = function(document, location) {
     }
 
     function done() {
-      if (!enabled) {
-        return
-      }
       if (document.getElementById($barContainer.id)) {
         clearTimeout($barTimer)
         $barProgress = 100
         update()
         $barContainer.style.opacity = '0'
+        /* If you're debugging, setting this to 0.5 is handy. */
         return
       }
 
@@ -494,13 +483,17 @@ var InstantClick = function(document, location) {
       /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
     }
 
-    var enabled = false
+    function updatePositionAndScale() {
+      $barContainer.style.left = pageXOffset + 'px'
+      $barContainer.style.width = innerWidth + 'px'
+      $barContainer.style.top = pageYOffset + 'px'
+      $barContainer.style[$barTransformProperty] = 'scaleY(' + (innerWidth / screen[Math.abs(orientation) == 90 ? 'height' : 'width'])  + ')'
+    }
 
     return {
       init: init,
       start: start,
-      done: done,
-      enabled: enabled
+      done: done
     }
   }()
 
@@ -550,7 +543,6 @@ var InstantClick = function(document, location) {
       triggerPageEvent('change', true)
       return
     }
-    var barColor = '#29f'
     for (var i = arguments.length - 1; i >= 0; i--) {
       var arg = arguments[i]
       if (arg === true) {
@@ -561,11 +553,6 @@ var InstantClick = function(document, location) {
       }
       else if (typeof arg == 'number') {
         $delayBeforePreload = arg
-      }
-      else if (typeof arg == 'object') {
-        if ('progressBar' in arg) {
-          barColor = arg.progressBar
-        }
       }
     }
     $currentLocationWithoutHash = removeHash(location.href)
@@ -579,7 +566,7 @@ var InstantClick = function(document, location) {
 
     instantanize(true)
 
-    bar.init(barColor)
+    bar.init()
 
     triggerPageEvent('change', true)
 
