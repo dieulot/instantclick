@@ -27,10 +27,13 @@ body {
 	margin: .2em 0;
 }
 
-/*#instantclick {
-	display: none;
-}*/
-
-/*#instantclick-bar {
-	background: red;
-}*/
+#instantclick {
+	_display: none;
+}
+#instantclick-bar {
+	_display: none;
+}
+#instantclick-bar {
+	_background: red;
+}
+/* Remove the underscore when you want to enable a declaration. */

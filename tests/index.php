@@ -6,6 +6,7 @@ $pages = array(
   'Page without title' => 'no-title',
   'Minimal markup' => 'minimal',
   'NProgress' => 'nprogress',
+  'Entities in the &#8249;title&rsaquo;' => 'entities'
 );
 
 $page = 'welcome';
@@ -40,7 +41,11 @@ if (isset($_GET['wait'])) {
 <!doctype html>
 <meta charset="utf-8">
 <?php if ($page != 'no-title'): ?>
-<title><?php echo date('H : i : s') ?> . <?php printf("%03d", microtime() * 1000) ?></title>
+<title><?php if ($page == 'entities'): ?>
+Entities in the &#8249;title&rsaquo;
+<?php else: ?>
+<?php echo date('H : i : s') ?> . <?php printf("%03d", microtime() * 1000) ?>
+<?php endif ?></title>
 <?php endif ?>
 <link rel="stylesheet" href="style.css?<?php echo $append ?>">
 <?php if (1): ?>

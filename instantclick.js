@@ -55,16 +55,12 @@ var InstantClick = function(document, location) {
   }
 
   function changePage(title, body, newUrl, scrollY) {
-    var doc = document.implementation.createHTMLDocument('')
-    doc.documentElement.innerHTML = body
-    document.documentElement.replaceChild(doc.body, document.body)
-    /* We cannot just use `document.body = doc.body` as it causes Safari 5.1, 6.0,
-       and Mobile 7.0 to execute script tags directly.
-    */
+    document.title = title
 
-    var elem = document.createElement('i')
-    elem.innerHTML = title
-    document.title = elem.textContent
+    document.documentElement.replaceChild(body, document.body)
+    /* We cannot just use `document.body = doc.body`, it causes Safari (tested
+       5.1, 6.0 and Mobile 7.0) to execute script tags directly.
+    */
 
     if (newUrl) {
       history.pushState(null, null, newUrl)
@@ -154,23 +150,11 @@ var InstantClick = function(document, location) {
 
     $timing.ready = +new Date - $timing.start
 
-    var text = $xhr.responseText
-
-    $title = ''
-    var titleIndex = text.indexOf('<title')
-    if (titleIndex > -1) {
-      $title = text.substr(text.indexOf('>', titleIndex) + 1)
-      $title = $title.substr(0, $title.indexOf('</title'))
-    }
-
-    var bodyIndex = text.indexOf('<body')
-    if (bodyIndex > -1) {
-      $body = text.substr(bodyIndex)
-      var closingIndex = $body.indexOf('</body')
-      if (closingIndex > -1) {
-        $body = $body.substr(0, closingIndex)
-      }
-
+    if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht)ml/)) {
+      var doc = document.implementation.createHTMLDocument('')
+      doc.documentElement.innerHTML = $xhr.responseText
+      $title = doc.title
+      $body = doc.body
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
         body: $body,
