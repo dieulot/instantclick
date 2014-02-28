@@ -3,6 +3,7 @@
 var InstantClick = function(document, location) {
   // Internal variables
   var $ua = navigator.userAgent,
+      $hasTouch = 'createTouch' in document,
       $currentLocationWithoutHash,
       $urlToPreload,
       $preloadTimer,
@@ -414,14 +415,14 @@ var InstantClick = function(document, location) {
       }
 
       var style = document.createElement('style')
-      style.innerHTML = '#instantclick{position:absolute;top:0;left:0;width:100%;pointer-events:none;z-index:3000;' + transitionProperty + ':opacity .25s .1s}'
+      style.innerHTML = '#instantclick{position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:3000;' + transitionProperty + ':opacity .25s .1s}'
         + '.instantclick-bar{background:#29f;width:100%;margin-left:-100%;height:3px;' + transitionProperty + ':all .25s}'
       /* We set the bar's background in `.instantclick-bar` so that it can be
          overriden in CSS with `#instantclick-bar`, as IDs have higher priority.
       */
       document.head.appendChild(style)
 
-      if ('orientation' in window) {
+      if ($hasTouch) {
         updatePositionAndScale()
         addEventListener('resize', updatePositionAndScale)
         addEventListener('scroll', updatePositionAndScale)
