@@ -52,6 +52,11 @@ Entities in the &#8249;title&rsaquo;
 <meta name="viewport" content="width=600">
 <?php endif ?>
 
+<link rel="stylesheet" href="trackme.css?<?php echo filemtime('trackme.css') ?>" data-instant-track>
+<script src="trackme.js?<?php echo filemtime('trackme.js') ?>" data-instant-track></script>
+<style data-instant-track>body { overflow-y: scroll; }</style>
+<script data-instant-track>if (window.lol) { lol() }</script>
+
 <?php if ($page == 'nprogress'): ?>
 <link rel="stylesheet" href="vendors/nprogress/nprogress-0.1.2.css">
 <script src="vendors/jquery/jquery-2.1.0.js"></script>
@@ -59,8 +64,6 @@ Entities in the &#8249;title&rsaquo;
 <?php endif ?>
 
 <?php if ($page == 'minimal'): ?><body>Hiya.<?php exit; endif ?>
-
-<body>
 
 <div id="preloading-level">
   <a data-no-instant href="?<?php echo $nocache ?>" class="<?php if ($preload_on == 'hover') echo 'selected' ?>">↻ On hover</a>

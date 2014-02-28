@@ -12,11 +12,12 @@ var InstantClick = function(document, location) {
       $xhr,
       $url = false,
       $title = false,
-      $hasBody = true,
+      $mustRedirect = false,
       $body = false,
       $timing = {},
       $isPreloading = false,
       $isWaitingForCompletion = false,
+      $trackedAssets = [],
 
   // Variables defined by public functions
       $useWhitelist,
@@ -161,9 +162,29 @@ var InstantClick = function(document, location) {
         title: $title,
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
       }
+
+      var elems = doc.head.children,
+          found = 0,
+          elem,
+          data
+
+      for (var i = elems.length - 1; i >= 0; i--) {
+        elem = elems[i]
+        if (elem.hasAttribute('data-instant-track')) {
+          data = elem.getAttribute('href') || elem.getAttribute('src') || elem.innerHTML
+          for (var j = $trackedAssets.length - 1; j >= 0; j--) {
+            if ($trackedAssets[j] == data) {
+              found++
+            }
+          }
+        }
+      }
+      if (found != $trackedAssets.length) {
+        $mustRedirect = true // Assets have changed
+      }
     }
     else {
-      $hasBody = false
+      $mustRedirect = true // Not an HTML document
     }
 
     if ($isWaitingForCompletion) {
@@ -272,7 +293,7 @@ var InstantClick = function(document, location) {
 
     $url = url
     $body = false
-    $hasBody = true
+    $mustRedirect = false
     $timing = {
       start: +new Date
     }
@@ -339,7 +360,7 @@ var InstantClick = function(document, location) {
       location.href = url
       return
     }
-    if (!$hasBody) {
+    if ($mustRedirect) {
       location.href = $url
       return
     }
@@ -544,6 +565,18 @@ var InstantClick = function(document, location) {
       title: document.title,
       scrollY: pageYOffset
     }
+
+    var elems = document.head.children,
+        elem,
+        data
+    for (var i = elems.length - 1; i >= 0; i--) {
+      elem = elems[i]
+      if (elem.hasAttribute('data-instant-track')) {
+        data = elem.getAttribute('href') || elem.getAttribute('src') || elem.innerHTML
+        $trackedAssets.push(data)
+      }
+    }
+
     $xhr = new XMLHttpRequest()
     $xhr.addEventListener('readystatechange', readystatechange)
 
@@ -590,7 +623,7 @@ var InstantClick = function(document, location) {
       xhr: $xhr,
       url: $url,
       title: $title,
-      hasBody: $hasBody,
+      mustRedirect: $mustRedirect,
       body: $body,
       timing: $timing,
       isPreloading: $isPreloading,
