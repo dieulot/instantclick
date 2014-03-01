@@ -25,8 +25,8 @@ var InstantClick = function(document, location) {
       $preloadOnMousedown,
       $delayBeforePreload,
       $eventsCallbacks = {
-        change: [],
-        click: []
+        beforechange: [],
+        change: []
       }
 
 
@@ -118,7 +118,6 @@ var InstantClick = function(document, location) {
     else {
       scrollTo(0, scrollY)
     }
-
     instantanize()
     bar.done()
     triggerPageEvent('change', false)
@@ -166,7 +165,6 @@ var InstantClick = function(document, location) {
       return
     }
     e.preventDefault()
-    triggerPageEvent('click')
     display(getLinkTarget(e.target).href)
   }
 
@@ -365,6 +363,7 @@ var InstantClick = function(document, location) {
       }
       preload(url)
       bar.start(0, true)
+      triggerPageEvent('beforechange')
       $isWaitingForCompletion = true
       return
     }
@@ -411,6 +410,7 @@ var InstantClick = function(document, location) {
     }
     if (!$body) {
       bar.start(0, true)
+      triggerPageEvent('beforechange')
       $isWaitingForCompletion = true
       return
     }

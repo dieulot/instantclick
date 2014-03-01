@@ -58,6 +58,7 @@ Entities in the &#8249;title&rsaquo;
 <script data-instant-track>if (window.lol) { lol() }</script>
 
 <?php if ($page == 'nprogress'): ?>
+<style>#instantclick { display: none; }</style>
 <link rel="stylesheet" href="vendors/nprogress/nprogress-0.1.2.css">
 <script src="vendors/jquery/jquery-2.1.0.js"></script>
 <script src="vendors/nprogress/nprogress-0.1.2.js"></script>
@@ -105,7 +106,7 @@ endforeach ?>
 
 <?php if ($page == 'nprogress'): ?>
 <script data-no-instant>
-InstantClick.on('click', function() {
+InstantClick.on('beforechange', function() {
   NProgress.start()
 })
 
@@ -113,7 +114,7 @@ InstantClick.on('change', function(isInitialLoad) {
   if (isInitialLoad) {
     addDebugMessage('NProgress on')
   }
-  NProgress.done()
+  NProgress.done(!isInitialLoad)
 })
 </script>
 <?php endif ?>
@@ -129,6 +130,10 @@ function addDebugMessage(message) {
   $debugMessages = message + '<br>' + (!divDebug.innerHTML && $debugMessages ? '<hr>' : '') + $debugMessages
   divDebug.innerHTML = $debugMessages
 }
+
+InstantClick.on('beforechange', function() {
+  addDebugMessage('Event: beforechange')
+})
 
 InstantClick.on('change', function(isInitialLoad) {
   addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
