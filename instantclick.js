@@ -27,7 +27,7 @@ var InstantClick = function(document, location) {
       $eventsCallbacks = {
         fetch: [],
         receive: [],
-        beforechange: [],
+        wait: [],
         change: []
       }
 
@@ -367,7 +367,7 @@ var InstantClick = function(document, location) {
       }
       preload(url)
       bar.start(0, true)
-      triggerPageEvent('beforechange')
+      triggerPageEvent('wait')
       $isWaitingForCompletion = true
       return
     }
@@ -414,7 +414,7 @@ var InstantClick = function(document, location) {
     }
     if (!$body) {
       bar.start(0, true)
-      triggerPageEvent('beforechange')
+      triggerPageEvent('wait')
       $isWaitingForCompletion = true
       return
     }

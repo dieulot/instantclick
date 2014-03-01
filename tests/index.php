@@ -139,8 +139,8 @@ InstantClick.on('receive', function() {
   addDebugMessage('<small><small>Event: receive</small></small>')
 })
 
-InstantClick.on('beforechange', function() {
-  addDebugMessage('Event: beforechange')
+InstantClick.on('wait', function() {
+  addDebugMessage('Event: wait')
 })
 
 InstantClick.on('change', function(isInitialLoad) {
