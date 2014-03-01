@@ -118,6 +118,17 @@ var InstantClick = function(document, location) {
     }
   }
 
+  function touchstart(e) {
+    var a = getLinkTarget(e.target)
+    if ($preloadOnMousedown) {
+      a.removeEventListener('mousedown', mousedown)
+    }
+    else {
+      a.removeEventListener('mouseover', mouseover)
+    }
+    preload(a.href)
+  }
+
   function click(e) {
     if (e.which > 1 || e.metaKey || e.ctrlKey) { // Opening in new tab
       return
@@ -217,6 +228,7 @@ var InstantClick = function(document, location) {
          ) {
         continue
       }
+      a.addEventListener('touchstart', touchstart)
       if ($preloadOnMousedown) {
         a.addEventListener('mousedown', mousedown)
       }
@@ -415,8 +427,8 @@ var InstantClick = function(document, location) {
       }
 
       var style = document.createElement('style')
-      style.innerHTML = '#instantclick{position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:3000;' + transitionProperty + ':opacity .25s .1s}'
-        + '.instantclick-bar{background:#29f;width:100%;margin-left:-100%;height:3px;' + transitionProperty + ':all .25s}'
+      style.innerHTML = '#instantclick{position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ':opacity .25s .1s}'
+        + '.instantclick-bar{background:#29d;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all .25s}'
       /* We set the bar's background in `.instantclick-bar` so that it can be
          overriden in CSS with `#instantclick-bar`, as IDs have higher priority.
       */
@@ -493,7 +505,11 @@ var InstantClick = function(document, location) {
       $barContainer.style.left = pageXOffset + 'px'
       $barContainer.style.width = innerWidth + 'px'
       $barContainer.style.top = pageYOffset + 'px'
-      $barContainer.style[$barTransformProperty] = 'scaleY(' + (innerWidth / screen[Math.abs(orientation) == 90 ? 'height' : 'width'])  + ')'
+      var scaleY = innerWidth / screen[Math.abs(orientation) == 90 ? 'height' : 'width'] * 2
+      /* We multiply the size by 2, as the progress bar is harder
+         to notice on a mobile device.
+      */
+      $barContainer.style[$barTransformProperty] = 'scaleY(' + scaleY  + ')'
     }
 
     return {
