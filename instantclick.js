@@ -196,7 +196,7 @@ var InstantClick = function(document, location) {
     $timing.ready = +new Date - $timing.start
     triggerPageEvent('receive')
 
-    if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht)ml/)) {
+    if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = $xhr.responseText
       $title = doc.title
@@ -251,8 +251,7 @@ var InstantClick = function(document, location) {
       a = as[i]
       if (a.target // target="_blank" etc.
           || a.hasAttribute('download')
-          || a.href.indexOf(domain + '/') != 0 // Another domain, or no href
-                                               // attribute
+          || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
           || (a.href.indexOf('#') > -1
               && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
           || ($useWhitelist
@@ -384,25 +383,11 @@ var InstantClick = function(document, location) {
          comments in `preload()` for the rationale behind this.)
 
          If the page is waiting for completion, the user clicked twice while
-         the page was preloading.
-         Two possibilities:
-         1) He clicks on the same link again, either because it's slow to
-            load (there's no browser loading indicator with InstantClick,
-            so he might think his click hasn't registered if the page
-            isn't loading fast enough) or because he has a habit of
-            double clicking on the web
-         2) He clicks on another link
-
-         In the first case, we redirect him (send him to the page the old
-         way) so that he can have the browser's loading indicator back.
-         In the second case, we redirect him because we haven't preloaded
-         that link, since we were already preloading the last one.
-
-         Determining if it's a double click might be overkill as there is
-         (hopefully) not that many people that double click on the web.
-         Fighting against the perception that the page is stuck is
-         interesting though, a seemingly good way to do that would be to
-         later incorporate a progress bar.
+         the page was preloading. Either on the same link or on another
+         link. If it's the same link something might have gone wrong (or he
+         could have double clicked), so we send him to the page the old way.
+         If it's another link, it hasn't been preloaded, so we redirect the
+         user the old way.
       */
 
       location.href = url
@@ -491,7 +476,7 @@ var InstantClick = function(document, location) {
       update()
       if (jump) {
         setTimeout(jumpStart, 0)
-      /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
+        /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
       }
       clearTimeout($barTimer)
       $barTimer = setTimeout(inc, 500)
