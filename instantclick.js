@@ -48,6 +48,38 @@ var InstantClick = function(document, location) {
     return target
   }
 
+  function isBlacklisted(elem) {
+    do {
+      if (!elem.hasAttribute) { // Parent of <html>
+        break
+      }
+      if (elem.hasAttribute('data-instant')) {
+        return false
+      }
+      if (elem.hasAttribute('data-no-instant')) {
+        return true
+      }
+    }
+    while (elem = elem.parentNode);
+    return false
+  }
+
+  function isWhitelisted(elem) {
+    do {
+      if (!elem.hasAttribute) { // Parent of <html>
+        break
+      }
+      if (elem.hasAttribute('data-no-instant')) {
+        return false
+      }
+      if (elem.hasAttribute('data-instant')) {
+        return true
+      }
+    }
+    while (elem = elem.parentNode);
+    return false
+  }
+
   function triggerPageEvent(eventType, arg1) {
     for (var i = 0; i < $eventsCallbacks[eventType].length; i++) {
       $eventsCallbacks[eventType][i](arg1)
@@ -223,8 +255,8 @@ var InstantClick = function(document, location) {
           || (a.href.indexOf('#') > -1
               && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
           || ($useWhitelist
-              ? !a.hasAttribute('data-instant')
-              : a.hasAttribute('data-no-instant'))
+              ? !isWhitelisted(a)
+              : isBlacklisted(a))
          ) {
         continue
       }

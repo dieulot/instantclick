@@ -2,6 +2,11 @@
 
 <p><a href="?<?php echo $append ?>"><b><i>A link with childs</i></b></a>
 
+<p><b data-no-instant><i><a href="?<?php echo $append ?>">A link in a blacklisted element</a></i></b>
+<br><b data-instant><i><a href="?<?php echo $append ?>">A link in a whitelisted element</a></i></b>
+<br><b data-instant><i data-no-instant><a href="?<?php echo $append ?>">A link in a blacklisted element in a whitelisted element (should blacklist)</a></i></b>
+<br><b data-no-instant><i data-instant><a href="?<?php echo $append ?>">A link in a whitelisted element in a blacklisted element (should whitelist)</a></i></b>
+
 <p><a href="image.png?<?php echo $append ?>">A link to an image, whitelisted. (should redirect)</a>
 
 <p style="font-size: 13px; width: 180px;">Some tiny text. Tiny text. Tiny text. Tiny text!!! I’m so tinyyyy!!!!!<br>
