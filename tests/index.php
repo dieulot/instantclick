@@ -131,6 +131,14 @@ function addDebugMessage(message) {
   divDebug.innerHTML = $debugMessages
 }
 
+InstantClick.on('fetch', function() {
+  addDebugMessage('<small><small>Event: fetch</small></small>')
+})
+
+InstantClick.on('receive', function() {
+  addDebugMessage('<small><small>Event: receive</small></small>')
+})
+
 InstantClick.on('beforechange', function() {
   addDebugMessage('Event: beforechange')
 })

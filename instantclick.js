@@ -25,6 +25,8 @@ var InstantClick = function(document, location) {
       $preloadOnMousedown,
       $delayBeforePreload,
       $eventsCallbacks = {
+        fetch: [],
+        receive: [],
         beforechange: [],
         change: []
       }
@@ -192,6 +194,7 @@ var InstantClick = function(document, location) {
     }
 
     $timing.ready = +new Date - $timing.start
+    triggerPageEvent('receive')
 
     if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
@@ -340,6 +343,7 @@ var InstantClick = function(document, location) {
     $timing = {
       start: +new Date
     }
+    triggerPageEvent('fetch')
     $xhr.open('GET', url)
     $xhr.send()
   }
