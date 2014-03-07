@@ -270,7 +270,7 @@ var InstantClick = function(document, location) {
       a.addEventListener('click', click)
     }
     if (!isInitializing) {
-      var scripts = document.getElementsByTagName('script'),
+      var scripts = document.body.getElementsByTagName('script'),
           script,
           copy,
           parentNode,
