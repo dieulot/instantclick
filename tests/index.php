@@ -106,7 +106,7 @@ endforeach ?>
 
 <?php if ($page == 'nprogress'): ?>
 <script data-no-instant>
-InstantClick.on('beforechange', function() {
+InstantClick.on('wait', function() {
   NProgress.start()
 })
 
