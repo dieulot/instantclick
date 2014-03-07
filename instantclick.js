@@ -615,6 +615,9 @@ var InstantClick = function(document, location) {
       elem = elems[i]
       if (elem.hasAttribute('data-instant-track')) {
         data = elem.getAttribute('href') || elem.getAttribute('src') || elem.innerHTML
+        /* We can't use just `elem.href` and `elem.src` because we can't
+           retrieve `href`s and `src`s from the Ajax response.
+        */
         $trackedAssets.push(data)
       }
     }
