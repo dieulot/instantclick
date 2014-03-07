@@ -523,6 +523,10 @@ var InstantClick = function(document, location) {
     }
 
     function updatePositionAndScale() {
+      /* Adapted from code by Sam Stephenson and Mislav Marohnić
+         http://signalvnoise.com/posts/2407
+      */
+
       $barContainer.style.left = pageXOffset + 'px'
       $barContainer.style.width = innerWidth + 'px'
       $barContainer.style.top = pageYOffset + 'px'
