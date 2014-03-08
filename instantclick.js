@@ -530,7 +530,7 @@ var InstantClick = function(document, location) {
       $barContainer.style.left = pageXOffset + 'px'
       $barContainer.style.width = innerWidth + 'px'
       $barContainer.style.top = pageYOffset + 'px'
-      var scaleY = innerWidth / screen[Math.abs(orientation) == 90 ? 'height' : 'width'] * 2
+      var scaleY = innerWidth / screen[typeof window.orientation != 'undefined' && Math.abs(orientation) == 90 ? 'height' : 'width'] * 2
       /* We multiply the size by 2, as the progress bar is harder
          to notice on a mobile device.
       */
