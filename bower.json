@@ -1,7 +1,13 @@
 {
   "name": "instantclick",
-  "version": "2.1",
+  "description": "InstantClick makes following links in your website instant.",
+  "version": "3.0.0",
   "main": [
     "./instantclick.js"
-  ]
+  ],
+  "license": "MIT",
+  "keywords": [
+    "pjax"
+  ],
+  "homepage": "http://instantclick.io/"
 }
