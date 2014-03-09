@@ -212,7 +212,6 @@ var InstantClick = function(document, location) {
 		for(var i = 0; i < imgages.length; i++) {
 		  m = new Image();
 		  m.src = imgages[i].src;
-		  console.log(imgages[i].src);
 		}
 	  }
 	  
