@@ -22,6 +22,7 @@ var InstantClick = function(document, location) {
 
   // Variables defined by public functions
       $useWhitelist,
+	  $prefetchImages,
       $preloadOnMousedown,
       $delayBeforePreload,
       $eventsCallbacks = {
@@ -140,6 +141,10 @@ var InstantClick = function(document, location) {
 
   function mouseover(e) {
     var a = getLinkTarget(e.target)
+	
+	if(isBlacklisted(a) || a.href == document.location)
+		return;
+	
     a.addEventListener('mouseout', mouseout)
 
     if (!$delayBeforePreload) {
@@ -201,6 +206,16 @@ var InstantClick = function(document, location) {
       doc.documentElement.innerHTML = $xhr.responseText
       $title = doc.title
       $body = doc.body
+	  
+	  if($prefetchImages) {
+		imgages = $body.getElementsByTagName('img');
+		for(var i = 0; i < imgages.length; i++) {
+		  m = new Image();
+		  m.src = imgages[i].src;
+		  console.log(imgages[i].src);
+		}
+	  }
+	  
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
         body: $body,
@@ -580,7 +595,7 @@ var InstantClick = function(document, location) {
      Because of this mess, the only whitelisted browser on Android is Chrome.
   */
 
-  function init() {
+  function init(params) {
     if ($currentLocationWithoutHash) {
       /* Already initialized */
       return
@@ -589,18 +604,14 @@ var InstantClick = function(document, location) {
       triggerPageEvent('change', true)
       return
     }
-    for (var i = arguments.length - 1; i >= 0; i--) {
-      var arg = arguments[i]
-      if (arg === true) {
-        $useWhitelist = true
-      }
-      else if (arg == 'mousedown') {
-        $preloadOnMousedown = true
-      }
-      else if (typeof arg == 'number') {
-        $delayBeforePreload = arg
-      }
-    }
+	
+	if(typeof params == 'object') {
+	  $useWhitelist 		= params.whitelist 	|| false;
+	  $preloadOnMousedown 	= params.mousedown 	|| false;
+	  $delayBeforePreload 	= params.delay 		|| 0;
+	  $prefetchImages 		= params.prefetch 	|| false;
+	}
+	
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
       body: document.body,
