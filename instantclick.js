@@ -201,6 +201,7 @@ var InstantClick = function(document, location) {
       doc.documentElement.innerHTML = $xhr.responseText
       $title = doc.title
       $body = doc.body
+      $url = $xhr.responseURL;
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
         body: $body,
