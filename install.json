@@ -1,0 +1,30 @@
+{
+  "resources": {
+    "body": [
+      {
+        "type": "script",
+        "src": "./instantclick.js"
+      },
+      {
+        "type": "script",
+        "contents": "InstantClick.init(); if (INSTALL_OPTIONS.progressBar !== true) { document.head.insertAdjacentHTML('beforeend', '<style>#instantclick { display: none; }</style>'); } else { if (INSTALL_OPTIONS.progressBarColor) { document.head.insertAdjacentHTML('beforeend', '<style>#instantclick-bar { background-color: ' + INSTALL_OPTIONS.progressBarColor + '; }</style>'); } }"
+      }
+    ]
+  },
+  "options": {
+    "properties": {
+      "progressBar": {
+        "title": "Show progress bar",
+        "description": "When navigating from one page to another, show a loading progress bar at the top of the page.",
+        "type": "boolean"
+      },
+      "progressBarColor": {
+        "title": "Progress bar color",
+        "description": "The color of the progress bar. (Requires \"Show progress bar\" to be checked.)",
+        "type": "string",
+        "format": "color",
+        "default": "#2299dd"
+      }
+    }
+  }
+}
