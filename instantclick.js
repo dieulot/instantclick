@@ -185,24 +185,37 @@ var InstantClick = function(document, location) {
   }
 
   function readystatechange() {
+    var urlWithoutHash = removeHash($url)
+
+    if (typeof($history[urlWithoutHash]) != 'object'){
+      $history[urlWithoutHash] = { loaded:false };
+    }
+
+    // if document not loaded
+    if ($history[urlWithoutHash].loaded == false){
     if ($xhr.readyState < 4) {
       return
     }
     if ($xhr.status == 0) {
       /* Request aborted */
+      $history[urlWithoutHash].loaded = false;
       return
+    }
     }
 
     $timing.ready = +new Date - $timing.start
     triggerPageEvent('receive')
 
+    // if document not loaded
+    if ($history[urlWithoutHash].loaded == false){
     if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = $xhr.responseText
       $title = doc.title
       $body = doc.body
-      var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
+        loaded:true,
+        mustRedirect:false,
         body: $body,
         title: $title,
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
@@ -225,12 +238,19 @@ var InstantClick = function(document, location) {
         }
       }
       if (found != $trackedAssets.length) {
-        $mustRedirect = true // Assets have changed
+        $history[urlWithoutHash].mustRedirect = true // Assets have changed
       }
     }
     else {
-      $mustRedirect = true // Not an HTML document
+      $history[urlWithoutHash].mustRedirect = true // Not an HTML document
     }
+    // Document ALLREADY LOADED
+    } else if ($history[urlWithoutHash].loaded == true){
+      $title = $history[urlWithoutHash].title
+      $body = $history[urlWithoutHash].body
+    }
+
+    $mustRedirect = $history[urlWithoutHash].mustRedirect;
 
     if ($isWaitingForCompletion) {
       $isWaitingForCompletion = false
@@ -343,8 +363,13 @@ var InstantClick = function(document, location) {
       start: +new Date
     }
     triggerPageEvent('fetch')
+    var urlWithoutHash = removeHash($url)
+    if (typeof($history[urlWithoutHash]) != 'object' || $history[urlWithoutHash].loaded==false) {
     $xhr.open('GET', url)
     $xhr.send()
+    } else {
+      readystatechange();
+    }
   }
 
   function display(url) {
@@ -605,6 +630,7 @@ var InstantClick = function(document, location) {
     }
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
+      loaded: true,
       body: document.body,
       title: document.title,
       scrollY: pageYOffset
