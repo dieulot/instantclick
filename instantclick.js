@@ -687,7 +687,8 @@ var InstantClick = function(document, location) {
     // debug: debug,
     supported: supported,
     init: init,
-    on: on
+    on: on,
+    instantanize: instantanize
   }
 
 }(document, location);
