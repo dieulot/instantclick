@@ -28,6 +28,7 @@ var InstantClick = function(document, location) {
         fetch: [],
         receive: [],
         wait: [],
+        dom: [],
         change: []
       }
 
@@ -120,6 +121,7 @@ var InstantClick = function(document, location) {
     else {
       scrollTo(0, scrollY)
     }
+    triggerPageEvent('dom', false)
     instantanize()
     bar.done()
     triggerPageEvent('change', false)
@@ -626,6 +628,8 @@ var InstantClick = function(document, location) {
 
     $xhr = new XMLHttpRequest()
     $xhr.addEventListener('readystatechange', readystatechange)
+
+    triggerPageEvent('dom', true)
 
     instantanize(true)
 
