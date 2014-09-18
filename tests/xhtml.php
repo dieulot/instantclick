@@ -17,7 +17,7 @@ header('Content-Type: application/xml; charset=utf-8'); // Necessary to do “re
 
      <p>Hovering over the link gives an error. This XHTML business is <a href="https://github.com/dieulot/instantclick/issues/52">madness</a>, so this won’t get fixed.</p>
 
-     <script src="<?php if (!file_exists('instantclick.js')) echo '../' ?>instantclick.js" data-no-instant=""></script>
+     <script src="instantclick.js.php" data-no-instant=""></script>
      <script data-no-instant="">InstantClick.init()</script>
 
 </body>

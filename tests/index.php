@@ -101,7 +101,7 @@ endforeach ?>
 
 
 
-<script src="<?php if (!file_exists('instantclick.js')) echo '../' ?>instantclick.js?<?php echo $nocache ?>" data-no-instant></script>
+<script src="instantclick.js.php?<?php echo $nocache ?>" data-no-instant></script>
 
 
 <?php if ($page == 'nprogress'): ?>
