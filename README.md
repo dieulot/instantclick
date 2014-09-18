@@ -19,7 +19,7 @@ Tests (in the `tests` folder) are HTML pages with which to check how InstantClic
 Here are the tests that I do:
 
 - Click on “Index page”, see if it works correctly.
-- Click on “Index page” with 2000 ms of delay, see if it works correctly.
+- Click on “Index page” with 2000 ms of delay, see if it works correctly.
 - Click on “Page with anchors #1”, click on “Page 2, anchor 1”, click on “Page 1, anchor 2”, go back and forward randomly. (At the time of this writing, 2014/03/19, scrolling *is* broken.)
 - In Internet Explorer 6, check that InstantClick’s “change” event is called, as it needs to fire even if InstantClick is unsupported.
 

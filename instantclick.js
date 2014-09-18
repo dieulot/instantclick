@@ -344,6 +344,7 @@ var InstantClick = function(document, location) {
     }
     triggerPageEvent('fetch')
     $xhr.open('GET', url)
+    $xhr.setRequestHeader('X-INSTANTCLICK', '3.0.1')
     $xhr.send()
   }
 
