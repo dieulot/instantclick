@@ -272,26 +272,15 @@ var InstantClick = function(document, location) {
     if (!isInitializing) {
       var scripts = document.body.getElementsByTagName('script'),
           script,
-          copy,
-          parentNode,
-          nextSibling
+          copy
 
-      for (i = 0, j = scripts.length; i < j; i++) {
+      for (i = scripts.length; i--;) {
         script = scripts[i]
         if (script.hasAttribute('data-no-instant')) {
           continue
         }
-        copy = document.createElement('script')
-        if (script.src) {
-          copy.src = script.src
-        }
-        if (script.innerHTML) {
-          copy.innerHTML = script.innerHTML
-        }
-        parentNode = script.parentNode
-        nextSibling = script.nextSibling
-        parentNode.removeChild(script)
-        parentNode.insertBefore(copy, nextSibling)
+        copy = script.cloneNode(true)
+        script.parentNode.replaceChild(copy, script)
       }
     }
   }
