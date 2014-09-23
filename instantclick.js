@@ -45,7 +45,7 @@ var InstantClick = function(document, location) {
   }
 
   function getLinkTarget(target) {
-    while (target.nodeName != 'A') {
+    while (target && target.nodeName != 'A') {
       target = target.parentNode
     }
     return target
@@ -123,7 +123,7 @@ var InstantClick = function(document, location) {
     else {
       scrollTo(0, scrollY)
     }
-    instantanize()
+    bindEvents()
     bar.done()
     triggerPageEvent('change', false)
   }
@@ -133,16 +133,35 @@ var InstantClick = function(document, location) {
     $isWaitingForCompletion = false
   }
 
+  function isPreloadable(a){
+    var domain = location.protocol + '//' + location.host
+
+    return !(a.tagName != 'A'
+        || a.target // target="_blank" etc.
+        || a.hasAttribute('download')
+        || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
+        || (a.href.indexOf('#') > -1
+            && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
+        || ($useWhitelist
+            ? !isWhitelisted(a)
+            : isBlacklisted(a))
+        )
+  }
+
 
   ////////// EVENT HANDLERS //////////
 
-
   function mousedown(e) {
-    preload(getLinkTarget(e.target).href)
+    var a = getLinkTarget(e.target)
+    if (!a || !isPreloadable(a)) return
+
+    preload(a.href)
   }
 
   function mouseover(e) {
     var a = getLinkTarget(e.target)
+    if (!a || !isPreloadable(a)) return
+
     a.addEventListener('mouseout', mouseout)
 
     if (!$delayBeforePreload) {
@@ -156,21 +175,21 @@ var InstantClick = function(document, location) {
 
   function touchstart(e) {
     var a = getLinkTarget(e.target)
-    if ($preloadOnMousedown) {
-      a.removeEventListener('mousedown', mousedown)
-    }
-    else {
-      a.removeEventListener('mouseover', mouseover)
-    }
+    if (!a || !isPreloadable(a)) return
+
     preload(a.href)
   }
 
   function click(e) {
+    var a = getLinkTarget(e.target)
+    if (!a || !isPreloadable(a)) return
+
     if (e.which > 1 || e.metaKey || e.ctrlKey) { // Opening in new tab
       return
     }
+
     e.preventDefault()
-    display(getLinkTarget(e.target).href)
+    display(a.href)
   }
 
   function mouseout() {
@@ -298,46 +317,31 @@ var InstantClick = function(document, location) {
 
   ////////// MAIN FUNCTIONS //////////
 
-  function instantanize(isInitializing) {
-    var as = document.getElementsByTagName('a'),
-        a,
-        domain = location.protocol + '//' + location.host
+  function bindEvents() {
+    var de = document.documentElement
 
-    for (var i = as.length - 1; i >= 0; i--) {
-      a = as[i]
-      if (a.target // target="_blank" etc.
-          || a.hasAttribute('download')
-          || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
-          || (a.href.indexOf('#') > -1
-              && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
-          || ($useWhitelist
-              ? !isWhitelisted(a)
-              : isBlacklisted(a))
-         ) {
+    de.addEventListener('touchstart', touchstart)
+    if ($preloadOnMousedown) {
+      de.addEventListener('mousedown', mousedown)
+    }
+    else {
+      de.addEventListener('mouseover', mouseover)
+    }
+    de.addEventListener('click', click)
+  }
+
+  function initPage(){
+    var scripts = document.body.getElementsByTagName('script'),
+        script,
+        copy
+
+    for (i = scripts.length; i--;) {
+      script = scripts[i]
+      if (script.hasAttribute('data-no-instant')) {
         continue
       }
-      a.addEventListener('touchstart', touchstart)
-      if ($preloadOnMousedown) {
-        a.addEventListener('mousedown', mousedown)
-      }
-      else {
-        a.addEventListener('mouseover', mouseover)
-      }
-      a.addEventListener('click', click)
-    }
-    if (!isInitializing) {
-      var scripts = document.body.getElementsByTagName('script'),
-          script,
-          copy
-
-      for (i = scripts.length; i--;) {
-        script = scripts[i]
-        if (script.hasAttribute('data-no-instant')) {
-          continue
-        }
-        copy = script.cloneNode(true)
-        script.parentNode.replaceChild(copy, script)
-      }
+      copy = script.cloneNode(true)
+      script.parentNode.replaceChild(copy, script)
     }
   }
 
@@ -673,7 +677,7 @@ var InstantClick = function(document, location) {
     $xhr = new XMLHttpRequest()
     $xhr.addEventListener('readystatechange', readystatechange)
 
-    instantanize(true)
+    initPage()
 
     bar.init()
 
