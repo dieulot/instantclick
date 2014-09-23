@@ -244,24 +244,55 @@ var InstantClick = function(document, location) {
     }
   }
 
+  function shouldCopyElement(el){
+    return el.tagName == 'META' || el.tagName == 'SCRIPT' || el.tagName == 'LINK' || el.tagName == 'STYLE';
+  }
+
+  function containsElement(needle, haystack){
+    for (var i = haystack.length; i--;) {
+      if (!shouldCopyElement(haystack[i])
+        continue
+
+      if (haystack[i].outerHTML == needle.outerHTML)
+        return true
+    }
+
+    return false
+  }
+
   function addExistingResources(head){
     var elems = head.children,
         currElems = document.head.children,
-        found = false
+        remove = [],
+        add = []
+
+    // Remove all elements in the old head but not the new
+    for (var i = currElems.length; i--;) {
+      if (!shouldCopyElement(elems[i]))
+        continue
+
+      if (!containsElement(currElems[i], elems)){
+        remove.push(currElems[i])
+      }
+    }
 
     // Add all elements in the new head but not the old
     for (var i = elems.length; i--;) {
-      found = false
-      for (var j = currElems.length; j--;) {
-        if (currElems[j].outerHTML === elems[i].outerHTML){
-          found = true
-          break
-        }
-      }
+      if (!shouldCopyElement(elems[i]))
+        continue
 
-      if (!found){
-        document.head.appendChild(elems[i].cloneNode(true))
+      if (!containsElement(elems[i], currElems)){
+        add.push(elems[i])
       }
+    }
+
+    // We remove and add in a seperate step to not mess with the iteration above by
+    // maniuplating the children as we iterate through them
+    for (var i = remove.length; i--;){
+      document.head.removeChild(remove[i])
+    }
+    for (var i = add.length; i--;){
+      document.head.appendChild(add[i].cloneNode(true))
     }
   }
 
