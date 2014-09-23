@@ -15,6 +15,7 @@ var InstantClick = function(document, location) {
       $title = false,
       $mustRedirect = false,
       $body = false,
+      $head = false,
       $timing = {},
       $isPreloading = false,
       $isWaitingForCompletion = false,
@@ -90,7 +91,9 @@ var InstantClick = function(document, location) {
     /* The `change` event takes one boolean argument: "isInitialLoad" */
   }
 
-  function changePage(title, body, newUrl, scrollY) {
+  function changePage(title, head, body, newUrl, scrollY) {
+    addExistingResources(head)
+
     document.title = title
 
     document.documentElement.replaceChild(body, document.body)
@@ -199,11 +202,14 @@ var InstantClick = function(document, location) {
     if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = $xhr.responseText
+
       $title = doc.title
       $body = doc.body
+      $head = doc.head
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
         body: $body,
+        head: $head,
         title: $title,
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
       }
@@ -238,9 +244,28 @@ var InstantClick = function(document, location) {
     }
   }
 
+  function addExistingResources(head){
+    var elems = head.children,
+        currElems = document.head.children,
+        found = false
+
+    // Add all elements in the new head but not the old
+    for (var i = elems.length; i--;) {
+      found = false
+      for (var j = currElems.length; j--;) {
+        if (currElems[j].outerHTML === elems[i].outerHTML){
+          found = true
+          break
+        }
+      }
+
+      if (!found){
+        document.head.appendChild(elems[i].cloneNode(true))
+      }
+    }
+  }
 
   ////////// MAIN FUNCTIONS //////////
-
 
   function instantanize(isInitializing) {
     var as = document.getElementsByTagName('a'),
@@ -394,7 +419,7 @@ var InstantClick = function(document, location) {
     }
     $history[$currentLocationWithoutHash].scrollY = pageYOffset
     setPreloadingAsHalted()
-    changePage($title, $body, $url)
+    changePage($title, $head, $body, $url)
   }
 
 
@@ -595,6 +620,7 @@ var InstantClick = function(document, location) {
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
       body: document.body,
+      head: document.head,
       title: document.title,
       scrollY: pageYOffset
     }
@@ -637,7 +663,7 @@ var InstantClick = function(document, location) {
 
       $history[$currentLocationWithoutHash].scrollY = pageYOffset
       $currentLocationWithoutHash = loc
-      changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
+      changePage($history[loc].title, $history[loc].head, $history[loc].body, false, $history[loc].scrollY)
     })
   }
 
