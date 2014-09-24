@@ -719,7 +719,7 @@ var InstantClick = function(document, location) {
 
       $history[$currentLocationWithoutHash].scrollY = pageYOffset
       $currentLocationWithoutHash = loc
-      changePage($history[loc].doc, false, $history[loc].scrollY)
+      changePage($history[loc].doc, null, $history[loc].scrollY)
     })
   }
 
