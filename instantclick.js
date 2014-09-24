@@ -302,7 +302,7 @@ var InstantClick = function(document, location) {
     }
 
     // We remove and add in a seperate step to not mess with the iteration above by
-    // maniuplating the children as we iterate through them
+    // manipulating the children as we iterate through them
     for (var i = remove.length; i--;){
       document.head.removeChild(remove[i])
     }
