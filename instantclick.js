@@ -12,10 +12,8 @@ var InstantClick = function(document, location) {
       $history = {},
       $xhr,
       $url = false,
-      $title = false,
       $mustRedirect = false,
-      $body = false,
-      $head = false,
+      $doc = false,
       $timing = {},
       $isPreloading = false,
       $isWaitingForCompletion = false,
@@ -91,12 +89,14 @@ var InstantClick = function(document, location) {
     /* The `change` event takes one boolean argument: "isInitialLoad" */
   }
 
-  function changePage(title, head, body, newUrl, scrollY) {
-    addExistingResources(head)
+  function changePage(doc, newUrl, scrollY) {
+    updateHeadResources(doc.head)
+    updateAttributes(doc.head, document.head)
+    updateAttributes(doc.documentElement, document.documentElement)
 
-    document.title = title
+    document.title = doc.title
 
-    document.documentElement.replaceChild(body, document.body)
+    document.documentElement.replaceChild(doc.body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
     */
@@ -222,14 +222,10 @@ var InstantClick = function(document, location) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = $xhr.responseText
 
-      $title = doc.title
-      $body = doc.body
-      $head = doc.head
+      $doc = doc
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
-        body: $body,
-        head: $head,
-        title: $title,
+        doc: $doc,
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
       }
 
@@ -269,7 +265,7 @@ var InstantClick = function(document, location) {
 
   function containsElement(needle, haystack){
     for (var i = haystack.length; i--;) {
-      if (!shouldCopyElement(haystack[i])
+      if (!shouldCopyElement(haystack[i]))
         continue
 
       if (haystack[i].outerHTML == needle.outerHTML)
@@ -279,7 +275,7 @@ var InstantClick = function(document, location) {
     return false
   }
 
-  function addExistingResources(head){
+  function updateHeadResources(head){
     var elems = head.children,
         currElems = document.head.children,
         remove = [],
@@ -287,7 +283,7 @@ var InstantClick = function(document, location) {
 
     // Remove all elements in the old head but not the new
     for (var i = currElems.length; i--;) {
-      if (!shouldCopyElement(elems[i]))
+      if (!shouldCopyElement(currElems[i]))
         continue
 
       if (!containsElement(currElems[i], elems)){
@@ -312,6 +308,31 @@ var InstantClick = function(document, location) {
     }
     for (var i = add.length; i--;){
       document.head.appendChild(add[i].cloneNode(true))
+    }
+  }
+
+  function updateAttributes(source, dest){
+    var attr,
+        remove = []
+
+    for (var i=source.attributes.length; i--;){
+      attr = source.attributes[i]
+
+      if (attr.specified && dest.getAttribute(attr.name) !== attr.value){
+        dest.setAttribute(attr.name, attr.value)
+      }
+    }
+
+    for (var i=dest.attributes.length; i--;){
+      attr = dest.attributes[i]
+
+      if (attr.specified && source.getAttribute(attr.name) !== attr.value){
+        remove.push(attr.name)
+      }
+    }
+
+    for (var i=remove.length; i--;){
+      dest.removeAttribute(remove[i]);
     }
   }
 
@@ -386,7 +407,7 @@ var InstantClick = function(document, location) {
     $isWaitingForCompletion = false
 
     $url = url
-    $body = false
+    $doc = false
     $mustRedirect = false
     $timing = {
       start: +new Date
@@ -446,7 +467,7 @@ var InstantClick = function(document, location) {
       location.href = $url
       return
     }
-    if (!$body) {
+    if (!$doc) {
       bar.start(0, true)
       triggerPageEvent('wait')
       $isWaitingForCompletion = true
@@ -454,7 +475,7 @@ var InstantClick = function(document, location) {
     }
     $history[$currentLocationWithoutHash].scrollY = pageYOffset
     setPreloadingAsHalted()
-    changePage($title, $head, $body, $url)
+    changePage($doc, $url)
   }
 
 
@@ -510,6 +531,7 @@ var InstantClick = function(document, location) {
         addEventListener('scroll', updatePositionAndScale)
       }
 
+      bindEvents()
     }
 
     function start(at, jump) {
@@ -654,8 +676,7 @@ var InstantClick = function(document, location) {
     }
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
-      body: document.body,
-      head: document.head,
+      doc: document,
       title: document.title,
       scrollY: pageYOffset
     }
@@ -698,7 +719,7 @@ var InstantClick = function(document, location) {
 
       $history[$currentLocationWithoutHash].scrollY = pageYOffset
       $currentLocationWithoutHash = loc
-      changePage($history[loc].title, $history[loc].head, $history[loc].body, false, $history[loc].scrollY)
+      changePage($history[loc].doc, false, $history[loc].scrollY)
     })
   }
 
@@ -719,9 +740,8 @@ var InstantClick = function(document, location) {
       history: $history,
       xhr: $xhr,
       url: $url,
-      title: $title,
+      doc: $doc,
       mustRedirect: $mustRedirect,
-      body: $body,
       timing: $timing,
       isPreloading: $isPreloading,
       isWaitingForCompletion: $isWaitingForCompletion
