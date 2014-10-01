@@ -278,16 +278,15 @@ var InstantClick = function(document, location) {
 
   function updateHeadResources(head){
     var elems = head.children,
-        currElems = document.head.children,
-        remove = [],
-        add = []
+        currElems = document.head.children
 
     // Remove all elements in the old head but not the new
     for (var i = currElems.length; i--;) {
       if (!shouldCopyElement(currElems[i]))
         continue
 
-      if (!containsElement(currElems[i], elems)){
+      // We always remove and readd script tags so they get reexecuted
+      if (!containsElement(currElems[i], elems) || currElems[i].tagName == 'SCRIPT') {
         remove.push(currElems[i])
       }
     }
@@ -297,24 +296,26 @@ var InstantClick = function(document, location) {
       if (!shouldCopyElement(elems[i]))
         continue
 
-      if (!containsElement(elems[i], currElems)){
+      if (!containsElement(elems[i], currElems) || elems[i].tagName == 'SCRIPT') {
         add.push(elems[i])
       }
     }
 
     // We remove and add in a seperate step to not mess with the iteration above by
     // manipulating the children as we iterate through them
-    for (var i = remove.length; i--;){
-      document.head.removeChild(remove[i])
-    }
     for (var i = add.length; i--;){
       document.head.appendChild(add[i].cloneNode(true))
+    }
+    for (var i = remove.length; i--;){
+      document.head.removeChild(remove[i])
     }
   }
 
   function updateAttributes(source, dest){
-    var attr,
-        remove = []
+    var attr
+
+    // We don't remove attributes to not mess with those added by client-side js
+    // like Typekit.
 
     for (var i=source.attributes.length; i--;){
       attr = source.attributes[i]
@@ -322,18 +323,6 @@ var InstantClick = function(document, location) {
       if (attr.specified && dest.getAttribute(attr.name) !== attr.value){
         dest.setAttribute(attr.name, attr.value)
       }
-    }
-
-    for (var i=dest.attributes.length; i--;){
-      attr = dest.attributes[i]
-
-      if (attr.specified && source.getAttribute(attr.name) !== attr.value){
-        remove.push(attr.name)
-      }
-    }
-
-    for (var i=remove.length; i--;){
-      dest.removeAttribute(remove[i]);
     }
   }
 
