@@ -294,9 +294,7 @@ var InstantClick = function(document, location) {
 
   function updateHeadResources(head){
     var elems = head.children,
-        currElems = document.head.children,
-        remove = [],
-        add = []
+        currElems = document.head.children
 
     // Remove all elements in the old head but not the new
     for (var i = currElems.length; i--;) {
@@ -330,8 +328,10 @@ var InstantClick = function(document, location) {
   }
 
   function updateAttributes(source, dest){
-    var attr,
-        remove = []
+    var attr
+
+    // We don't remove attributes to not mess with those added by client-side js
+    // like Typekit.
 
     for (var i=source.attributes.length; i--;){
       attr = source.attributes[i]
@@ -340,9 +340,6 @@ var InstantClick = function(document, location) {
         dest.setAttribute(attr.name, attr.value)
       }
     }
-
-    // We don't remove existing attributes to avoid breaking attrs
-    // which have been added by clientside js (i.e. Typekit)
   }
 
   ////////// MAIN FUNCTIONS //////////
