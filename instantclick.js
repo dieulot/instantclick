@@ -42,6 +42,22 @@ var InstantClick = function(document, location) {
     return url.substr(0, index)
   }
 
+  function cloneNode(el) {
+    // We can't use the native cloneNode as it won't reexecute script tags
+    var newEl = document.createElement(el.tagName),
+        attr
+
+    for (var i=el.attributes.length; i--;){
+      attr = el.attributes[i]
+
+      if (attr.specified){
+        newEl.setAttribute(attr.name, attr.value)
+      }
+    }
+
+    return newEl
+  }
+
   function getLinkTarget(target) {
     while (target && target.nodeName != 'A') {
       target = target.parentNode
@@ -282,14 +298,34 @@ var InstantClick = function(document, location) {
         remove = [],
         add = []
 
-    // We remove and readd everything to ensure that script tags get executed again
-    for (var i = currElems.length; i--;){
-      if (shouldCopyElement(currElems[i]))
-        document.head.removeChild(currElems[i])
+    // Remove all elements in the old head but not the new
+    for (var i = currElems.length; i--;) {
+      if (!shouldCopyElement(currElems[i]))
+        continue
+
+      // We always remove and readd script tags so they get reexecuted
+      if (!containsElement(currElems[i], elems) || currElems[i].tagName == 'SCRIPT') {
+        remove.push(currElems[i])
+      }
     }
-    for (var i = elems.length; i--;){
-      if (shouldCopyElement(elems[i]))
-        document.head.appendChild(elems[i].cloneNode(true))
+
+    // Add all elements in the new head but not the old
+    for (var i = elems.length; i--;) {
+      if (!shouldCopyElement(elems[i]))
+        continue
+
+      if (!containsElement(elems[i], currElems) || elems[i].tagName == 'SCRIPT') {
+        add.push(elems[i])
+      }
+    }
+
+    // We remove and add in a seperate step to not mess with the iteration above by
+    // manipulating the children as we iterate through them
+    for (var i = add.length; i--;){
+      document.head.appendChild(cloneNode(add[i]))
+    }
+    for (var i = remove.length; i--;){
+      document.head.removeChild(remove[i])
     }
   }
 
@@ -334,7 +370,7 @@ var InstantClick = function(document, location) {
       if (script.hasAttribute('data-no-instant')) {
         continue
       }
-      copy = script.cloneNode(true)
+      copy = cloneNode(script)
       script.parentNode.replaceChild(copy, script)
     }
   }
