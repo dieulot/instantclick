@@ -278,7 +278,9 @@ var InstantClick = function(document, location) {
 
   function updateHeadResources(head){
     var elems = head.children,
-        currElems = document.head.children
+        currElems = document.head.children,
+        remove = [],
+        add = []
 
     // We remove and readd everything to ensure that script tags get executed again
     for (var i = currElems.length; i--;){
