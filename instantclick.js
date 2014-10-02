@@ -55,6 +55,8 @@ var InstantClick = function(document, location) {
       }
     }
 
+    newEl.innerHTML = el.innerHTML
+
     return newEl
   }
 
