@@ -328,7 +328,12 @@ var InstantClick = function(document, location) {
       if (add[i].tagName == 'SCRIPT' && add[i].innerHTML && !add[i].getAttribute('src')){
         var type = add[i].getAttribute('type');
         if (!type || type == "text/javascript" || type == "application/javascript"){
-          eval(add[i].innerHTML);
+          var content = add[i].innerHTML
+          setTimeout((function(content){
+            return function(){
+              eval(content)
+            }
+          })(content), 0)
         }
       }
     }
