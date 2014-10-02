@@ -323,6 +323,14 @@ var InstantClick = function(document, location) {
     // manipulating the children as we iterate through them
     for (var i = add.length; i--;){
       document.head.appendChild(cloneNode(add[i]))
+
+      // Injected script nodes don't get executed
+      if (add[i].tagName == 'SCRIPT' && add[i].innerHTML && !add[i].getAttribute('src')){
+        var type = add[i].getAttribute('type');
+        if (!type || type == "text/javascript" || type == "application/javascript"){
+          eval(add[i].innerHTML);
+        }
+      }
     }
     for (var i = remove.length; i--;){
       document.head.removeChild(remove[i])
