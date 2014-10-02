@@ -12,9 +12,8 @@ var InstantClick = function(document, location) {
       $history = {},
       $xhr,
       $url = false,
-      $title = false,
       $mustRedirect = false,
-      $body = false,
+      $doc = false,
       $timing = {},
       $isPreloading = false,
       $isWaitingForCompletion = false,
@@ -43,8 +42,26 @@ var InstantClick = function(document, location) {
     return url.substr(0, index)
   }
 
+  function cloneNode(el) {
+    // We can't use the native cloneNode as it won't reexecute script tags
+    var newEl = document.createElement(el.tagName),
+        attr
+
+    for (var i=el.attributes.length; i--;){
+      attr = el.attributes[i]
+
+      if (attr.specified){
+        newEl.setAttribute(attr.name, attr.value)
+      }
+    }
+
+    newEl.innerHTML = el.innerHTML
+
+    return newEl
+  }
+
   function getLinkTarget(target) {
-    while (target.nodeName != 'A') {
+    while (target && target.nodeName != 'A') {
       target = target.parentNode
     }
     return target
@@ -90,10 +107,14 @@ var InstantClick = function(document, location) {
     /* The `change` event takes one boolean argument: "isInitialLoad" */
   }
 
-  function changePage(title, body, newUrl, scrollY) {
-    document.title = title
+  function changePage(doc, newUrl, scrollY) {
+    updateHeadResources(doc.head)
+    updateAttributes(doc.head, document.head)
+    updateAttributes(doc.documentElement, document.documentElement)
 
-    document.documentElement.replaceChild(body, document.body)
+    document.title = doc.title
+
+    document.documentElement.replaceChild(doc.body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
     */
@@ -120,7 +141,7 @@ var InstantClick = function(document, location) {
     else {
       scrollTo(0, scrollY)
     }
-    instantanize()
+    bindEvents()
     bar.done()
     triggerPageEvent('change', false)
   }
@@ -130,16 +151,35 @@ var InstantClick = function(document, location) {
     $isWaitingForCompletion = false
   }
 
+  function isPreloadable(a){
+    var domain = location.protocol + '//' + location.host
+
+    return !(a.tagName != 'A'
+        || a.target // target="_blank" etc.
+        || a.hasAttribute('download')
+        || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
+        || (a.href.indexOf('#') > -1
+            && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
+        || ($useWhitelist
+            ? !isWhitelisted(a)
+            : isBlacklisted(a))
+        )
+  }
+
 
   ////////// EVENT HANDLERS //////////
 
-
   function mousedown(e) {
-    preload(getLinkTarget(e.target).href)
+    var a = getLinkTarget(e.target)
+    if (!a || !isPreloadable(a)) return
+
+    preload(a.href)
   }
 
   function mouseover(e) {
     var a = getLinkTarget(e.target)
+    if (!a || !isPreloadable(a)) return
+
     a.addEventListener('mouseout', mouseout)
 
     if (!$delayBeforePreload) {
@@ -153,21 +193,22 @@ var InstantClick = function(document, location) {
 
   function touchstart(e) {
     var a = getLinkTarget(e.target)
-    if ($preloadOnMousedown) {
-      a.removeEventListener('mousedown', mousedown)
-    }
-    else {
-      a.removeEventListener('mouseover', mouseover)
-    }
+    if (!a || !isPreloadable(a)) return
+
     preload(a.href)
   }
 
   function click(e) {
+    var a = getLinkTarget(e.target)
+    if (!a || !isPreloadable(a)) return
+    if (e.defaultPrevented || e.returnValue === false) return
+
     if (e.which > 1 || e.metaKey || e.ctrlKey) { // Opening in new tab
       return
     }
+
     e.preventDefault()
-    display(getLinkTarget(e.target).href)
+    display(a.href)
   }
 
   function mouseout() {
@@ -199,12 +240,11 @@ var InstantClick = function(document, location) {
     if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = $xhr.responseText
-      $title = doc.title
-      $body = doc.body
+
+      $doc = doc
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
-        body: $body,
-        title: $title,
+        doc: $doc,
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
       }
 
@@ -238,61 +278,112 @@ var InstantClick = function(document, location) {
     }
   }
 
+  function shouldCopyElement(el){
+    return el.tagName == 'META' || el.tagName == 'SCRIPT' || el.tagName == 'LINK' || el.tagName == 'STYLE';
+  }
+
+  function containsElement(needle, haystack){
+    for (var i = haystack.length; i--;) {
+      if (!shouldCopyElement(haystack[i]))
+        continue
+
+      if (haystack[i].outerHTML == needle.outerHTML)
+        return true
+    }
+
+    return false
+  }
+
+  function updateHeadResources(head){
+    var elems = head.children,
+        currElems = document.head.children
+
+    // Remove all elements in the old head but not the new
+    for (var i = currElems.length; i--;) {
+      if (!shouldCopyElement(currElems[i]))
+        continue
+
+      // We always remove and readd script tags so they get reexecuted
+      if (!containsElement(currElems[i], elems) || currElems[i].tagName == 'SCRIPT') {
+        remove.push(currElems[i])
+      }
+    }
+
+    // Add all elements in the new head but not the old
+    for (var i = elems.length; i--;) {
+      if (!shouldCopyElement(elems[i]))
+        continue
+
+      if (!containsElement(elems[i], currElems) || elems[i].tagName == 'SCRIPT') {
+        add.push(elems[i])
+      }
+    }
+
+    // We remove and add in a seperate step to not mess with the iteration above by
+    // manipulating the children as we iterate through them
+    for (var i = add.length; i--;){
+      document.head.appendChild(cloneNode(add[i]))
+
+      // Injected script nodes don't get executed
+      if (add[i].tagName == 'SCRIPT' && add[i].innerHTML && !add[i].getAttribute('src')){
+        var type = add[i].getAttribute('type');
+        if (!type || type == "text/javascript" || type == "application/javascript"){
+          var content = add[i].innerHTML
+          setTimeout((function(content){
+            return function(){
+              eval(content)
+            }
+          })(content), 0)
+        }
+      }
+    }
+    for (var i = remove.length; i--;){
+      document.head.removeChild(remove[i])
+    }
+  }
+
+  function updateAttributes(source, dest){
+    var attr
+
+    // We don't remove attributes to not mess with those added by client-side js
+    // like Typekit.
+
+    for (var i=source.attributes.length; i--;){
+      attr = source.attributes[i]
+
+      if (attr.specified && dest.getAttribute(attr.name) !== attr.value){
+        dest.setAttribute(attr.name, attr.value)
+      }
+    }
+  }
 
   ////////// MAIN FUNCTIONS //////////
 
+  function bindEvents() {
+    var de = document.documentElement
 
-  function instantanize(isInitializing) {
-    var as = document.getElementsByTagName('a'),
-        a,
-        domain = location.protocol + '//' + location.host
+    de.addEventListener('touchstart', touchstart)
+    if ($preloadOnMousedown) {
+      de.addEventListener('mousedown', mousedown)
+    }
+    else {
+      de.addEventListener('mouseover', mouseover)
+    }
+    de.addEventListener('click', click)
+  }
 
-    for (var i = as.length - 1; i >= 0; i--) {
-      a = as[i]
-      if (a.target // target="_blank" etc.
-          || a.hasAttribute('download')
-          || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
-          || (a.href.indexOf('#') > -1
-              && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
-          || ($useWhitelist
-              ? !isWhitelisted(a)
-              : isBlacklisted(a))
-         ) {
+  function initPage(){
+    var scripts = document.body.getElementsByTagName('script'),
+        script,
+        copy
+
+    for (i = scripts.length; i--;) {
+      script = scripts[i]
+      if (script.hasAttribute('data-no-instant')) {
         continue
       }
-      a.addEventListener('touchstart', touchstart)
-      if ($preloadOnMousedown) {
-        a.addEventListener('mousedown', mousedown)
-      }
-      else {
-        a.addEventListener('mouseover', mouseover)
-      }
-      a.addEventListener('click', click)
-    }
-    if (!isInitializing) {
-      var scripts = document.body.getElementsByTagName('script'),
-          script,
-          copy,
-          parentNode,
-          nextSibling
-
-      for (i = 0, j = scripts.length; i < j; i++) {
-        script = scripts[i]
-        if (script.hasAttribute('data-no-instant')) {
-          continue
-        }
-        copy = document.createElement('script')
-        if (script.src) {
-          copy.src = script.src
-        }
-        if (script.innerHTML) {
-          copy.innerHTML = script.innerHTML
-        }
-        parentNode = script.parentNode
-        nextSibling = script.nextSibling
-        parentNode.removeChild(script)
-        parentNode.insertBefore(copy, nextSibling)
-      }
+      copy = cloneNode(script)
+      script.parentNode.replaceChild(copy, script)
     }
   }
 
@@ -337,7 +428,7 @@ var InstantClick = function(document, location) {
     $isWaitingForCompletion = false
 
     $url = url
-    $body = false
+    $doc = false
     $mustRedirect = false
     $timing = {
       start: +new Date
@@ -397,7 +488,7 @@ var InstantClick = function(document, location) {
       location.href = $url
       return
     }
-    if (!$body) {
+    if (!$doc) {
       bar.start(0, true)
       triggerPageEvent('wait')
       $isWaitingForCompletion = true
@@ -405,7 +496,7 @@ var InstantClick = function(document, location) {
     }
     $history[$currentLocationWithoutHash].scrollY = pageYOffset
     setPreloadingAsHalted()
-    changePage($title, $body, $url)
+    changePage($doc, $url)
   }
 
 
@@ -461,6 +552,7 @@ var InstantClick = function(document, location) {
         addEventListener('scroll', updatePositionAndScale)
       }
 
+      bindEvents()
     }
 
     function start(at, jump) {
@@ -605,7 +697,7 @@ var InstantClick = function(document, location) {
     }
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
-      body: document.body,
+      doc: document,
       title: document.title,
       scrollY: pageYOffset
     }
@@ -627,7 +719,7 @@ var InstantClick = function(document, location) {
     $xhr = new XMLHttpRequest()
     $xhr.addEventListener('readystatechange', readystatechange)
 
-    instantanize(true)
+    initPage()
 
     bar.init()
 
@@ -648,7 +740,7 @@ var InstantClick = function(document, location) {
 
       $history[$currentLocationWithoutHash].scrollY = pageYOffset
       $currentLocationWithoutHash = loc
-      changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
+      changePage($history[loc].doc, null, $history[loc].scrollY)
     })
   }
 
@@ -669,9 +761,8 @@ var InstantClick = function(document, location) {
       history: $history,
       xhr: $xhr,
       url: $url,
-      title: $title,
+      doc: $doc,
       mustRedirect: $mustRedirect,
-      body: $body,
       timing: $timing,
       isPreloading: $isPreloading,
       isWaitingForCompletion: $isWaitingForCompletion
