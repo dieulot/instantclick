@@ -558,7 +558,7 @@ var InstantClick = function(document, location) {
      2.3.7: pushState appears to work correctly, but
             `doc.documentElement.innerHTML = body` is buggy.
             See details here: http://stackoverflow.com/q/21918564
-            Note an issue anymore, but it may fail where 3.0 do, this needs
+            Not an issue anymore, but it may fail where 3.0 do, this needs
             testing again.
 
      3.0:   pushState appears to work correctly (though the URL bar is only
