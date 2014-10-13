@@ -657,34 +657,10 @@ var InstantClick = function(document, location) {
   }
 
 
-  /* The debug function isn't included by default to reduce file size.
-     To enable it, add a slash at the beginning of the comment englobing
-     the debug function, and uncomment "debug: debug," in the return
-     statement below the function. */
-
-  /*
-  function debug() {
-    return {
-      currentLocationWithoutHash: $currentLocationWithoutHash,
-      history: $history,
-      xhr: $xhr,
-      url: $url,
-      title: $title,
-      mustRedirect: $mustRedirect,
-      body: $body,
-      timing: $timing,
-      isPreloading: $isPreloading,
-      isWaitingForCompletion: $isWaitingForCompletion
-    }
-  }
-  //*/
-
-
   ////////////////////
 
 
   return {
-    // debug: debug,
     supported: supported,
     init: init,
     on: on
