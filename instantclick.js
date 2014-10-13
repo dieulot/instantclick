@@ -742,6 +742,13 @@ var InstantClick = function(document, location) {
       $currentLocationWithoutHash = loc
       changePage($history[loc].doc, null, $history[loc].scrollY)
     })
+
+    addEventListener('load', function(){
+      // We override document.write as there's little point to using it after the page has loaded,
+      // and rerunning scripts which think the original page is loading will cause their
+      // document.write calls to clear the page.
+      document.write = function(){}
+    })
   }
 
   function on(eventType, callback) {
