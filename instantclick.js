@@ -3,6 +3,7 @@
 var InstantClick = function(document, location) {
   // Internal variables
   var $ua = navigator.userAgent,
+      $isChromeOnIOS = $ua.indexOf(' CriOS/') > -1,
       $hasTouch = 'createTouch' in document,
       $currentLocationWithoutHash,
       $urlToPreload,
@@ -91,8 +92,6 @@ var InstantClick = function(document, location) {
   }
 
   function changePage(title, body, newUrl, scrollY) {
-    document.title = title
-
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
@@ -120,6 +119,21 @@ var InstantClick = function(document, location) {
     else {
       scrollTo(0, scrollY)
     }
+
+    if ($isChromeOnIOS && document.title == title) {
+      /* Chrome on iOS:
+       *
+       * 1. Removes title on pushState, so the title needs to be set after.
+       *
+       * 2. Will not set the title if it’s identical when trimmed, so
+       *    appending a space won't do, but a non-breaking space works.
+       */
+      document.title = title + String.fromCharCode(160)
+    }
+    else {
+      document.title = title
+    }
+
     instantanize()
     bar.done()
     triggerPageEvent('change', false)
