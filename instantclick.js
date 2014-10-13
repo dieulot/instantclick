@@ -719,8 +719,6 @@ var InstantClick = function(document, location) {
     $xhr = new XMLHttpRequest()
     $xhr.addEventListener('readystatechange', readystatechange)
 
-    initPage()
-
     bar.init()
 
     triggerPageEvent('change', true)
