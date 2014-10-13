@@ -3,7 +3,7 @@
 var InstantClick = function(document, location) {
   // Internal variables
   var $ua = navigator.userAgent,
-      $isChromeOnIOS = $ua.indexOf(' CriOS/') > -1,
+      $isChromeForIOS = $ua.indexOf(' CriOS/') > -1,
       $hasTouch = 'createTouch' in document,
       $currentLocationWithoutHash,
       $urlToPreload,
@@ -120,8 +120,8 @@ var InstantClick = function(document, location) {
       scrollTo(0, scrollY)
     }
 
-    if ($isChromeOnIOS && document.title == title) {
-      /* Chrome on iOS:
+    if ($isChromeForIOS && document.title == title) {
+      /* Chrome for iOS:
        *
        * 1. Removes title on pushState, so the title needs to be set after.
        *
