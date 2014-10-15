@@ -147,12 +147,45 @@ var InstantClick = function(document, location) {
 
   ////////// EVENT HANDLERS //////////
 
+  function handleMouseEnter(handler) {
+    return function(e) {
+      e = e || event // IE
+      var toElement = e.relatedTarget || e.srcElement // IE
+
+      while (toElement && toElement !== this) {
+        toElement = toElement.parentNode
+      }
+
+      if (toElement == this) {
+        return
+      }
+
+      return handler.call(this, e)
+    };
+  }
+
+  function handleMouseLeave(handler) {
+    return function(e) {
+      e = e || event // IE
+      var toElement = e.relatedTarget || e.toElement // IE
+
+      while (toElement && toElement !== this) {
+        toElement = toElement.parentNode
+      }
+
+      if (toElement == this) {
+        return
+      }
+
+      return handler.call(this, e)
+    }
+  }
 
   function mousedown(e) {
     preload(getLinkTarget(e.target).href)
   }
 
-  function mouseover(e) {
+  var mouseover = handleMouseEnter(function (e) {
     var a = getLinkTarget(e.target)
     a.addEventListener('mouseout', mouseout)
 
@@ -163,7 +196,21 @@ var InstantClick = function(document, location) {
       $urlToPreload = a.href
       $preloadTimer = setTimeout(preload, $delayBeforePreload)
     }
-  }
+  })
+
+  var mouseout = handleMouseLeave(function () {
+    if ($preloadTimer) {
+      clearTimeout($preloadTimer)
+      $preloadTimer = false
+      return
+    }
+
+    if (!$isPreloading || $isWaitingForCompletion) {
+      return
+    }
+    $xhr.abort()
+    setPreloadingAsHalted()
+  })
 
   function touchstart(e) {
     var a = getLinkTarget(e.target)
@@ -182,20 +229,6 @@ var InstantClick = function(document, location) {
     }
     e.preventDefault()
     display(getLinkTarget(e.target).href)
-  }
-
-  function mouseout() {
-    if ($preloadTimer) {
-      clearTimeout($preloadTimer)
-      $preloadTimer = false
-      return
-    }
-
-    if (!$isPreloading || $isWaitingForCompletion) {
-      return
-    }
-    $xhr.abort()
-    setPreloadingAsHalted()
   }
 
   function readystatechange() {
@@ -279,7 +312,7 @@ var InstantClick = function(document, location) {
         a.addEventListener('mousedown', mousedown)
       }
       else {
-        a.addEventListener('mouseover', mouseover)
+          a.addEventListener('mouseover', mouseover)
       }
       a.addEventListener('click', click)
     }

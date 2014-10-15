@@ -6,7 +6,8 @@ $pages = array(
   'Page without title' => 'no-title',
   'Minimal markup' => 'minimal',
   'NProgress' => 'nprogress',
-  'Entities in the &#8249;title&rsaquo;' => 'entities'
+  'Entities in the &#8249;title&rsaquo;' => 'entities',
+  'Link with children' => 'children'
 );
 
 $page = 'welcome';
