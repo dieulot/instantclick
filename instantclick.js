@@ -144,6 +144,13 @@ var InstantClick = function(document, location) {
     $isWaitingForCompletion = false
   }
 
+  function removeNoscriptTags(html) {
+    /* Must be done on text, not on a node's innerHTML, otherwise strange
+     * things happen with implicitly closed elements (see the Noscript test).
+     */
+    return html.replace(/<noscript[\s\S]+<\/noscript>/gi, '')
+  }
+
 
   ////////// EVENT HANDLERS //////////
 
@@ -212,7 +219,7 @@ var InstantClick = function(document, location) {
 
     if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
-      doc.documentElement.innerHTML = $xhr.responseText
+      doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
       $title = doc.title
       $body = doc.body
       var urlWithoutHash = removeHash($url)
