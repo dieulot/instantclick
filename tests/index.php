@@ -27,12 +27,18 @@ if (isset($_GET['on'])) {
   }
 }
 
+$use_amd = isset($_GET['amd']) && $_GET['amd'];
+
 $nocache = '&amp;nocache=' . microtime(true) * 10000;
 if ($preload_on == 'hover') {
   $append = $nocache;
 }
 else {
   $append = '&amp;on=' . $preload_on . $nocache;
+}
+
+if ($use_amd) {
+    $append .= '&amp;amd=' . $use_amd;
 }
 
 if (isset($_GET['wait'])) {
@@ -71,6 +77,7 @@ Entities in the &#8249;title&rsaquo;
   <a data-no-instant href="?<?php echo $nocache ?>" class="<?php if ($preload_on == 'hover') echo 'selected' ?>">↻ On hover</a>
   <a data-no-instant href="?on=100<?php echo $nocache ?>" class="<?php if ($preload_on === (int)$preload_on) echo 'selected' ?>">↻ On hover + 100 ms delay</a>
   <a data-no-instant href="?on=mousedown<?php echo $nocache ?>" class="<?php if ($preload_on == 'mousedown') echo 'selected' ?>">↻ On mousedown</a>
+  <a data-no-instant href="?amd=1<?php echo $nocache ?>" class="<?php if ($amd) echo 'selected' ?>">↻ Using Require.js</a>
 </div>
 
 <hr>
@@ -153,7 +160,23 @@ function testEvents(InstantClick) {
 }
 </script>
 
+<?php if ($use_amd): ?>
+<script src="vendors/requirejs/requirejs-2.1.15.js" data-no-instant></script>
+<script>
+require.config({
+baseUrl: '/'
+});
+
+require(['InstantClick'], function(InstantClick) {
+addDebugMessage('Loaded with: Require.js AMD')
+testEvents(InstantClick)
+});
+</script>
+
+<?php else: ?>
 <script src="instantclick.js.php?<?php echo $nocache ?>" data-no-instant></script>
 <script>
+addDebugMessage('Loaded with: script tag')
 testEvents(window.InstantClick)
 </script>
+<?php endif ?>
