@@ -1,6 +1,14 @@
 /* InstantClick 3.0.1 | (C) 2014 Alexandre Dieulot | http://instantclick.io/license */
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(['InstantClick'], factory(root.document, root.location));
+  } else if (typeof exports === 'object') {
+    module.exports = factory(root.document, root.location);
+  } else {
+    root.InstantClick = factory(root.document, root.location);
+  }
+}(window || this, function(document, location) {
 
-var InstantClick = function(document, location) {
   // Internal variables
   var $ua = navigator.userAgent,
       $isChromeForIOS = $ua.indexOf(' CriOS/') > -1,
@@ -687,4 +695,4 @@ var InstantClick = function(document, location) {
     on: on
   }
 
-}(document, location);
+}));

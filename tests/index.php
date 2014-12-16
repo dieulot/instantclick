@@ -27,12 +27,18 @@ if (isset($_GET['on'])) {
   }
 }
 
+$use_amd = isset($_GET['amd']) && $_GET['amd'];
+
 $nocache = '&amp;nocache=' . microtime(true) * 10000;
 if ($preload_on == 'hover') {
   $append = $nocache;
 }
 else {
   $append = '&amp;on=' . $preload_on . $nocache;
+}
+
+if ($use_amd) {
+    $append .= '&amp;amd=' . $use_amd;
 }
 
 if (isset($_GET['wait'])) {
@@ -71,6 +77,7 @@ Entities in the &#8249;title&rsaquo;
   <a data-no-instant href="?<?php echo $nocache ?>" class="<?php if ($preload_on == 'hover') echo 'selected' ?>">↻ On hover</a>
   <a data-no-instant href="?on=100<?php echo $nocache ?>" class="<?php if ($preload_on === (int)$preload_on) echo 'selected' ?>">↻ On hover + 100 ms delay</a>
   <a data-no-instant href="?on=mousedown<?php echo $nocache ?>" class="<?php if ($preload_on == 'mousedown') echo 'selected' ?>">↻ On mousedown</a>
+  <a data-no-instant href="?amd=1<?php echo $nocache ?>" class="<?php if ($amd) echo 'selected' ?>">↻ Using Require.js</a>
 </div>
 
 <hr>
@@ -100,26 +107,6 @@ endforeach ?>
 
 <div id="divDebug"></div>
 
-
-
-<script src="instantclick.js.php?<?php echo $nocache ?>" data-no-instant></script>
-
-
-<?php if ($page == 'nprogress'): ?>
-<script data-no-instant>
-InstantClick.on('wait', function() {
-  NProgress.start()
-})
-
-InstantClick.on('change', function(isInitialLoad) {
-  if (isInitialLoad) {
-    addDebugMessage('NProgress on')
-  }
-  NProgress.done(!isInitialLoad)
-})
-</script>
-<?php endif ?>
-
 <script data-no-instant>
 var $debugMessages = ''
 
@@ -132,29 +119,64 @@ function addDebugMessage(message) {
   divDebug.innerHTML = $debugMessages
 }
 
-InstantClick.on('fetch', function() {
-  addDebugMessage('<small><small>Event: fetch</small></small>')
-})
+function testEvents(InstantClick) {
+  <?php if ($page == 'nprogress'): ?>
+  InstantClick.on('wait', function() {
+    NProgress.start()
+  })
 
-InstantClick.on('receive', function() {
-  addDebugMessage('<small><small>Event: receive</small></small>')
-})
+  InstantClick.on('change', function(isInitialLoad) {
+    if (isInitialLoad) {
+      addDebugMessage('NProgress on')
+    }
+    NProgress.done(!isInitialLoad)
+  })
+  <?php endif ?>
 
-InstantClick.on('wait', function() {
-  addDebugMessage('Event: wait')
-})
+  InstantClick.on('fetch', function() {
+    addDebugMessage('<small><small>Event: fetch</small></small>')
+  })
 
-InstantClick.on('change', function(isInitialLoad) {
-  addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
-})
+  InstantClick.on('receive', function() {
+    addDebugMessage('<small><small>Event: receive</small></small>')
+  })
 
-InstantClick.init(<?php
-if ($preload_on == 'mousedown') {
-  echo "'mousedown'";
+  InstantClick.on('wait', function() {
+    addDebugMessage('Event: wait')
+  })
+
+  InstantClick.on('change', function(isInitialLoad) {
+    addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
+  })
+
+  InstantClick.init(<?php
+  if ($preload_on == 'mousedown') {
+    echo "'mousedown'";
+  }
+  elseif ((int)$preload_on != 0) {
+    echo $preload_on;
+  }
+  ?>);
 }
-elseif ((int)$preload_on != 0) {
-  echo $preload_on;
-}
-
-?>);
 </script>
+
+<?php if ($use_amd): ?>
+<script src="vendors/requirejs/requirejs-2.1.15.js" data-no-instant></script>
+<script>
+require.config({
+baseUrl: '/'
+});
+
+require(['InstantClick'], function(InstantClick) {
+addDebugMessage('Loaded with: Require.js AMD')
+testEvents(InstantClick)
+});
+</script>
+
+<?php else: ?>
+<script src="instantclick.js.php?<?php echo $nocache ?>" data-no-instant></script>
+<script>
+addDebugMessage('Loaded with: script tag')
+testEvents(window.InstantClick)
+</script>
+<?php endif ?>
