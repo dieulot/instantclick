@@ -100,26 +100,6 @@ endforeach ?>
 
 <div id="divDebug"></div>
 
-
-
-<script src="instantclick.js.php?<?php echo $nocache ?>" data-no-instant></script>
-
-
-<?php if ($page == 'nprogress'): ?>
-<script data-no-instant>
-InstantClick.on('wait', function() {
-  NProgress.start()
-})
-
-InstantClick.on('change', function(isInitialLoad) {
-  if (isInitialLoad) {
-    addDebugMessage('NProgress on')
-  }
-  NProgress.done(!isInitialLoad)
-})
-</script>
-<?php endif ?>
-
 <script data-no-instant>
 var $debugMessages = ''
 
@@ -132,29 +112,48 @@ function addDebugMessage(message) {
   divDebug.innerHTML = $debugMessages
 }
 
-InstantClick.on('fetch', function() {
-  addDebugMessage('<small><small>Event: fetch</small></small>')
-})
+function testEvents(InstantClick) {
+  <?php if ($page == 'nprogress'): ?>
+  InstantClick.on('wait', function() {
+    NProgress.start()
+  })
 
-InstantClick.on('receive', function() {
-  addDebugMessage('<small><small>Event: receive</small></small>')
-})
+  InstantClick.on('change', function(isInitialLoad) {
+    if (isInitialLoad) {
+      addDebugMessage('NProgress on')
+    }
+    NProgress.done(!isInitialLoad)
+  })
+  <?php endif ?>
 
-InstantClick.on('wait', function() {
-  addDebugMessage('Event: wait')
-})
+  InstantClick.on('fetch', function() {
+    addDebugMessage('<small><small>Event: fetch</small></small>')
+  })
 
-InstantClick.on('change', function(isInitialLoad) {
-  addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
-})
+  InstantClick.on('receive', function() {
+    addDebugMessage('<small><small>Event: receive</small></small>')
+  })
 
-InstantClick.init(<?php
-if ($preload_on == 'mousedown') {
-  echo "'mousedown'";
+  InstantClick.on('wait', function() {
+    addDebugMessage('Event: wait')
+  })
+
+  InstantClick.on('change', function(isInitialLoad) {
+    addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
+  })
+
+  InstantClick.init(<?php
+  if ($preload_on == 'mousedown') {
+    echo "'mousedown'";
+  }
+  elseif ((int)$preload_on != 0) {
+    echo $preload_on;
+  }
+  ?>);
 }
-elseif ((int)$preload_on != 0) {
-  echo $preload_on;
-}
+</script>
 
-?>);
+<script src="instantclick.js.php?<?php echo $nocache ?>" data-no-instant></script>
+<script>
+testEvents(window.InstantClick)
 </script>
