@@ -36,4 +36,4 @@ body {
 #instantclick-bar {
 	_background: red;
 }
-/* Remove the underscore when you want to enable a declaration. */
+/* An underscore before a property name acts like a comment, remove it to enable a declaration. */
