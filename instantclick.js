@@ -137,6 +137,11 @@ var InstantClick = function(document, location) {
     instantanize()
     bar.done()
     triggerPageEvent('change', false)
+
+    // Real event, useful for combining userscripts, but only for that so it’s undocumented.
+    var userscriptEvent = document.createEvent('HTMLEvents')
+    userscriptEvent.initEvent('instantclick:newpage', true, true)
+    dispatchEvent(userscriptEvent)
   }
 
   function setPreloadingAsHalted() {
