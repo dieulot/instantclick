@@ -45,7 +45,7 @@ var InstantClick = function(document, location) {
   }
 
   function getLinkTarget(target) {
-    while (target.nodeName != 'A') {
+    while (target && target.nodeName != 'A') {
       target = target.parentNode
     }
     return target
@@ -81,6 +81,23 @@ var InstantClick = function(document, location) {
     }
     while (elem = elem.parentNode);
     return false
+  }
+
+  function isPreloadable(a) {
+    var domain = location.protocol + '//' + location.host
+
+    if (a.target // target="_blank" etc.
+        || a.hasAttribute('download')
+        || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
+        || (a.href.indexOf('#') > -1
+            && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
+        || ($useWhitelist
+            ? !isWhitelisted(a)
+            : isBlacklisted(a))
+       ) {
+      return false
+    }
+    return true
   }
 
   function triggerPageEvent(eventType, arg1) {
@@ -161,11 +178,22 @@ var InstantClick = function(document, location) {
 
 
   function mousedown(e) {
-    preload(getLinkTarget(e.target).href)
+    var a = getLinkTarget(e.target)
+
+    if (!a || !isPreloadable(a)) {
+      return
+    }
+
+    preload(a.href)
   }
 
   function mouseover(e) {
     var a = getLinkTarget(e.target)
+
+    if (!a || !isPreloadable(a)) {
+      return
+    }
+
     a.addEventListener('mouseout', mouseout)
 
     if (!$delayBeforePreload) {
@@ -179,6 +207,11 @@ var InstantClick = function(document, location) {
 
   function touchstart(e) {
     var a = getLinkTarget(e.target)
+
+    if (!a || !isPreloadable(a)) {
+      return
+    }
+
     if ($preloadOnMousedown) {
       a.removeEventListener('mousedown', mousedown)
     }
@@ -189,11 +222,17 @@ var InstantClick = function(document, location) {
   }
 
   function click(e) {
+    var a = getLinkTarget(e.target)
+
+    if (!a || !isPreloadable(a)) {
+      return
+    }
+
     if (e.which > 1 || e.metaKey || e.ctrlKey) { // Opening in new tab
       return
     }
     e.preventDefault()
-    display(getLinkTarget(e.target).href)
+    display(a.href)
   }
 
   function mouseout() {
@@ -269,32 +308,15 @@ var InstantClick = function(document, location) {
 
 
   function instantanize(isInitializing) {
-    var as = document.getElementsByTagName('a'),
-        a,
-        domain = location.protocol + '//' + location.host
-
-    for (var i = as.length - 1; i >= 0; i--) {
-      a = as[i]
-      if (a.target // target="_blank" etc.
-          || a.hasAttribute('download')
-          || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
-          || (a.href.indexOf('#') > -1
-              && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
-          || ($useWhitelist
-              ? !isWhitelisted(a)
-              : isBlacklisted(a))
-         ) {
-        continue
-      }
-      a.addEventListener('touchstart', touchstart)
-      if ($preloadOnMousedown) {
-        a.addEventListener('mousedown', mousedown)
-      }
-      else {
-        a.addEventListener('mouseover', mouseover)
-      }
-      a.addEventListener('click', click)
+    document.body.addEventListener('touchstart', touchstart, true)
+    if ($preloadOnMousedown) {
+      document.body.addEventListener('mousedown', mousedown, true)
     }
+    else {
+      document.body.addEventListener('mouseover', mouseover, true)
+    }
+    document.body.addEventListener('click', click, true)
+
     if (!isInitializing) {
       var scripts = document.body.getElementsByTagName('script'),
           script,

@@ -10,6 +10,9 @@
 
 <p><a href="image.png?<?php echo $append ?>">A link to an image, whitelisted. (should redirect)</a>
 
+<p><span id="dynamic">A dynamically added link</span>
+<script>setTimeout(function() { document.getElementById('dynamic').innerHTML = '<a href="?<?php echo $append ?>">A dynamically added link</a>' }, 400)</script>
+
 <p style="font-size: 13px; width: 180px;">Some tiny text. Tiny text. Tiny text. Tiny text!!! I’m so tinyyyy!!!!!<br>
 This is useful to test the progress bar’s behavior when zoomed on a touch device.<br>
 Be sure to test with and without a viewport.</p>
