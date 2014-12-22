@@ -8,6 +8,7 @@ var InstantClick = function(document, location) {
       $currentLocationWithoutHash,
       $urlToPreload,
       $preloadTimer,
+      $lastTouchTimestamp,
 
   // Preloading-related variables
       $history = {},
@@ -178,6 +179,10 @@ var InstantClick = function(document, location) {
 
 
   function mousedown(e) {
+    if ($lastTouchTimestamp > (+new Date - 500)) {
+      return
+    }
+
     var a = getLinkTarget(e.target)
 
     if (!a || !isPreloadable(a)) {
@@ -188,6 +193,10 @@ var InstantClick = function(document, location) {
   }
 
   function mouseover(e) {
+    if ($lastTouchTimestamp > (+new Date - 500)) {
+      return
+    }
+
     var a = getLinkTarget(e.target)
 
     if (!a || !isPreloadable(a)) {
@@ -206,6 +215,8 @@ var InstantClick = function(document, location) {
   }
 
   function touchstart(e) {
+    $lastTouchTimestamp = +new Date
+
     var a = getLinkTarget(e.target)
 
     if (!a || !isPreloadable(a)) {
