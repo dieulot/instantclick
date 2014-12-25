@@ -15,7 +15,7 @@ if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
   $page = $_GET['page'];
 }
 
-$delays = array(100, 200, 300, 400, 500, 1000, 1500, 2000, 10000);
+$delays = array(200, 500, 1000, 2000, 10000);
 
 $preload_on = 'hover';
 if (isset($_GET['on'])) {
