@@ -8,6 +8,7 @@ $pages = array(
   'NProgress' => 'nprogress',
   'Entities in the &#8249;title&rsaquo;' => 'entities',
   'Noscript' => 'noscript',
+  'Alter on receive' => 'alter-receive',
 );
 
 $page = 'welcome';
@@ -136,7 +137,20 @@ InstantClick.on('fetch', function() {
   addDebugMessage('<small><small>Event: fetch</small></small>')
 })
 
-InstantClick.on('receive', function() {
+InstantClick.on('receive', function(url, body, title) {
+  if (url.indexOf('#alter') > -1) {
+    addDebugMessage('<small><small>Event: receive (altered)</small></small>')
+    var elementToAlter = body.querySelector('#to_alter')
+    if (elementToAlter) {
+      elementToAlter.innerHTML = '<b>Altered!</b>'
+    }
+    title = '[Altered] ' + title
+
+    return {
+      body: body,
+      title: title
+    }
+  }
   addDebugMessage('<small><small>Event: receive</small></small>')
 })
 

@@ -101,12 +101,28 @@ var InstantClick = function(document, location) {
     return true
   }
 
-  function triggerPageEvent(eventType, arg1) {
+  function triggerPageEvent(eventType, arg1, arg2, arg3) {
+    var returnValue = false
     for (var i = 0; i < $eventsCallbacks[eventType].length; i++) {
-      $eventsCallbacks[eventType][i](arg1)
-    }
+      if (eventType == 'receive') {
+        var altered = $eventsCallbacks[eventType][i](arg1, arg2, arg3)
+        if (altered) {
+          /* Update args for the next iteration of the loop. */
+          if ('body' in altered) {
+            arg2 = altered.body
+          }
+          if ('title' in altered) {
+            arg3 = altered.title
+          }
 
-    /* The `change` event takes one boolean argument: "isInitialLoad" */
+          returnValue = altered
+        }
+      }
+      else {
+        $eventsCallbacks[eventType][i](arg1, arg2, arg3)
+      }
+    }
+    return returnValue
   }
 
   function changePage(title, body, newUrl, scrollY) {
@@ -270,13 +286,23 @@ var InstantClick = function(document, location) {
     }
 
     $timing.ready = +new Date - $timing.start
-    triggerPageEvent('receive')
 
     if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
       $title = doc.title
       $body = doc.body
+
+      var alteredOnReceive = triggerPageEvent('receive', $url, $body, $title)
+      if (alteredOnReceive) {
+        if ('body' in alteredOnReceive) {
+          $body = alteredOnReceive.body
+        }
+        if ('title' in alteredOnReceive) {
+          $title = alteredOnReceive.title
+        }
+      }
+
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
         body: $body,
