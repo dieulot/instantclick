@@ -180,7 +180,7 @@ var InstantClick = function(document, location) {
 
   function mousedown(e) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      return
+      return // Otherwise, click doesn’t fire
     }
 
     var a = getLinkTarget(e.target)
@@ -194,7 +194,7 @@ var InstantClick = function(document, location) {
 
   function mouseover(e) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      return
+      return // Otherwise, click doesn’t fire
     }
 
     var a = getLinkTarget(e.target)
@@ -410,12 +410,26 @@ var InstantClick = function(document, location) {
     if (!('display' in $timing)) {
       $timing.display = +new Date - $timing.start
     }
-    if ($preloadTimer) {
-      /* Happens when there’s a delay before preloading and that delay
+    if ($preloadTimer || !$isPreloading) {
+      /* $preloadTimer:
+         Happens when there’s a delay before preloading and that delay
          hasn't expired (preloading didn't kick in).
+
+         !$isPreloading:
+         A link has been clicked, and preloading hasn’t been initiated.
+         It happens with touch devices when a user taps *near* the link,
+         Safari/Chrome will trigger mousedown, mouseover, click (and others),
+         but when that happens we ignore mousedown/mouseover (otherwise click
+         doesn’t fire). Maybe there’s a way to make the click event fire, but
+         that’s not worth it as mousedown/over happen just 1ms before click
+         in this situation.
+
+         It also happens when a user uses his keyboard to navigate (with Tab
+         and Return), and possibly in other non-mainstream ways to navigate
+         a website.
       */
 
-      if ($url && $url != url) {
+      if ($preloadTimer && $url && $url != url) {
         /* Happens when the user clicks on a link before preloading
            kicks in while another link is already preloading.
         */
@@ -423,32 +437,21 @@ var InstantClick = function(document, location) {
         location.href = url
         return
       }
+
       preload(url)
       bar.start(0, true)
       triggerPageEvent('wait')
-      $isWaitingForCompletion = true
+      $isWaitingForCompletion = true // Must be set *after* calling `preload`
       return
     }
-    if (!$isPreloading || $isWaitingForCompletion) {
-      /* If the page isn't preloaded, it likely means the user has focused
-         on a link (with his Tab key) and then pressed Return, which
-         triggered a click.
-         Because very few people do this, it isn't worth handling this case
-         and preloading on focus (also, focusing on a link doesn't mean it's
-         likely that you'll "click" on it), so we just redirect them when
-         they "click".
-         It could also mean the user hovered over a link less than 100 ms
-         after a page display, thus we didn't start the preload (see
-         comments in `preload()` for the rationale behind this.)
-
-         If the page is waiting for completion, the user clicked twice while
-         the page was preloading. Either on the same link or on another
-         link. If it's the same link something might have gone wrong (or he
-         could have double clicked), so we send him to the page the old way.
+    if ($isWaitingForCompletion) {
+      /* The user clicked on a link while a page was preloading. Either on
+         the same link or on another link. If it's the same link something
+         might have gone wrong (or he could have double clicked, we don’t
+         handle that case), so we send him to the page without pjax.
          If it's another link, it hasn't been preloaded, so we redirect the
-         user the old way.
+         user to it.
       */
-
       location.href = url
       return
     }
