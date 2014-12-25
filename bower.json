@@ -1,7 +1,7 @@
 {
   "name": "instantclick",
   "description": "InstantClick makes following links in your website instant.",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "main": [
     "./instantclick.js"
   ],
