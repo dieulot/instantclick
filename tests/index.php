@@ -11,7 +11,7 @@ $pages = array(
   'Alter on receive' => 'alter-receive',
 );
 
-$page = 'welcome';
+$page = 'index';
 if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
   $page = $_GET['page'];
 }
@@ -97,7 +97,7 @@ endforeach ?>
 
 <hr>
 
-<?php include $page . '.html' ?>
+<?php include('pages/' . $page . '.html') ?>
 
 <div id="divDebug"></div>
 
