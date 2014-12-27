@@ -1,0 +1,10 @@
+<h2>Childs and blacklist</h2>
+
+<p><a href="?<?= $append ?>"><span><span>A link with childs.</span></span></a>
+
+<p><a href="?<?= $append ?>">A <span>link</span> with <span>multiple</span> childs <span>cohabiting</span>.</a> <a href="https://github.com/dieulot/instantclick/pull/65" target="_blank">#65</a>
+
+<p><span data-no-instant><span><a href="?<?= $append ?>">A link in a blacklisted element.</a></span></span>
+<br><span data-instant><span><a href="?<?= $append ?>">A link in a whitelisted element.</a></span></span>
+<br><span data-instant><span data-no-instant><a href="?<?= $append ?>">A link in a blacklisted element in a whitelisted element. Should blacklist.</a></span></span>
+<br><span data-no-instant><span data-instant><a href="?<?= $append ?>">A link in a whitelisted element in a blacklisted element. Should whitelist.</a></span></span>

@@ -9,6 +9,8 @@ $pages = [
   'Entities in the &#8249;title&rsaquo;' => 'entities',
   'Noscript' => 'noscript',
   'Alter on receive' => 'alter-receive',
+  'Childs and blacklist' => 'child-n-blacklist',
+  'Non-HTML file' => 'non-html',
 ];
 
 if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
