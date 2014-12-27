@@ -29,12 +29,7 @@ if (isset($_GET['on'])) {
 }
 
 $nocache = '&amp;nocache=' . microtime(true) * 10000;
-if ($preload_on == 'hover') {
-  $append = $nocache;
-}
-else {
-  $append = '&amp;on=' . $preload_on . $nocache;
-}
+$append = '&amp;on=' . $preload_on . $nocache;
 
 if (isset($_GET['wait'])) {
    usleep((int)$_GET['wait'] * 1000);
