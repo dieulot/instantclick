@@ -1,17 +1,17 @@
 <h2>Index page</h2>
 
-<p><a href="?<?php echo $append ?>"><b><i>A link with childs</i></b></a>
-<br><a href="?<?php echo $append ?>"><span style="color: #300">A</span> <span style="color: #030">link</span> <span style="color: #330">with</span> <span style="color: #003">multiple</span> <span style="color: #333">childs</span></a>
+<p><a href="?<?= $append ?>"><b><i>A link with childs</i></b></a>
+<br><a href="?<?= $append ?>"><span style="color: #300">A</span> <span style="color: #030">link</span> <span style="color: #330">with</span> <span style="color: #003">multiple</span> <span style="color: #333">childs</span></a>
 
-<p><b data-no-instant><i><a href="?<?php echo $append ?>">A link in a blacklisted element</a></i></b>
-<br><b data-instant><i><a href="?<?php echo $append ?>">A link in a whitelisted element</a></i></b>
-<br><b data-instant><i data-no-instant><a href="?<?php echo $append ?>">A link in a blacklisted element in a whitelisted element (should blacklist)</a></i></b>
-<br><b data-no-instant><i data-instant><a href="?<?php echo $append ?>">A link in a whitelisted element in a blacklisted element (should whitelist)</a></i></b>
+<p><b data-no-instant><i><a href="?<?= $append ?>">A link in a blacklisted element</a></i></b>
+<br><b data-instant><i><a href="?<?= $append ?>">A link in a whitelisted element</a></i></b>
+<br><b data-instant><i data-no-instant><a href="?<?= $append ?>">A link in a blacklisted element in a whitelisted element (should blacklist)</a></i></b>
+<br><b data-no-instant><i data-instant><a href="?<?= $append ?>">A link in a whitelisted element in a blacklisted element (should whitelist)</a></i></b>
 
-<p><a href="image.png?<?php echo $append ?>">A link to an image, whitelisted. (should redirect)</a>
+<p><a href="image.png?<?= $append ?>">A link to an image, whitelisted. (should redirect)</a>
 
 <p><span id="dynamic">A dynamically added link</span>
-<script>setTimeout(function() { document.getElementById('dynamic').innerHTML = '<a href="?<?php echo $append ?>">A dynamically added link</a>' }, 400)</script>
+<script>setTimeout(function() { document.getElementById('dynamic').innerHTML = '<a href="?<?= $append ?>">A dynamically added link</a>' }, 400)</script>
 
 <p style="font-size: 13px; width: 180px;">Some tiny text. Tiny text. Tiny text. Tiny text!!! I’m so tinyyyy!!!!!<br>
 This is useful to test the progress bar’s behavior when zoomed on a touch device.<br>

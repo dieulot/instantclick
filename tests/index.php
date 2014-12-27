@@ -1,5 +1,5 @@
-<?php
-$pages = array(
+<?
+$pages = [
   'Index page' => '',
   'Page with anchors #1' => 'anchor1',
   'Page with anchors #2' => 'anchor2',
@@ -9,14 +9,14 @@ $pages = array(
   'Entities in the &#8249;title&rsaquo;' => 'entities',
   'Noscript' => 'noscript',
   'Alter on receive' => 'alter-receive',
-);
+];
 
 $page = 'index';
 if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
   $page = $_GET['page'];
 }
 
-$delays = array(200, 500, 1000, 2000, 10000);
+$delays = [200, 500, 1000, 2000, 10000];
 
 $preload_on = 'hover';
 if (isset($_GET['on'])) {
@@ -42,36 +42,37 @@ if (isset($_GET['wait'])) {
 ?>
 <!doctype html>
 <meta charset="utf-8">
-<?php if ($page != 'no-title'): ?>
-<title><?php if ($page == 'entities'): ?>
+<? if ($page != 'no-title'): ?>
+<title><? if ($page == 'entities'): ?>
 Entities in the &#8249;title&rsaquo;
-<?php else: ?>
-<?php echo date('H : i : s') ?> . <?php printf("%03d", microtime() * 1000) ?>
-<?php endif ?></title>
-<?php endif ?>
-<link rel="stylesheet" href="style.css?<?php echo $append ?>">
-<?php if (1): ?>
+<? else: ?>
+<?= date('H : i : s') ?> . <? printf("%03d", microtime() * 1000) ?>
+<? endif ?></title>
+<? endif ?>
+<link rel="stylesheet" href="style.css?<?= $append ?>">
 <meta name="viewport" content="width=600">
-<?php endif ?>
 
-<link rel="stylesheet" href="trackme.css?<?php echo filemtime('trackme.css') ?>" data-instant-track>
-<script src="trackme.js?<?php echo filemtime('trackme.js') ?>" data-instant-track></script>
+<link rel="stylesheet" href="trackme.css?<?= filemtime('trackme.css') ?>" data-instant-track>
+<script src="trackme.js?<?= filemtime('trackme.js') ?>" data-instant-track></script>
 <style data-instant-track>body { overflow-y: scroll; }</style>
 <script data-instant-track>if (window.lol) { lol() }</script>
 
-<?php if ($page == 'nprogress'): ?>
+<? if ($page == 'nprogress'): ?>
 <style>#instantclick { display: none; }</style>
 <link rel="stylesheet" href="vendors/nprogress/nprogress-0.1.2.css">
 <script src="vendors/jquery/jquery-2.1.0.js"></script>
 <script src="vendors/nprogress/nprogress-0.1.2.js"></script>
-<?php endif ?>
+<? endif ?>
 
-<?php if ($page == 'minimal'): ?><body>Hiya.<?php exit; endif ?>
+<? if ($page == 'minimal'): ?>
+<body>Hiya.
+<? exit;
+endif ?>
 
 <div id="preloading-level">
-  <a data-no-instant href="?<?php echo $nocache ?>" class="<?php if ($preload_on == 'hover') echo 'selected' ?>">↻ On hover</a>
-  <a data-no-instant href="?on=100<?php echo $nocache ?>" class="<?php if ($preload_on === (int)$preload_on) echo 'selected' ?>">↻ On hover + 100 ms delay</a>
-  <a data-no-instant href="?on=mousedown<?php echo $nocache ?>" class="<?php if ($preload_on == 'mousedown') echo 'selected' ?>">↻ On mousedown</a>
+  <a data-no-instant href="?<?= $nocache ?>" class="<?= $preload_on == 'hover' ? 'selected' : '' ?>">↻ On hover</a>
+  <a data-no-instant href="?on=100<?= $nocache ?>" class="<?= $preload_on === (int)$preload_on ? 'selected' : '' ?>">↻ On hover + 100 ms delay</a>
+  <a data-no-instant href="?on=mousedown<?= $nocache ?>" class="<?= $preload_on == 'mousedown' ? 'selected' : '' ?>">↻ On mousedown</a>
 </div>
 
 <hr>
@@ -79,34 +80,34 @@ Entities in the &#8249;title&rsaquo;
 <table>
   <tr>
     <th>Page</th>
-    <th colspan="<?php echo count($delays) ?>">Delays (in milliseconds)</th>
+    <th colspan="<?= count($delays) ?>">Delays (in milliseconds)</th>
 
-<?php foreach ($pages as $name => $row): ?>
+<? foreach ($pages as $name => $row): ?>
   <tr>
-    <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . $append ?>"><?php echo $name ?></a>
-<?php if (in_array($row, array(
+    <td><a href="?<?= ($row != '' ? ('page=' . $row) : '') . $append ?>"><?= $name ?></a>
+<? if (in_array($row, [
  'nprogress',
-))): ?>
-        <a data-no-instant href="?page=<?php echo $row . $append ?>">↻</a>
-<?php endif ?>
-<?php foreach ($delays as $delay): ?>
-    <td><a href="?<?php echo ($row != '' ? ('page=' . $row) : '') . '&amp;wait=' . $delay . $append ?>"><small><?php echo $delay ?></small></a>
-<?php endforeach;
+])): ?>
+        <a data-no-instant href="?page=<?= $row . $append ?>">↻</a>
+<? endif ?>
+<? foreach ($delays as $delay): ?>
+    <td><a href="?<?= ($row != '' ? ('page=' . $row) : '') . '&amp;wait=' . $delay . $append ?>"><small><?= $delay ?></small></a>
+<? endforeach;
 endforeach ?>
 </table>
 
 <hr>
 
-<?php include('pages/' . $page . '.html') ?>
+<? include('pages/' . $page . '.html') ?>
 
 <div id="divDebug"></div>
 
 
 
-<script src="instantclick.js.php?<?php echo $nocache ?>" data-no-instant></script>
+<script src="instantclick.js.php?<?= $nocache ?>" data-no-instant></script>
 
 
-<?php if ($page == 'nprogress'): ?>
+<? if ($page == 'nprogress'): ?>
 <script data-no-instant>
 InstantClick.on('wait', function() {
   NProgress.start()
@@ -119,7 +120,7 @@ InstantClick.on('change', function(isInitialLoad) {
   NProgress.done(!isInitialLoad)
 })
 </script>
-<?php endif ?>
+<? endif ?>
 
 <script data-no-instant>
 var $debugMessages = ''
@@ -162,7 +163,7 @@ InstantClick.on('change', function(isInitialLoad) {
   addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
 })
 
-InstantClick.init(<?php
+InstantClick.init(<?
 if ($preload_on == 'mousedown') {
   echo "'mousedown'";
 }
