@@ -1,3 +1,5 @@
+# [InstantClick](http://instantclick.io/)
+
 ## Contributing
 
 Check out the [roadmap](http://instantclick.io/roadmap) to see what features need to be implemented.
