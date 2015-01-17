@@ -21,6 +21,7 @@ var InstantClick = function(document, location) {
       $isPreloading = false,
       $isWaitingForCompletion = false,
       $trackedAssets = [],
+      $contentLength = 0,
 
   // Variables defined by public functions
       $useWhitelist,
@@ -277,6 +278,18 @@ var InstantClick = function(document, location) {
   }
 
   function readystatechange() {
+    if ($xhr.readyState === $xhr.LOADING) {
+      if (!$contentLength) {
+        $contentLength = $xhr.getResponseHeader('Content-Length');
+      }
+
+      if ($contentLength) {
+        bar.jump($contentLength / $xhr.responseText.length)
+      }
+	} else if ($xhr.readyState === $xhr.HEADERS_RECEIVED) {
+      $contentLength = $xhr.getResponseHeader('Content-Length');
+    }
+
     if ($xhr.readyState < 4) {
       return
     }
@@ -566,23 +579,15 @@ var InstantClick = function(document, location) {
         setTimeout(jumpStart, 0)
         /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
       }
-      clearTimeout($barTimer)
-      $barTimer = setTimeout(inc, 500)
     }
 
     function jumpStart() {
-      $barProgress = 10
+      $barProgress = 2.5
       update()
     }
 
-    function inc() {
-      $barProgress += 1 + (Math.random() * 2)
-      if ($barProgress >= 98) {
-        $barProgress = 98
-      }
-      else {
-        $barTimer = setTimeout(inc, 500)
-      }
+    function jump(at) {
+      $barProgress = at * 0.975 + 2.5
       update()
     }
 
@@ -595,7 +600,6 @@ var InstantClick = function(document, location) {
 
     function done() {
       if (document.getElementById($barContainer.id)) {
-        clearTimeout($barTimer)
         $barProgress = 100
         update()
         $barContainer.style.opacity = '0'
@@ -630,6 +634,7 @@ var InstantClick = function(document, location) {
     return {
       init: init,
       start: start,
+      jump: jump,
       done: done
     }
   }()
