@@ -134,7 +134,7 @@ var InstantClick = function(document, location) {
 
   function changePage(title, body, newUrl, scrollY) {
     if ($changePageCallback) {
-      $changePageCallback(body, !!newUrl)
+      $changePageCallback(body)
     } else {
       document.documentElement.replaceChild(body, document.body)
     }
@@ -145,26 +145,23 @@ var InstantClick = function(document, location) {
     if (newUrl) {
       history.pushState(null, null, newUrl)
 
-      if (!$changePageCallback) {
-        var hashIndex = newUrl.indexOf('#'),
-            hashElem = hashIndex > -1
-                       && document.getElementById(newUrl.substr(hashIndex + 1)),
-            offset = 0
+      var hashIndex = newUrl.indexOf('#'),
+          hashElem = hashIndex > -1
+                     && document.getElementById(newUrl.substr(hashIndex + 1)),
+          offset = 0
 
-        if (hashElem) {
-          while (hashElem.offsetParent) {
-            offset += hashElem.offsetTop
-  
-            hashElem = hashElem.offsetParent
-          }
+      if (hashElem) {
+        while (hashElem.offsetParent) {
+          offset += hashElem.offsetTop
+
+          hashElem = hashElem.offsetParent
         }
-      
-        scrollTo(0, offset)
       }
-      
+      scrollTo(0, offset)
+
       $currentLocationWithoutHash = removeHash(newUrl)
     }
-    else if (!$changePageCallback) {
+    else {
       scrollTo(0, scrollY)
     }
 
