@@ -23,6 +23,7 @@ var InstantClick = function(document, location) {
       $trackedAssets = [],
 
   // Variables defined by public functions
+      $changePageCallback,
       $useWhitelist,
       $preloadOnMousedown,
       $delayBeforePreload,
@@ -84,6 +85,12 @@ var InstantClick = function(document, location) {
     return false
   }
 
+  function createDocument(documentHTML) {
+    var doc = document.implementation.createHTMLDocument('')
+    doc.documentElement.innerHTML = removeNoscriptTags(documentHTML)
+	return doc
+  }
+
   function isPreloadable(a) {
     var domain = location.protocol + '//' + location.host
 
@@ -126,7 +133,11 @@ var InstantClick = function(document, location) {
   }
 
   function changePage(title, body, newUrl, scrollY) {
-    document.documentElement.replaceChild(body, document.body)
+    if ($changePageCallback) {
+      $changePageCallback(body)
+    } else {
+      document.documentElement.replaceChild(body, document.body)
+    }
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
     */
@@ -288,8 +299,8 @@ var InstantClick = function(document, location) {
     $timing.ready = +new Date - $timing.start
 
     if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
-      var doc = document.implementation.createHTMLDocument('')
-      doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
+      var documentHTML = $xhr.responseText
+      var doc = createDocument(documentHTML)
       $title = doc.title
       $body = doc.body
 
@@ -305,8 +316,7 @@ var InstantClick = function(document, location) {
 
       var urlWithoutHash = removeHash($url)
       $history[urlWithoutHash] = {
-        body: $body,
-        title: $title,
+        documentHTML: documentHTML,
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
       }
 
@@ -681,7 +691,10 @@ var InstantClick = function(document, location) {
     }
     for (var i = arguments.length - 1; i >= 0; i--) {
       var arg = arguments[i]
-      if (arg === true) {
+      if (typeof arg === 'function') {
+        $changePageCallback = arg
+      }
+      else if (arg === true) {
         $useWhitelist = true
       }
       else if (arg == 'mousedown') {
@@ -693,8 +706,7 @@ var InstantClick = function(document, location) {
     }
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
-      body: document.body,
-      title: document.title,
+      documentText: document.documentElement.outerHTML,
       scrollY: pageYOffset
     }
 
@@ -736,7 +748,8 @@ var InstantClick = function(document, location) {
 
       $history[$currentLocationWithoutHash].scrollY = pageYOffset
       $currentLocationWithoutHash = loc
-      changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
+      var newDocument = createDocument($history[loc].documentHTML)  
+      changePage(newDocument.title, newDocument.body, false, $history[loc].scrollY)
     })
   }
 
