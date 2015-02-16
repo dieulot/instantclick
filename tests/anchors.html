@@ -1,11 +1,11 @@
-<h2>Page with anchors #<?php echo $us ?></h2>
+<h2>Page with anchors #<?= $us ?></h2>
 
 <table>
 <?php for ($i = 1; $i <= 3; $i++): ?>
   <tr>
-    <td><a href="?page=anchor<?php echo $they ?><?php echo $append ?>#<?php echo $i ?>">Page <b><?php echo $they ?></b>, anchor <?php echo $i ?></a>
+    <td><a href="?page=anchor<?= $they ?><?= $append ?>#<?= $i ?>">Page <b><?= $they ?></b>, anchor <?= $i ?></a>
 <?php foreach ($delays as $delay): ?>
-    <td><a href="?page=anchor<?php echo $they ?><?php echo '&amp;wait=' . $delay . $append ?>#<?php echo $i ?>"><small><?php echo $delay ?></small></a>
+    <td><a href="?page=anchor<?= $they ?><?= '&amp;wait=' . $delay . $append ?>#<?= $i ?>"><small><?= $delay ?></small></a>
 <?php endforeach;
 endfor ?>
 </table>
@@ -20,9 +20,9 @@ endfor ?>
 <table>
 <?php for ($i = 1; $i <= 3; $i++): ?>
   <tr>
-    <td><a href="?page=anchor<?php echo $they ?><?php echo $append ?>#<?php echo $i ?>">Page <b><?php echo $they ?></b>, anchor <?php echo $i ?></a>
+    <td><a href="?page=anchor<?= $they ?><?= $append ?>#<?= $i ?>">Page <b><?= $they ?></b>, anchor <?= $i ?></a>
 <?php foreach ($delays as $delay): ?>
-    <td><a href="?page=anchor<?php echo $they ?><?php echo '&amp;wait=' . $delay . $append ?>#<?php echo $i ?>"><small><?php echo $delay ?></small></a>
+    <td><a href="?page=anchor<?= $they ?><?= '&amp;wait=' . $delay . $append ?>#<?= $i ?>"><small><?= $delay ?></small></a>
 <?php endforeach;
 endfor ?>
 </table>
@@ -39,9 +39,9 @@ endfor ?>
 <table>
 <?php for ($i = 1; $i <= 3; $i++): ?>
   <tr>
-    <td><a href="?page=anchor<?php echo $they ?><?php echo $append ?>#<?php echo $i ?>">Page <b><?php echo $they ?></b>, anchor <?php echo $i ?></a>
+    <td><a href="?page=anchor<?= $they ?><?= $append ?>#<?= $i ?>">Page <b><?= $they ?></b>, anchor <?= $i ?></a>
 <?php foreach ($delays as $delay): ?>
-    <td><a href="?page=anchor<?php echo $they ?><?php echo '&amp;wait=' . $delay . $append ?>#<?php echo $i ?>"><small><?php echo $delay ?></small></a>
+    <td><a href="?page=anchor<?= $they ?><?= '&amp;wait=' . $delay . $append ?>#<?= $i ?>"><small><?= $delay ?></small></a>
 <?php endforeach;
 endfor ?>
 </table>

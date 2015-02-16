@@ -1,4 +1,4 @@
-<?
+<?php
 $pages = [
   'Index page' => 'index',
   'Page with anchors #1' => 'anchor1',
@@ -41,15 +41,15 @@ if (isset($_GET['wait'])) {
 ?>
 <!doctype html>
 <meta charset="utf-8">
-<? if ($page != 'no-title'): ?>
+<?php if ($page != 'no-title'): ?>
 <title>
-<? if ($page == 'entities'): ?>
+<?php if ($page == 'entities'): ?>
 Entities in the &#8249;title&rsaquo;
-<? else: ?>
-<?= date('H : i : s') ?> . <? printf("%03d", microtime() * 1000) ?>
-<? endif ?>
+<?php else: ?>
+<?= date('H : i : s') ?> . <?php printf("%03d", microtime() * 1000) ?>
+<?php endif ?>
 </title>
-<? endif ?>
+<?php endif ?>
 <link rel="stylesheet" href="style.css?<?= $append ?>">
 <meta name="viewport" content="width=600">
 
@@ -58,18 +58,18 @@ Entities in the &#8249;title&rsaquo;
 <style data-instant-track>body { overflow-y: scroll; }</style>
 <script data-instant-track>if (window.lol) { lol() }</script>
 
-<? // NProgress specific code
+<?php // NProgress specific code
 if ($page == 'nprogress'): ?>
 <style>#instantclick { display: none; }</style>
 <link rel="stylesheet" href="vendors/nprogress/nprogress-0.1.2.css">
 <script src="vendors/jquery/jquery-2.1.0.js"></script>
 <script src="vendors/nprogress/nprogress-0.1.2.js"></script>
-<? endif ?>
+<?php endif ?>
 
-<? // Minimal specific code
+<?php // Minimal specific code
 if ($page == 'minimal'): ?>
 <body>Hiya.
-<? exit;
+<?php exit;
 endif ?>
 
 <div id="preloading-level">
@@ -85,21 +85,21 @@ endif ?>
     <th>Page</th>
     <th colspan="<?= count($delays) ?>">Delays (in milliseconds)</th>
 
-<? foreach ($pages as $name => $row): ?>
+<?php foreach ($pages as $name => $row): ?>
   <tr>
     <td><a href="?page=<?= $row . $append ?>"><?= $name ?></a>
-<? if ($row == 'nprogress'): ?>
+<?php if ($row == 'nprogress'): ?>
         <a data-no-instant href="?page=<?= $row . $append ?>">↻</a>
-<? endif ?>
-<? foreach ($delays as $delay): ?>
+<?php endif ?>
+<?php foreach ($delays as $delay): ?>
     <td><a href="?page=<?= $row ?>&amp;wait=<?= $delay . $append ?>"><small><?= $delay ?></small></a>
-<? endforeach;
+<?php endforeach;
 endforeach ?>
 </table>
 
 <hr>
 
-<? include('pages/' . $page . '.html') ?>
+<?php include('pages/' . $page . '.html') ?>
 
 <div id="divDebug"></div>
 
@@ -108,7 +108,7 @@ endforeach ?>
 <script src="instantclick.js.php?<?= $nocache ?>" data-no-instant></script>
 
 
-<? // NProgress specific code
+<?php // NProgress specific code
 if ($page == 'nprogress'): ?>
 <script data-no-instant>
 InstantClick.on('wait', function() {
@@ -122,7 +122,7 @@ InstantClick.on('change', function(isInitialLoad) {
   NProgress.done(!isInitialLoad)
 })
 </script>
-<? endif ?>
+<?php endif ?>
 
 <script data-no-instant>
 var $debugMessages = ''
@@ -165,7 +165,7 @@ InstantClick.on('change', function(isInitialLoad) {
   addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
 })
 
-InstantClick.init(<?
+InstantClick.init(<?php
 if ($preload_on == 'mousedown') {
   echo "'mousedown'";
 }
