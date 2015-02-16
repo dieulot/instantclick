@@ -1,4 +1,4 @@
-/* InstantClick 3.1.0 | (C) 2014, 2015 Alexandre Dieulot | http://instantclick.io/license */
+/* InstantClick 3.1.0 | (C) 2014-2015 Alexandre Dieulot | http://instantclick.io/license */
 
 var InstantClick = function(document, location) {
   // Internal variables
