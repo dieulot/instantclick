@@ -2,7 +2,7 @@
 
 ## Issues
 
-Report bugs and propose enhancements in issues.
+Report bugs and suggest enhancements in issues.
 
 ## Pull requests
 
