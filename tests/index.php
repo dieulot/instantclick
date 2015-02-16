@@ -50,6 +50,11 @@ Entities in the &#8249;title&rsaquo;
 <?php endif ?>
 </title>
 <?php endif ?>
+<script>
+if (location.pathname.substr(0, 6) == '/tests' && location.pathname[6] != '/') {
+  location.href = location.href.replace('/tests', '/tests/')
+}
+</script>
 <link rel="stylesheet" href="style.css?<?= $append ?>">
 <meta name="viewport" content="width=600">
 
