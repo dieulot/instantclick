@@ -343,6 +343,40 @@ var InstantClick = function(document, location) {
 
   ////////// MAIN FUNCTIONS //////////
 
+  function syncload(scripts, i) {
+    var script,
+        copy,
+        parentNode,
+        nextSibling
+    if (i < scripts.length) {
+      script = scripts[i]
+      if (script.hasAttribute('data-no-instant')) {
+        syncload(scripts, i + 1)
+        return
+      }
+      copy = document.createElement('script')
+      if (script.src) {
+        copy.src = script.src
+      }
+      if (script.innerHTML) {
+        copy.innerHTML = script.innerHTML
+      }
+      parentNode = script.parentNode
+      nextSibling = script.nextSibling
+      parentNode.removeChild(script)
+      parentNode.insertBefore(copy, nextSibling)
+      // real browsers:
+      copy.onload = function() {
+        syncload(scripts, i + 1)
+      }
+      // internet explorer:
+      copy.onreadystatechange = function() {
+        if (this.readyState == 'complete') {
+          syncload(scripts, i + 1)
+        }
+      }
+    }
+  }
 
   function instantanize(isInitializing) {
     document.body.addEventListener('touchstart', touchstart, true)
@@ -355,29 +389,7 @@ var InstantClick = function(document, location) {
     document.body.addEventListener('click', click, true)
 
     if (!isInitializing) {
-      var scripts = document.body.getElementsByTagName('script'),
-          script,
-          copy,
-          parentNode,
-          nextSibling
-
-      for (i = 0, j = scripts.length; i < j; i++) {
-        script = scripts[i]
-        if (script.hasAttribute('data-no-instant')) {
-          continue
-        }
-        copy = document.createElement('script')
-        if (script.src) {
-          copy.src = script.src
-        }
-        if (script.innerHTML) {
-          copy.innerHTML = script.innerHTML
-        }
-        parentNode = script.parentNode
-        nextSibling = script.nextSibling
-        parentNode.removeChild(script)
-        parentNode.insertBefore(copy, nextSibling)
-      }
+      syncload(document.body.getElementsByTagName('script'), 0)
     }
   }
 
