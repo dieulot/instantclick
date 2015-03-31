@@ -3,7 +3,7 @@
   "description": "InstantClick makes following links in your website instant.",
   "version": "3.1.0",
   "main": [
-    "./instantclick.js"
+    "./src/instantclick.js"
   ],
   "license": "MIT",
   "keywords": [

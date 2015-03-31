@@ -1,5 +1,5 @@
 <?php
-$file = '../instantclick.js';
+$file = '../src/instantclick.js';
 if (file_exists('instanclick.js')) {
   $file = 'instantclick.js';
 }
