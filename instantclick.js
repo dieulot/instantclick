@@ -187,7 +187,7 @@ var InstantClick = function(document, location) {
     /* Must be done on text, not on a node's innerHTML, otherwise strange
      * things happen with implicitly closed elements (see the Noscript test).
      */
-    return html.replace(/<noscript[\s\S]+<\/noscript>/gi, '')
+    return html.replace(/<noscript[\s\S]+?<\/noscript>/gi, '')
   }
 
 
