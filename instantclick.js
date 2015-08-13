@@ -117,6 +117,12 @@ var InstantClick = function(document, location) {
 
           returnValue = altered
         }
+      } else if (eventType == 'fetch') {
+        var new_url = $eventsCallbacks[eventType][i](arg1, arg2, arg3)
+        if (new_url) {
+          arg1 = new_url
+        }
+        returnValue = new_url
       }
       else {
         $eventsCallbacks[eventType][i](arg1, arg2, arg3)
@@ -427,7 +433,10 @@ var InstantClick = function(document, location) {
     $timing = {
       start: +new Date
     }
-    triggerPageEvent('fetch')
+    var new_url = triggerPageEvent('fetch', url)
+    if(new_url) {
+      url = new_url
+    }
     $xhr.open('GET', url)
     $xhr.send()
   }
