@@ -30,7 +30,8 @@ var InstantClick = function(document, location) {
         fetch: [],
         receive: [],
         wait: [],
-        change: []
+        change: [],
+        restore: []
       }
 
 
@@ -125,7 +126,7 @@ var InstantClick = function(document, location) {
     return returnValue
   }
 
-  function changePage(title, body, newUrl, scrollY) {
+  function changePage(title, body, newUrl, scrollY, pop) {
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
@@ -170,7 +171,12 @@ var InstantClick = function(document, location) {
 
     instantanize()
     bar.done()
-    triggerPageEvent('change', false)
+    if (pop) {
+      triggerPageEvent('restore')
+    }
+    else {
+      triggerPageEvent('change', false)
+    }
 
     // Real event, useful for combining userscripts, but only for that so it’s undocumented.
     var userscriptEvent = document.createEvent('HTMLEvents')
@@ -736,7 +742,7 @@ var InstantClick = function(document, location) {
 
       $history[$currentLocationWithoutHash].scrollY = pageYOffset
       $currentLocationWithoutHash = loc
-      changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
+      changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY, true)
     })
   }
 
