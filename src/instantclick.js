@@ -65,7 +65,7 @@ var instantClick
         return true
       }
     }
-    while (elem = elem.parentNode);
+    while (elem = elem.parentNode)
     return false
   }
 
@@ -81,7 +81,7 @@ var instantClick
         return true
       }
     }
-    while (elem = elem.parentNode);
+    while (elem = elem.parentNode)
     return false
   }
 
