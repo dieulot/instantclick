@@ -3,8 +3,7 @@
 var instantClick
   , InstantClick = instantClick = function(document, location) {
   // Internal variables
-  var $ua = navigator.userAgent
-    , $isChromeForIOS = $ua.indexOf(' CriOS/') > -1
+  var $isChromeForIOS = navigator.userAgent.indexOf(' CriOS/') > -1
     , $hasTouch = 'createTouch' in document
     , $currentLocationWithoutHash
     , $urlToPreload
@@ -645,7 +644,7 @@ var instantClick
   ////////// PUBLIC VARIABLE AND FUNCTIONS //////////
 
   var supported = 'pushState' in history
-                  && (!$ua.match('Android') || $ua.match('Chrome/'))
+                  && (!navigator.userAgent.match('Android') || navigator.userAgent.match('Chrome/'))
                   && location.protocol != "file:"
 
   /* The state of Android's AOSP browsers:
