@@ -1,9 +1,9 @@
 /* InstantClick 3.1.0 | (C) 2014-2015 Alexandre Dieulot | http://instantclick.io/license */
 
 var instantClick
-  , InstantClick = instantClick = function(document, location) {
+  , InstantClick = instantClick = function(document, location, $userAgent) {
   // Internal variables
-  var $isChromeForIOS = navigator.userAgent.indexOf(' CriOS/') > -1
+  var $isChromeForIOS = $userAgent.indexOf(' CriOS/') > -1
     , $hasTouch = 'createTouch' in document
     , $currentLocationWithoutHash
     , $urlToPreload
@@ -644,7 +644,7 @@ var instantClick
   ////////// PUBLIC VARIABLE AND FUNCTIONS //////////
 
   var supported = 'pushState' in history
-                  && (!navigator.userAgent.match('Android') || navigator.userAgent.match('Chrome/'))
+                  && (!$userAgent.match('Android') || $userAgent.match('Chrome/'))
                   && location.protocol != "file:"
 
   /* The state of Android's AOSP browsers:
@@ -760,4 +760,4 @@ var instantClick
     on: on
   }
 
-}(document, location);
+}(document, location, navigator.userAgent);
