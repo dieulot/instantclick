@@ -3,31 +3,31 @@
 var instantClick
   , InstantClick = instantClick = function(document, location) {
   // Internal variables
-  var $ua = navigator.userAgent,
-      $isChromeForIOS = $ua.indexOf(' CriOS/') > -1,
-      $hasTouch = 'createTouch' in document,
-      $currentLocationWithoutHash,
-      $urlToPreload,
-      $preloadTimer,
-      $lastTouchTimestamp,
+  var $ua = navigator.userAgent
+    , $isChromeForIOS = $ua.indexOf(' CriOS/') > -1
+    , $hasTouch = 'createTouch' in document
+    , $currentLocationWithoutHash
+    , $urlToPreload
+    , $preloadTimer
+    , $lastTouchTimestamp
 
   // Preloading-related variables
-      $history = {},
-      $xhr,
-      $url = false,
-      $title = false,
-      $mustRedirect = false,
-      $body = false,
-      $timing = {},
-      $isPreloading = false,
-      $isWaitingForCompletion = false,
-      $trackedAssets = [],
+    , $history = {}
+    , $xhr
+    , $url = false
+    , $title = false
+    , $mustRedirect = false
+    , $body = false
+    , $timing = {}
+    , $isPreloading = false
+    , $isWaitingForCompletion = false
+    , $trackedAssets = []
 
   // Variables defined by public functions
-      $useWhitelist,
-      $preloadOnMousedown,
-      $delayBeforePreload,
-      $eventsCallbacks = {
+    , $useWhitelist
+    , $preloadOnMousedown
+    , $delayBeforePreload
+    , $eventsCallbacks = {
         fetch: [],
         receive: [],
         wait: [],
@@ -136,10 +136,10 @@ var instantClick
     if (newUrl) {
       history.pushState(null, null, newUrl)
 
-      var hashIndex = newUrl.indexOf('#'),
-          hashElem = hashIndex > -1
-                     && document.getElementById(newUrl.substr(hashIndex + 1)),
-          offset = 0
+      var hashIndex = newUrl.indexOf('#')
+        , hashElem = hashIndex > -1
+                     && document.getElementById(newUrl.substr(hashIndex + 1))
+        , offset = 0
 
       if (hashElem) {
         while (hashElem.offsetParent) {
@@ -317,10 +317,10 @@ var instantClick
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
       }
 
-      var elems = doc.head.children,
-          found = 0,
-          elem,
-          data
+      var elems = doc.head.children
+        , found = 0
+        , elem
+        , data
 
       for (var i = elems.length - 1; i >= 0; i--) {
         elem = elems[i]
@@ -362,11 +362,11 @@ var instantClick
     document.body.addEventListener('click', click, true)
 
     if (!isInitializing) {
-      var scripts = document.body.getElementsByTagName('script'),
-          script,
-          copy,
-          parentNode,
-          nextSibling
+      var scripts = document.body.getElementsByTagName('script')
+        , script
+        , copy
+        , parentNode
+        , nextSibling
 
       for (i = 0, j = scripts.length; i < j; i++) {
         script = scripts[i]
@@ -508,11 +508,11 @@ var instantClick
 
 
   var bar = function() {
-    var $barContainer,
-        $barElement,
-        $barTransformProperty,
-        $barProgress,
-        $barTimer
+    var $barContainer
+      , $barElement
+      , $barTransformProperty
+      , $barProgress
+      , $barTimer
 
     function init() {
       $barContainer = document.createElement('div')
@@ -626,8 +626,8 @@ var instantClick
       $barContainer.style.width = innerWidth + 'px'
       $barContainer.style.top = pageYOffset + 'px'
 
-      var landscape = 'orientation' in window && Math.abs(orientation) == 90,
-          scaleY = innerWidth / screen[landscape ? 'height' : 'width'] * 2
+      var landscape = 'orientation' in window && Math.abs(orientation) == 90
+        , scaleY = innerWidth / screen[landscape ? 'height' : 'width'] * 2
       /* We multiply the size by 2 because the progress bar is harder
          to notice on a mobile device.
       */
@@ -705,9 +705,9 @@ var instantClick
       scrollY: pageYOffset
     }
 
-    var elems = document.head.children,
-        elem,
-        data
+    var elems = document.head.children
+      , elem
+      , data
     for (var i = elems.length - 1; i >= 0; i--) {
       elem = elems[i]
       if (elem.hasAttribute('data-instant-track')) {
