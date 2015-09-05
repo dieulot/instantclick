@@ -1,6 +1,8 @@
 /* InstantClick 3.1.0 | (C) 2014-2015 Alexandre Dieulot | http://instantclick.io/license */
 
-var InstantClick = function(document, location) {
+var InstantClick // Declared before assignment to not be forced to be global
+
+var instantClick = InstantClick = function(document, location) {
   // Internal variables
   var $ua = navigator.userAgent,
       $isChromeForIOS = $ua.indexOf(' CriOS/') > -1,
