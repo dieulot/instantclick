@@ -192,10 +192,10 @@ var instantClick
   }
 
 
-  ////////// EVENT HANDLERS //////////
+  ////////// EVENT LISTENERS //////////
 
 
-  function mousedown(e) {
+  function mousedownListener(e) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
       return // Otherwise, click doesn’t fire
     }
@@ -209,7 +209,7 @@ var instantClick
     preload(a.href)
   }
 
-  function mouseover(e) {
+  function mouseoverListener(e) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
       return // Otherwise, click doesn’t fire
     }
@@ -220,7 +220,7 @@ var instantClick
       return
     }
 
-    a.addEventListener('mouseout', mouseout)
+    a.addEventListener('mouseout', mouseoutListener)
 
     if (!$delayBeforePreload) {
       preload(a.href)
@@ -231,7 +231,7 @@ var instantClick
     }
   }
 
-  function touchstart(e) {
+  function touchstartListener(e) {
     $lastTouchTimestamp = +new Date
 
     var a = getLinkTarget(e.target)
@@ -241,15 +241,15 @@ var instantClick
     }
 
     if ($preloadOnMousedown) {
-      a.removeEventListener('mousedown', mousedown)
+      a.removeEventListener('mousedown', mousedownListener)
     }
     else {
-      a.removeEventListener('mouseover', mouseover)
+      a.removeEventListener('mouseover', mouseoverListener)
     }
     preload(a.href)
   }
 
-  function click(e) {
+  function clickListener(e) {
     var a = getLinkTarget(e.target)
 
     if (!a || !isPreloadable(a)) {
@@ -263,7 +263,7 @@ var instantClick
     display(a.href)
   }
 
-  function mouseout() {
+  function mouseoutListener() {
     if ($preloadTimer) {
       clearTimeout($preloadTimer)
       $preloadTimer = false
@@ -277,7 +277,7 @@ var instantClick
     setPreloadingAsHalted()
   }
 
-  function readystatechange() {
+  function readystatechangeListener() {
     if ($xhr.readyState < 4) {
       return
     }
@@ -346,14 +346,14 @@ var instantClick
 
 
   function instantanize(isInitializing) {
-    document.body.addEventListener('touchstart', touchstart, true)
+    document.body.addEventListener('touchstart', touchstartListener, true)
     if ($preloadOnMousedown) {
-      document.body.addEventListener('mousedown', mousedown, true)
+      document.body.addEventListener('mousedown', mousedownListener, true)
     }
     else {
-      document.body.addEventListener('mouseover', mouseover, true)
+      document.body.addEventListener('mouseover', mouseoverListener, true)
     }
-    document.body.addEventListener('click', click, true)
+    document.body.addEventListener('click', clickListener, true)
 
     if (!isInitializing) {
       var scripts = document.body.getElementsByTagName('script')
@@ -714,7 +714,7 @@ var instantClick
     }
 
     $xhr = new XMLHttpRequest()
-    $xhr.addEventListener('readystatechange', readystatechange)
+    $xhr.addEventListener('readystatechange', readystatechangeListener)
 
     instantanize(true)
 
