@@ -401,8 +401,7 @@ var instantClick
          - Opera 12.16: triggers when cursor moved
 
          To remedy to this, we do not start preloading if last display
-         occurred less than 100 ms ago. If they happen to click on the link,
-         they will be redirected.
+         occurred less than 100 ms ago.
       */
 
       return
