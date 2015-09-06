@@ -564,7 +564,7 @@ var instantClick
       update()
       if (jump) {
         setTimeout(jumpStart, 0)
-        /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
+        /* Must be done in a timer, otherwise the CSS animation doesn't happen (I don't know why). */
       }
       clearTimeout($barTimer)
       $barTimer = setTimeout(inc, 500)
@@ -599,7 +599,7 @@ var instantClick
         $barProgress = 100
         update()
         $barContainer.style.opacity = '0'
-        /* If you're debugging, setting this to 0.5 is handy. */
+        /* When you're debugging, setting this to 0.5 is handy. */
         return
       }
 
