@@ -316,11 +316,11 @@ var instantClick
         , elem
         , data
 
-      for (var i = elems.length - 1; i >= 0; i--) {
+      for (var i = 0; i < elems.length; i++) {
         elem = elems[i]
         if (elem.hasAttribute('data-instant-track')) {
           data = elem.getAttribute('href') || elem.getAttribute('src') || elem.innerHTML
-          for (var j = $trackedAssets.length - 1; j >= 0; j--) {
+          for (var j = 0; j < $trackedAssets.length; j++) {
             if ($trackedAssets[j] == data) {
               found++
             }
@@ -362,7 +362,7 @@ var instantClick
         , parentNode
         , nextSibling
 
-      for (i = 0, j = scripts.length; i < j; i++) {
+      for (i = 0; i < scripts.length; i++) {
         script = scripts[i]
         if (script.hasAttribute('data-no-instant')) {
           continue
@@ -520,7 +520,7 @@ var instantClick
 
       $barTransformProperty = 'transform'
       if (!($barTransformProperty in $barElement.style)) {
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < vendors.length; i++) {
           if (vendors[i] + 'Transform' in $barElement.style) {
             $barTransformProperty = vendors[i] + 'Transform'
           }
@@ -529,7 +529,7 @@ var instantClick
 
       var transitionProperty = 'transition'
       if (!(transitionProperty in $barElement.style)) {
-        for (var i = 0; i < 3; i++) {
+        for (var i = 0; i < vendors.length; i++) {
           if (vendors[i] + 'Transition' in $barElement.style) {
             transitionProperty = '-' + vendors[i].toLowerCase() + '-' + transitionProperty
           }
@@ -680,7 +680,7 @@ var instantClick
       triggerPageEvent('change', true)
       return
     }
-    for (var i = arguments.length - 1; i >= 0; i--) {
+    for (var i = 0; i < arguments.length; i++) {
       var arg = arguments[i]
       if (arg === true) {
         $useWhitelist = true
@@ -702,7 +702,7 @@ var instantClick
     var elems = document.head.children
       , elem
       , data
-    for (var i = elems.length - 1; i >= 0; i--) {
+    for (var i = 0; i < elems.length; i++) {
       elem = elems[i]
       if (elem.hasAttribute('data-instant-track')) {
         data = elem.getAttribute('href') || elem.getAttribute('src') || elem.innerHTML
