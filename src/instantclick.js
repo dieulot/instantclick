@@ -160,7 +160,7 @@ var instantClick
        *
        * 1. Removes title on pushState, so the title needs to be set after.
        *
-       * 2. Will not set the title if it’s identical when trimmed, so
+       * 2. Will not set the title if it's identical when trimmed, so
        *    appending a space won't do; but a non-breaking space works.
        */
       document.title = title + String.fromCharCode(160)
@@ -197,7 +197,7 @@ var instantClick
 
   function mousedownListener(e) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      return // Otherwise, click doesn’t fire
+      return // Otherwise, click doesn't fire
     }
 
     var a = getLinkTarget(e.target)
@@ -211,7 +211,7 @@ var instantClick
 
   function mouseoverListener(e) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      return // Otherwise, click doesn’t fire
+      return // Otherwise, click doesn't fire
     }
 
     var a = getLinkTarget(e.target)
@@ -438,16 +438,16 @@ var instantClick
     }
     if ($preloadTimer || !$isPreloading) {
       /* $preloadTimer:
-         Happens when there’s a delay before preloading and that delay
+         Happens when there's a delay before preloading and that delay
          hasn't expired (preloading didn't kick in).
 
          !$isPreloading:
-         A link has been clicked, and preloading hasn’t been initiated.
+         A link has been clicked, and preloading hasn't been initiated.
          It happens with touch devices when a user taps *near* the link,
          Safari/Chrome will trigger mousedown, mouseover, click (and others),
          but when that happens we ignore mousedown/mouseover (otherwise click
-         doesn’t fire). Maybe there’s a way to make the click event fire, but
-         that’s not worth it as mousedown/over happen just 1ms before click
+         doesn't fire). Maybe there's a way to make the click event fire, but
+         that's not worth it as mousedown/over happen just 1ms before click
          in this situation.
 
          It also happens when a user uses his keyboard to navigate (with Tab
@@ -473,7 +473,7 @@ var instantClick
     if ($isWaitingForCompletion) {
       /* The user clicked on a link while a page was preloading. Either on
          the same link or on another link. If it's the same link something
-         might have gone wrong (or he could have double clicked, we don’t
+         might have gone wrong (or he could have double clicked, we don't
          handle that case), so we send him to the page without pjax.
          If it's another link, it hasn't been preloaded, so we redirect the
          user to it.
@@ -611,7 +611,7 @@ var instantClick
     }
 
     function updatePositionAndScale() {
-      /* Adapted from code by Sam Stephenson and Mislav Marohnić
+      /* Adapted from code by Sam Stephenson and Mislav Marohnic
          http://signalvnoise.com/posts/2407
       */
 
