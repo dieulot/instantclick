@@ -169,7 +169,6 @@ var instantClick
     }
 
     instantanize()
-    bar.done()
     if (pop) {
       triggerPageEvent('restore')
     }
@@ -464,7 +463,6 @@ var instantClick
       }
 
       preload(url)
-      bar.start(0, true)
       triggerPageEvent('wait')
       $isWaitingForCompletion = true // Must be set *after* calling `preload`
       return
@@ -485,7 +483,6 @@ var instantClick
       return
     }
     if (!$body) {
-      bar.start(0, true)
       triggerPageEvent('wait')
       $isWaitingForCompletion = true
       return
@@ -577,8 +574,6 @@ var instantClick
     $xhr.addEventListener('readystatechange', readystatechangeListener)
 
     instantanize(true)
-
-    bar.init()
 
     triggerPageEvent('change', true)
 
