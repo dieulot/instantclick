@@ -136,7 +136,7 @@
     if (isInitialPage && instantClick.supported) {
       init()
     }
-    if (!isInitialPage) {
+    else if (!isInitialPage) {
       done()
     }
   })
