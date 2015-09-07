@@ -37,8 +37,8 @@
     }
 
     var style = document.createElement('style')
-    style.innerHTML = '#instantclick{position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ':opacity .25s .1s}'
-      + '.instantclick-bar{background:#29d;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all .25s}'
+    style.innerHTML = '#instantclick{position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ":opacity 1s}\n"
+      + '.instantclick-bar{background:#29d;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all 1s}'
     /* We set the bar's background in `.instantclick-bar` so that it can be
        overriden in CSS with `#instantclick-bar`, as IDs have higher priority.
     */
@@ -49,37 +49,26 @@
       addEventListener('resize', updatePositionAndScale)
       addEventListener('scroll', updatePositionAndScale)
     }
-
   }
 
-  function start(at, jump) {
-    $progress = at
-    if (document.getElementById($container.id)) {
-      document.body.removeChild($container)
-    }
-    $container.style.opacity = '1'
-    if (document.getElementById($container.id)) {
-      document.body.removeChild($container)
-      /* So there's no CSS animation if already done once and it goes from 1 to 0 */
-    }
+  function start() {
+    $progress = 0
+    $container.style.opacity = '0'
     update()
-    if (jump) {
-      setTimeout(jumpStart, 0)
-      /* Must be done in a timer, otherwise the CSS animation doesn't happen (I don't know why). */
-    }
-    clearTimeout($timer)
+    setTimeout(display, 0) // Done in a timer to do that on next frame, so that the CSS animation happens
     $timer = setTimeout(inc, 500)
   }
 
-  function jumpStart() {
+  function display() {
     $progress = 10
+    $container.style.opacity = '1'
     update()
   }
 
   function inc() {
     $progress += 1 + (Math.random() * 2)
-    if ($progress >= 98) {
-      $progress = 98
+    if ($progress > 99) {
+      $progress = 99
     }
     else {
       $timer = setTimeout(inc, 500)
@@ -95,20 +84,13 @@
   }
 
   function done() {
-    if (document.getElementById($container.id)) {
-      clearTimeout($timer)
-      $progress = 100
-      update()
-      $container.style.opacity = '0'
-      /* When you're debugging, setting this to 0.5 is handy. */
-      return
-    }
+    clearTimeout($timer)
+  }
 
-    /* The bar container hasn't been appended: It's a new page. */
-    start($progress == 100 ? 0 : $progress)
-    /* $progress is 100 on popstate, usually. */
-    setTimeout(done, 0)
-    /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
+  function remove() {
+    if (document.getElementById($container.id)) {
+      document.body.removeChild($container)
+    }
   }
 
   function updatePositionAndScale() {
@@ -121,7 +103,7 @@
     $container.style.top = pageYOffset + 'px'
 
     var landscape = 'orientation' in window && Math.abs(orientation) == 90
-      , scaleY = innerWidth / screen[landscape ? 'height' : 'width'] * 2
+      , scaleY = innerWidth / screen[landscape ? 'height' : 'width'] * 1.34
     /* We multiply the size by 2 because the progress bar is harder
        to notice on a mobile device.
     */
@@ -141,7 +123,7 @@
     }
   })
 
-  instantClick.on('wait', function() {
-    start(0, true)
-  })
+  instantClick.on('wait', start)
+
+  instantClick.on('restore', remove) // Should be removed in a `beforechange` event instead
 })();
