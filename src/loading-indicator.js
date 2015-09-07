@@ -1,34 +1,34 @@
 var bar = function() {
-  var $barContainer
-    , $barElement
-    , $barTransformProperty
-    , $barProgress
-    , $barTimer
+  var $container
+    , $element
+    , $transformProperty
+    , $progress
+    , $timer
     , $hasTouch = 'createTouch' in document
 
   function init() {
-    $barContainer = document.createElement('div')
-    $barContainer.id = 'instantclick'
-    $barElement = document.createElement('div')
-    $barElement.id = 'instantclick-bar'
-    $barElement.className = 'instantclick-bar'
-    $barContainer.appendChild($barElement)
+    $container = document.createElement('div')
+    $container.id = 'instantclick'
+    $element = document.createElement('div')
+    $element.id = 'instantclick-bar'
+    $element.className = 'instantclick-bar'
+    $container.appendChild($element)
 
     var vendors = ['Webkit', 'Moz', 'O']
 
-    $barTransformProperty = 'transform'
-    if (!($barTransformProperty in $barElement.style)) {
+    $transformProperty = 'transform'
+    if (!($transformProperty in $element.style)) {
       for (var i = 0; i < vendors.length; i++) {
-        if (vendors[i] + 'Transform' in $barElement.style) {
-          $barTransformProperty = vendors[i] + 'Transform'
+        if (vendors[i] + 'Transform' in $element.style) {
+          $transformProperty = vendors[i] + 'Transform'
         }
       }
     }
 
     var transitionProperty = 'transition'
-    if (!(transitionProperty in $barElement.style)) {
+    if (!(transitionProperty in $element.style)) {
       for (var i = 0; i < vendors.length; i++) {
-        if (vendors[i] + 'Transition' in $barElement.style) {
+        if (vendors[i] + 'Transition' in $element.style) {
           transitionProperty = '-' + vendors[i].toLowerCase() + '-' + transitionProperty
         }
       }
@@ -51,13 +51,13 @@ var bar = function() {
   }
 
   function start(at, jump) {
-    $barProgress = at
-    if (document.getElementById($barContainer.id)) {
-      document.body.removeChild($barContainer)
+    $progress = at
+    if (document.getElementById($container.id)) {
+      document.body.removeChild($container)
     }
-    $barContainer.style.opacity = '1'
-    if (document.getElementById($barContainer.id)) {
-      document.body.removeChild($barContainer)
+    $container.style.opacity = '1'
+    if (document.getElementById($container.id)) {
+      document.body.removeChild($container)
       /* So there's no CSS animation if already done once and it goes from 1 to 0 */
     }
     update()
@@ -65,46 +65,46 @@ var bar = function() {
       setTimeout(jumpStart, 0)
       /* Must be done in a timer, otherwise the CSS animation doesn't happen (I don't know why). */
     }
-    clearTimeout($barTimer)
-    $barTimer = setTimeout(inc, 500)
+    clearTimeout($timer)
+    $timer = setTimeout(inc, 500)
   }
 
   function jumpStart() {
-    $barProgress = 10
+    $progress = 10
     update()
   }
 
   function inc() {
-    $barProgress += 1 + (Math.random() * 2)
-    if ($barProgress >= 98) {
-      $barProgress = 98
+    $progress += 1 + (Math.random() * 2)
+    if ($progress >= 98) {
+      $progress = 98
     }
     else {
-      $barTimer = setTimeout(inc, 500)
+      $timer = setTimeout(inc, 500)
     }
     update()
   }
 
   function update() {
-    $barElement.style[$barTransformProperty] = 'translate(' + $barProgress + '%)'
-    if (!document.getElementById($barContainer.id)) {
-      document.body.appendChild($barContainer)
+    $element.style[$transformProperty] = 'translate(' + $progress + '%)'
+    if (!document.getElementById($container.id)) {
+      document.body.appendChild($container)
     }
   }
 
   function done() {
-    if (document.getElementById($barContainer.id)) {
-      clearTimeout($barTimer)
-      $barProgress = 100
+    if (document.getElementById($container.id)) {
+      clearTimeout($timer)
+      $progress = 100
       update()
-      $barContainer.style.opacity = '0'
+      $container.style.opacity = '0'
       /* When you're debugging, setting this to 0.5 is handy. */
       return
     }
 
     /* The bar container hasn't been appended: It's a new page. */
-    start($barProgress == 100 ? 0 : $barProgress)
-    /* $barProgress is 100 on popstate, usually. */
+    start($progress == 100 ? 0 : $progress)
+    /* $progress is 100 on popstate, usually. */
     setTimeout(done, 0)
     /* Must be done in a timer, otherwise the CSS animation doesn't happen. */
   }
@@ -114,16 +114,16 @@ var bar = function() {
        http://signalvnoise.com/posts/2407
     */
 
-    $barContainer.style.left = pageXOffset + 'px'
-    $barContainer.style.width = innerWidth + 'px'
-    $barContainer.style.top = pageYOffset + 'px'
+    $container.style.left = pageXOffset + 'px'
+    $container.style.width = innerWidth + 'px'
+    $container.style.top = pageYOffset + 'px'
 
     var landscape = 'orientation' in window && Math.abs(orientation) == 90
       , scaleY = innerWidth / screen[landscape ? 'height' : 'width'] * 2
     /* We multiply the size by 2 because the progress bar is harder
        to notice on a mobile device.
     */
-    $barContainer.style[$barTransformProperty] = 'scaleY(' + scaleY  + ')'
+    $container.style[$transformProperty] = 'scaleY(' + scaleY  + ')'
   }
 
   return {
