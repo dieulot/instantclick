@@ -20,7 +20,7 @@ else {
   $page = 'index';
 }
 
-$delays = [200, 500, 1000, 2000, 10000];
+$delays = [200, 500, 1000, 5000];
 
 if (isset($_GET['on']) && (int)$_GET['on'] != 0) {
   $preload_on = (int)$_GET['on'];
