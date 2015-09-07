@@ -13,7 +13,6 @@
     $container.id = 'instantclick'
     $element = document.createElement('div')
     $element.id = 'instantclick-bar'
-    $element.className = 'instantclick-bar'
     $container.appendChild($element)
 
     var vendors = ['Webkit', 'Moz', 'O']
@@ -36,13 +35,10 @@
       }
     }
 
-    var style = document.createElement('style')
-    style.innerHTML = '#instantclick{position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ":opacity 1s}\n"
-      + '.instantclick-bar{background:#29d;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all 1s}'
-    /* We set the bar's background in `.instantclick-bar` so that it can be
-       overriden in CSS with `#instantclick-bar`, as IDs have higher priority.
-    */
-    document.head.appendChild(style)
+    var styleElement = document.createElement('style')
+    styleElement.innerHTML = '#instantclick{color:#29d;position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ":opacity 1s}\n"
+      + '#instantclick-bar{background:currentColor;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all 1s}'
+    document.head.insertBefore(styleElement, document.head.firstChild)
 
     if ($hasTouch) {
       updatePositionAndScale()

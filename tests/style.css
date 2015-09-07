@@ -33,7 +33,7 @@ body {
 #instantclick-bar {
 	_display: none;
 }
-#instantclick-bar {
-	_background: red;
+#instantclick {
+	_color: red;
 }
 /* An underscore before a property name acts like a comment, remove it to enable a declaration. */
