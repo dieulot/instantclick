@@ -117,7 +117,7 @@
     */
 
     $container.style.left = pageXOffset + 'px'
-    $container.style.width = innerWidth + 'px'
+    $container.style.width = document.body.clientWidth + 'px'
     $container.style.top = pageYOffset + 'px'
 
     var landscape = 'orientation' in window && Math.abs(orientation) == 90
