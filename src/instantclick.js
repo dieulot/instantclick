@@ -339,6 +339,24 @@ var instantClick
     }
   }
 
+  function popstateListener() {
+    var loc = removeHash(location.href)
+    if (loc == $currentLocationWithoutHash) {
+      return
+    }
+
+    if (!(loc in $history)) {
+      location.href = location.href
+      /* Reloads the page while using cache for scripts, styles and images,
+         unlike `location.reload()` */
+      return
+    }
+
+    $history[$currentLocationWithoutHash].scrollY = pageYOffset
+    $currentLocationWithoutHash = loc
+    changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY, true)
+  }
+
 
   ////////// MAIN FUNCTIONS //////////
 
@@ -575,23 +593,7 @@ var instantClick
 
     triggerPageEvent('change', true)
 
-    addEventListener('popstate', function() {
-      var loc = removeHash(location.href)
-      if (loc == $currentLocationWithoutHash) {
-        return
-      }
-
-      if (!(loc in $history)) {
-        location.href = location.href
-        /* Reloads the page while using cache for scripts, styles and images,
-           unlike `location.reload()` */
-        return
-      }
-
-      $history[$currentLocationWithoutHash].scrollY = pageYOffset
-      $currentLocationWithoutHash = loc
-      changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY, true)
-    })
+    addEventListener('popstate', popstateListener)
   }
 
   function on(eventType, callback) {
