@@ -499,26 +499,24 @@ var instantClick
                   && (!$userAgent.match('Android') || $userAgent.match('Chrome/'))
                   && location.protocol != "file:"
 
-  /* The state of Android's AOSP browsers:
+  /* The (sad) state of Android's AOSP browsers:
 
      2.3.7: pushState appears to work correctly, but
             `doc.documentElement.innerHTML = body` is buggy.
-            See details here: http://stackoverflow.com/q/21918564
-            Not an issue anymore, but it may fail where 3.0 do, this needs
-            testing again.
+            Update: InstantClick doesn't use that anymore, but it may
+            fail where 3.0 do, this needs testing again.
 
-     3.0:   pushState appears to work correctly (though the URL bar is only
-            updated on focus), but
+     3.0:   pushState appears to work correctly (though the address bar is
+            only updated on focus), but
             `document.documentElement.replaceChild(doc.body, document.body)`
-        throws DOMException: WRONG_DOCUMENT_ERR.
+            throws DOMException: WRONG_DOCUMENT_ERR.
 
      4.0.2: Doesn't support pushState.
 
      4.0.4,
      4.1.1,
      4.2,
-     4.3:   pushState is here, but it doesn't update the URL bar.
-            (Great logic there.)
+     4.3:   Claims support for pushState, but doesn't update the address bar.
 
      4.4:   Works correctly. Claims to be 'Chrome/30.0.0.0'.
 
