@@ -607,7 +607,8 @@ var instantClick
   return {
     supported: supported,
     init: init,
-    on: on
+    on: on,
+    preload: preload
   }
 
 }(document, location, navigator.userAgent);
