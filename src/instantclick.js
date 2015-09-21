@@ -22,7 +22,6 @@ var instantClick
     , $trackedAssets = []
 
   // Variables defined by public functions
-    , $useWhitelist
     , $preloadOnMousedown
     , $delayBeforePreload
     , $eventsCallbacks = {
@@ -68,22 +67,6 @@ var instantClick
     return false
   }
 
-  function isWhitelisted(elem) {
-    do {
-      if (!elem.hasAttribute) { // Parent of <html>
-        break
-      }
-      if (elem.hasAttribute('data-no-instant')) {
-        return false
-      }
-      if (elem.hasAttribute('data-instant')) {
-        return true
-      }
-    }
-    while (elem = elem.parentNode)
-    return false
-  }
-
   function isPreloadable(a) {
     var domain = location.protocol + '//' + location.host
 
@@ -92,9 +75,7 @@ var instantClick
         || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
         || (a.href.indexOf('#') > -1
             && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
-        || ($useWhitelist
-            ? !isWhitelisted(a)
-            : isBlacklisted(a))
+        || isBlacklisted(a)
        ) {
       return false
     }
@@ -544,7 +525,7 @@ var instantClick
      Because of this mess, the only whitelisted browser on Android is Chrome.
   */
 
-  function init() {
+  function init(preloadingMode) {
     if ($currentLocationWithoutHash) {
       /* Already initialized */
       return
@@ -553,18 +534,14 @@ var instantClick
       triggerPageEvent('change', true)
       return
     }
-    for (var i = 0; i < arguments.length; i++) {
-      var arg = arguments[i]
-      if (arg === true) {
-        $useWhitelist = true
-      }
-      else if (arg == 'mousedown') {
-        $preloadOnMousedown = true
-      }
-      else if (typeof arg == 'number') {
-        $delayBeforePreload = arg
-      }
+
+    if (preloadingMode == 'mousedown') {
+      $preloadOnMousedown = true
     }
+    else if (typeof preloadingMode == 'number') {
+      $delayBeforePreload = preloadingMode
+    }
+
     $currentLocationWithoutHash = removeHash(location.href)
     $history[$currentLocationWithoutHash] = {
       body: document.body,
