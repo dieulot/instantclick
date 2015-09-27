@@ -359,7 +359,7 @@ var instantClick
         , parentNode
         , nextSibling
 
-      for (i = 0; i < scripts.length; i++) {
+      for (var i = 0, j = scripts.length; i < j; i++) {
         script = scripts[i]
         if (script.hasAttribute('data-no-instant')) {
           continue
