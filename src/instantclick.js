@@ -577,6 +577,9 @@ var instantClick
     $eventsCallbacks[eventType].push(callback)
   }
 
+  function off(eventType) {
+    $eventsCallbacks[eventType] = []
+  }
 
   ////////////////////
 
@@ -584,7 +587,8 @@ var instantClick
   return {
     supported: supported,
     init: init,
-    on: on
+    on: on,
+    off: off
   }
 
 }(document, location, navigator.userAgent);
