@@ -113,7 +113,9 @@ var instantClick
     */
 
     if (newUrl) {
-      history.pushState(null, null, newUrl)
+      if (location.href !== newUrl){
+        history.pushState(null, null, newUrl)
+      }
 
       var hashIndex = newUrl.indexOf('#')
         , hashElem = hashIndex > -1
