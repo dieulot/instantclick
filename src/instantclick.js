@@ -32,6 +32,7 @@ var instantClick
         restore: []
       }
     , $currentPageTimers = []
+    , $currentPageXhrs = []
 
 
   ////////// HELPERS //////////
@@ -114,6 +115,7 @@ var instantClick
     */
 
     killTimers()
+    killXhrs()
 
     if (newUrl) {
       if (newUrl != location.href) {
@@ -180,6 +182,15 @@ var instantClick
       clearTimeout($currentPageTimers[i])
     }
     $currentPageTimers = []
+  }
+
+  function killXhrs() {
+    for (var i = 0; i < $currentPageXhrs.length; i++) {
+      if (typeof $currentPageXhrs[i] == 'object' && 'abort' in $currentPageXhrs[i]) {
+        $currentPageXhrs[i].abort()
+      }
+    }
+    $currentPageXhrs = []
   }
 
 
@@ -601,6 +612,10 @@ var instantClick
     return timer
   }
 
+  function xhr(xhr) {
+    $currentPageXhrs.push(xhr)
+  }
+
 
   ////////////////////
 
@@ -610,7 +625,8 @@ var instantClick
     init: init,
     on: on,
     setTimeout: setTimeout,
-    setInterval: setInterval
+    setInterval: setInterval,
+    xhr: xhr
   }
 
 }(document, location, navigator.userAgent);
