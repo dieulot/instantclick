@@ -311,7 +311,7 @@ var instantClick
       return
     }
     if ($xhr.status == 0) {
-      /* Request failed or aborted */
+      /* Request error/timeout/abort */
       if ($isWaitingForCompletion) {
         location.href = $url
       }
@@ -488,6 +488,7 @@ var instantClick
     }
     triggerPageEvent('fetch')
     $xhr.open('GET', url)
+    $xhr.timeout = 90000 // Must be set after `open()` with IE
     $xhr.send()
   }
 
