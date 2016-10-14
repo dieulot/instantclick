@@ -56,6 +56,11 @@
   }
 
   function display() {
+    if ($progress == 100) {
+      // `done` has been called in between `start` and the execution of its timer
+      return
+    }
+
     $progress = 10
     $container.style.opacity = '1'
     update()
@@ -80,6 +85,7 @@
   }
 
   function done() {
+    $progress = 100
     clearTimeout($timer)
   }
 
