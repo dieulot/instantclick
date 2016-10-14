@@ -303,7 +303,10 @@ var instantClick
       return
     }
     if ($xhr.status == 0) {
-      /* Request aborted */
+      /* Request failed or aborted */
+      if ($isWaitingForCompletion) {
+        location.href = $url
+      }
       return
     }
 
