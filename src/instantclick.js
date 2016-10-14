@@ -159,6 +159,14 @@ var instantClick
 
     instantanize()
     if (pop) {
+      /* iOS's gesture to go back by swiping from the left edge of the screen
+       * will start a preloading if the user touches a link, it needs to be
+       * cancelled otherwise the page behind the touched link will be
+       * displayed.
+       */
+      $xhr.abort()
+      setPreloadingAsHalted()
+
       triggerPageEvent('restore')
     }
     else {
