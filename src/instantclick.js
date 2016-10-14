@@ -252,7 +252,19 @@ var instantClick
     preload(a.href)
   }
 
+  function clickListenerPrelude(e) {
+    /* Makes clickListener be fired after everyone else, so that we can respect
+     * event.preventDefault.
+     */
+    document.body.addEventListener('click', clickListener)
+  }
+
   function clickListener(e) {
+    document.body.removeEventListener('click', clickListener)
+    if (e.defaultPrevented) {
+      return
+    }
+
     var a = getLinkTarget(e.target)
 
     if (!a || !isPreloadable(a)) {
@@ -380,7 +392,7 @@ var instantClick
     else {
       document.body.addEventListener('mouseover', mouseoverListener, true)
     }
-    document.body.addEventListener('click', clickListener, true)
+    document.body.addEventListener('click', clickListenerPrelude, true)
 
     if (!isInitializing) {
       var scripts = document.body.getElementsByTagName('script')
