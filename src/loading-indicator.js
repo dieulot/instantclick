@@ -36,8 +36,8 @@
     }
 
     var styleElement = document.createElement('style')
-    styleElement.innerHTML = '#instantclick{color:#29d;position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ":opacity 1s}\n"
-      + '#instantclick-bar{background:currentColor;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all 1s .5s}'
+    styleElement.innerHTML = '#instantclick{color:#29d;position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ":opacity 1s .5s}\n"
+      + '#instantclick-bar{background:currentColor;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all 1s}'
     document.head.insertBefore(styleElement, document.head.firstChild)
 
     if ($hasTouch) {
