@@ -432,10 +432,11 @@ var instantClick
     }
   }
 
-  function preload(url) {
+  function preload(url, calledOnDisplay) {
     if (!$preloadOnMousedown
         && 'display' in $timing
-        && +new Date - ($timing.start + $timing.display) < 100) {
+        && +new Date - ($timing.start + $timing.display) < 100
+        && !calledOnDisplay) {
       /* After a page is displayed, if the user's cursor happens to be above
          a link a mouseover event will be in most browsers triggered
          automatically, and in other browsers it will be triggered when the
@@ -514,7 +515,7 @@ var instantClick
         return
       }
 
-      preload(url)
+      preload(url, true)
       triggerPageEvent('wait')
       $isWaitingForCompletion = true // Must be set *after* calling `preload`
       return
