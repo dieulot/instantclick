@@ -369,9 +369,17 @@ var instantClick
     }
 
     if (!(loc in $history)) {
-      location.href = location.href
-      /* Reloads the page while using cache for scripts, styles and images,
-         unlike `location.reload()` */
+      if (loc == location.href) { // no location.hash
+        location.href = location.href
+        /* Reloads the page while using cache for scripts, styles and images,
+           unlike `location.reload()` */
+      }
+      else {
+        /* When there's a hash, `location.href = location.href` won't reload
+           the page (but will trigger a popstate event, thus causing an infinite
+           loop), so we need to call `location.reload()` */
+        location.reload()
+      }
       return
     }
 
