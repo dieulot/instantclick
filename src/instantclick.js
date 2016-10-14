@@ -414,14 +414,27 @@ var instantClick
     document.body.addEventListener('click', clickListenerPrelude, true)
 
     if (!isInitializing) {
-      var scripts = document.body.getElementsByTagName('script')
+      var scriptsInDOM = document.body.getElementsByTagName('script')
+        , scriptsToCopy = []
         , script
         , copy
         , parentNode
         , nextSibling
+        , i
 
-      for (var i = 0, j = scripts.length; i < j; i++) {
-        script = scripts[i]
+      /* `scriptsInDOM` will change during the copy of scripts if a script add
+         or delete scripts, so we need to put scripts in an array to loop
+         through them correctly.
+      */
+      for (i = 0; i < scriptsInDOM.length; i++) {
+        scriptsToCopy.push(scriptsInDOM[i])
+      }
+
+      for (i = 0; i < scriptsToCopy.length; i++) {
+        script = scriptsToCopy[i]
+        if (!script) { // Might have disappeared, see previous comment
+          continue
+        }
         if (script.hasAttribute('data-no-instant')) {
           continue
         }
