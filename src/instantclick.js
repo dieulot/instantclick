@@ -30,6 +30,7 @@ var instantClick
         receive: [],
         wait: [],
         change: [],
+        exit: [],
         restore: []
       }
     , $currentPageTimers = []
@@ -313,6 +314,7 @@ var instantClick
     if ($xhr.status == 0) {
       /* Request error/timeout/abort */
       if ($isWaitingForCompletion) {
+        triggerPageEvent('exit', $url, 'network problem')
         location.href = $url
       }
       return
@@ -380,6 +382,7 @@ var instantClick
     }
 
     if (!(loc in $history)) {
+      triggerPageEvent('exit', location.href, 'not in history')
       if (loc == location.href) { // no location.hash
         location.href = location.href
         /* Reloads the page while using cache for scripts, styles and images,
@@ -533,6 +536,7 @@ var instantClick
            kicks in while another link is already preloading.
         */
 
+        triggerPageEvent('exit', url, 'click occured while preloading planned')
         location.href = url
         return
       }
@@ -543,17 +547,19 @@ var instantClick
       return
     }
     if ($isWaitingForCompletion) {
-      /* The user clicked on a link while a page was preloading. Either on
-         the same link or on another link. If it's the same link something
-         might have gone wrong (or he could have double clicked, we don't
-         handle that case), so we send him to the page without pjax.
+      /* The user clicked on a link while a page to display was preloading.
+         Either on the same link or on another link. If it's the same link
+         something might have gone wrong (or he could have double clicked, we
+         don't handle that case), so we send him to the page without pjax.
          If it's another link, it hasn't been preloaded, so we redirect the
          user to it.
       */
+      triggerPageEvent('exit', url, 'clicked on a link while waiting for another page to display')
       location.href = url
       return
     }
     if ($mustRedirect) {
+      triggerPageEvent('exit', $url, 'not html or changed assets')
       location.href = $url
       return
     }
