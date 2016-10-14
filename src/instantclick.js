@@ -266,7 +266,13 @@ var instantClick
     display(a.href)
   }
 
-  function mouseoutListener() {
+  function mouseoutListener(e) {
+    if (getLinkTarget(e.target) == getLinkTarget(e.relatedTarget)) {
+      /* Happens when mouseout-ing and mouseover-ing child elements of the same link element,
+         we don't want to stop preloading then. */
+      return
+    }
+
     if ($preloadTimer) {
       clearTimeout($preloadTimer)
       $preloadTimer = false
