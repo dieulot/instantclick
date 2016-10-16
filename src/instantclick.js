@@ -207,12 +207,12 @@ var instantClick
   ////////// EVENT LISTENERS //////////
 
 
-  function mousedownListener(e) {
+  function mousedownListener(event) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
       return // Otherwise, click doesn't fire
     }
 
-    var a = getLinkTarget(e.target)
+    var a = getLinkTarget(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
@@ -221,12 +221,12 @@ var instantClick
     preload(a.href)
   }
 
-  function mouseoverListener(e) {
+  function mouseoverListener(event) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
       return // Otherwise, click doesn't fire
     }
 
-    var a = getLinkTarget(e.target)
+    var a = getLinkTarget(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
@@ -243,10 +243,10 @@ var instantClick
     }
   }
 
-  function touchstartListener(e) {
+  function touchstartListener(event) {
     $lastTouchTimestamp = +new Date
 
-    var a = getLinkTarget(e.target)
+    var a = getLinkTarget(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
@@ -261,34 +261,34 @@ var instantClick
     preload(a.href)
   }
 
-  function clickListenerPrelude(e) {
+  function clickListenerPrelude() {
     /* Makes clickListener be fired after everyone else, so that we can respect
      * event.preventDefault.
      */
     document.body.addEventListener('click', clickListener)
   }
 
-  function clickListener(e) {
+  function clickListener(event) {
     document.body.removeEventListener('click', clickListener)
-    if (e.defaultPrevented) {
+    if (event.defaultPrevented) {
       return
     }
 
-    var a = getLinkTarget(e.target)
+    var a = getLinkTarget(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
     }
 
-    if (e.which > 1 || e.metaKey || e.ctrlKey) { // Opening in new tab
+    if (event.which > 1 || event.metaKey || event.ctrlKey) { // Opening in new tab
       return
     }
-    e.preventDefault()
+    event.preventDefault()
     display(a.href)
   }
 
-  function mouseoutListener(e) {
-    if (getLinkTarget(e.target) == getLinkTarget(e.relatedTarget)) {
+  function mouseoutListener(event) {
+    if (getLinkTarget(event.target) == getLinkTarget(event.relatedTarget)) {
       /* Happens when mouseout-ing and mouseover-ing child elements of the same link element,
          we don't want to stop preloading then. */
       return
