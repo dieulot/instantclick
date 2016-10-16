@@ -55,19 +55,19 @@ var instantClick
     return target
   }
 
-  function isBlacklisted(elem) {
+  function isBlacklisted(element) {
     do {
-      if (!elem.hasAttribute) { // Parent of <html>
+      if (!element.hasAttribute) { // Parent of <html>
         break
       }
-      if (elem.hasAttribute('data-instant')) {
+      if (element.hasAttribute('data-instant')) {
         return false
       }
-      if (elem.hasAttribute('data-no-instant')) {
+      if (element.hasAttribute('data-no-instant')) {
         return true
       }
     }
-    while (elem = elem.parentNode)
+    while (element = element.parentNode)
     return false
   }
 
@@ -125,15 +125,15 @@ var instantClick
       }
 
       var hashIndex = newUrl.indexOf('#')
-        , hashElem = hashIndex > -1
+        , hashElement = hashIndex > -1
                      && document.getElementById(newUrl.substr(hashIndex + 1))
         , offset = 0
 
-      if (hashElem) {
-        while (hashElem.offsetParent) {
-          offset += hashElem.offsetTop
+      if (hashElement) {
+        while (hashElement.offsetParent) {
+          offset += hashElement.offsetTop
 
-          hashElem = hashElem.offsetParent
+          hashElement = hashElement.offsetParent
         }
       }
       scrollTo(0, offset)
@@ -345,15 +345,15 @@ var instantClick
         scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
       }
 
-      var elems = doc.head.children
+      var elements = doc.head.children
         , found = 0
-        , elem
+        , element
         , data
 
-      for (var i = 0; i < elems.length; i++) {
-        elem = elems[i]
-        if (elem.hasAttribute('data-instant-track')) {
-          data = elem.getAttribute('href') || elem.getAttribute('src') || elem.innerHTML
+      for (var i = 0; i < elements.length; i++) {
+        element = elements[i]
+        if (element.hasAttribute('data-instant-track')) {
+          data = element.getAttribute('href') || element.getAttribute('src') || element.innerHTML
           for (var j = 0; j < $trackedAssets.length; j++) {
             if ($trackedAssets[j] == data) {
               found++
@@ -632,14 +632,14 @@ var instantClick
       scrollY: pageYOffset
     }
 
-    var elems = document.head.children
-      , elem
+    var elements = document.head.children
+      , element
       , data
-    for (var i = 0; i < elems.length; i++) {
-      elem = elems[i]
-      if (elem.hasAttribute('data-instant-track')) {
-        data = elem.getAttribute('href') || elem.getAttribute('src') || elem.innerHTML
-        /* We can't use just `elem.href` and `elem.src` because we can't
+    for (var i = 0; i < elements.length; i++) {
+      element = elements[i]
+      if (element.hasAttribute('data-instant-track')) {
+        data = element.getAttribute('href') || element.getAttribute('src') || element.innerHTML
+        /* We can't use just `element.href` and `element.src` because we can't
            retrieve `href`s and `src`s from the Ajax response.
         */
         $trackedAssets.push(data)
