@@ -42,7 +42,7 @@ var instantClick
 
   function removeHash(url) {
     var index = url.indexOf('#')
-    if (index < 0) {
+    if (index == -1) {
       return url
     }
     return url.substr(0, index)
