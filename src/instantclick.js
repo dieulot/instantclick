@@ -48,11 +48,12 @@ var instantClick
     return url.substr(0, index)
   }
 
-  function getLinkTarget(target) {
-    while (target && target.nodeName != 'A') {
-      target = target.parentNode
+  function getParentLinkElement(element) {
+    while (element && element.nodeName != 'A') {
+      element = element.parentNode
     }
-    return target
+    // `element` will be null if no link element is found
+    return element
   }
 
   function isBlacklisted(element) {
@@ -212,7 +213,7 @@ var instantClick
       return // Otherwise, click doesn't fire
     }
 
-    var a = getLinkTarget(event.target)
+    var a = getParentLinkElement(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
@@ -226,7 +227,7 @@ var instantClick
       return // Otherwise, click doesn't fire
     }
 
-    var a = getLinkTarget(event.target)
+    var a = getParentLinkElement(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
@@ -246,7 +247,7 @@ var instantClick
   function touchstartListener(event) {
     $lastTouchTimestamp = +new Date
 
-    var a = getLinkTarget(event.target)
+    var a = getParentLinkElement(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
@@ -274,7 +275,7 @@ var instantClick
       return
     }
 
-    var a = getLinkTarget(event.target)
+    var a = getParentLinkElement(event.target)
 
     if (!a || !isPreloadable(a)) {
       return
@@ -288,7 +289,7 @@ var instantClick
   }
 
   function mouseoutListener(event) {
-    if (getLinkTarget(event.target) == getLinkTarget(event.relatedTarget)) {
+    if (getParentLinkElement(event.target) == getParentLinkElement(event.relatedTarget)) {
       /* Happens when mouseout-ing and mouseover-ing child elements of the same link element,
          we don't want to stop preloading then. */
       return
