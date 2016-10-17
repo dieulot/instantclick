@@ -323,7 +323,8 @@ var instantClick
 
     $timing.ready = +new Date - $timing.start
 
-    if ($xhr.getResponseHeader('Content-Type').match(/\/(x|ht|xht)ml/)) {
+    var contentType = $xhr.getResponseHeader('Content-Type')
+    if (contentType && contentType.match(/\/(x|ht|xht)ml/)) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
       $title = doc.title
