@@ -72,15 +72,15 @@ var instantClick
     return false
   }
 
-  function isPreloadable(a) {
+  function isPreloadable(linkElement) {
     var domain = location.protocol + '//' + location.host
 
-    if (a.target // target="_blank" etc.
-        || a.hasAttribute('download')
-        || a.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
-        || (a.href.indexOf('#') > -1
-            && removeHash(a.href) == $currentLocationWithoutHash) // Anchor
-        || isBlacklisted(a)
+    if (linkElement.target // target="_blank" etc.
+        || linkElement.hasAttribute('download')
+        || linkElement.href.indexOf(domain + '/') != 0 // Another domain, or no href attribute
+        || (linkElement.href.indexOf('#') > -1
+            && removeHash(linkElement.href) == $currentLocationWithoutHash) // Anchor
+        || isBlacklisted(linkElement)
        ) {
       return false
     }
@@ -213,13 +213,13 @@ var instantClick
       return // Otherwise, click doesn't fire
     }
 
-    var a = getParentLinkElement(event.target)
+    var linkElement = getParentLinkElement(event.target)
 
-    if (!a || !isPreloadable(a)) {
+    if (!linkElement || !isPreloadable(linkElement)) {
       return
     }
 
-    preload(a.href)
+    preload(linkElement.href)
   }
 
   function mouseoverListener(event) {
@@ -227,19 +227,19 @@ var instantClick
       return // Otherwise, click doesn't fire
     }
 
-    var a = getParentLinkElement(event.target)
+    var linkElement = getParentLinkElement(event.target)
 
-    if (!a || !isPreloadable(a)) {
+    if (!linkElement || !isPreloadable(linkElement)) {
       return
     }
 
-    a.addEventListener('mouseout', mouseoutListener)
+    linkElement.addEventListener('mouseout', mouseoutListener)
 
     if (!$delayBeforePreload) {
-      preload(a.href)
+      preload(linkElement.href)
     }
     else {
-      $urlToPreload = a.href
+      $urlToPreload = linkElement.href
       $preloadTimer = setTimeout(preload, $delayBeforePreload)
     }
   }
@@ -247,19 +247,19 @@ var instantClick
   function touchstartListener(event) {
     $lastTouchTimestamp = +new Date
 
-    var a = getParentLinkElement(event.target)
+    var linkElement = getParentLinkElement(event.target)
 
-    if (!a || !isPreloadable(a)) {
+    if (!linkElement || !isPreloadable(linkElement)) {
       return
     }
 
     if ($preloadOnMousedown) {
-      a.removeEventListener('mousedown', mousedownListener)
+      linkElement.removeEventListener('mousedown', mousedownListener)
     }
     else {
-      a.removeEventListener('mouseover', mouseoverListener)
+      linkElement.removeEventListener('mouseover', mouseoverListener)
     }
-    preload(a.href)
+    preload(linkElement.href)
   }
 
   function clickListenerPrelude() {
@@ -275,9 +275,9 @@ var instantClick
       return
     }
 
-    var a = getParentLinkElement(event.target)
+    var linkElement = getParentLinkElement(event.target)
 
-    if (!a || !isPreloadable(a)) {
+    if (!linkElement || !isPreloadable(linkElement)) {
       return
     }
 
@@ -285,7 +285,7 @@ var instantClick
       return
     }
     event.preventDefault()
-    display(a.href)
+    display(linkElement.href)
   }
 
   function mouseoutListener(event) {
