@@ -324,7 +324,7 @@ var instantClick
     $timing.ready = +new Date - $timing.start
 
     var contentType = $xhr.getResponseHeader('Content-Type')
-    if (contentType && contentType.match(/\/(x|ht|xht)ml/)) {
+    if (contentType && /^text\/html/i.test(contentType)) {
       var doc = document.implementation.createHTMLDocument('')
       doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
       $title = doc.title
