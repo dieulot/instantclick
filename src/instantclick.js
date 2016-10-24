@@ -309,9 +309,25 @@ var instantClick
   }
 
   function readystatechangeListener() {
+    if ($xhr.readyState == 2) { // headers received
+      var contentType = $xhr.getResponseHeader('Content-Type')
+      if (!contentType || !/^text\/html/i.test(contentType)) {
+        $mustRedirect = true
+      }
+    }
+
     if ($xhr.readyState < 4) {
       return
     }
+
+    if ($mustRedirect) {
+      if ($isWaitingForCompletion) {
+        triggerPageEvent('exit', $url, 'non-html content-type')
+        location.href = $url
+      }
+      return
+    }
+
     if ($xhr.status == 0) {
       /* Request error/timeout/abort */
       if ($isWaitingForCompletion) {
@@ -323,52 +339,46 @@ var instantClick
 
     $timing.ready = +new Date - $timing.start
 
-    var contentType = $xhr.getResponseHeader('Content-Type')
-    if (contentType && /^text\/html/i.test(contentType)) {
-      var doc = document.implementation.createHTMLDocument('')
-      doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
-      $title = doc.title
-      $body = doc.body
+    var doc = document.implementation.createHTMLDocument('')
+    doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
+    $title = doc.title
+    $body = doc.body
 
-      var alteredOnReceive = triggerPageEvent('receive', $url, $body, $title)
-      if (alteredOnReceive) {
-        if ('body' in alteredOnReceive) {
-          $body = alteredOnReceive.body
-        }
-        if ('title' in alteredOnReceive) {
-          $title = alteredOnReceive.title
-        }
+    var alteredOnReceive = triggerPageEvent('receive', $url, $body, $title)
+    if (alteredOnReceive) {
+      if ('body' in alteredOnReceive) {
+        $body = alteredOnReceive.body
       }
-
-      var urlWithoutHash = removeHash($url)
-      $history[urlWithoutHash] = {
-        body: $body,
-        title: $title,
-        scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
+      if ('title' in alteredOnReceive) {
+        $title = alteredOnReceive.title
       }
+    }
 
-      var elements = doc.head.children
-        , found = 0
-        , element
-        , data
+    var urlWithoutHash = removeHash($url)
+    $history[urlWithoutHash] = {
+      body: $body,
+      title: $title,
+      scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
+    }
 
-      for (var i = 0; i < elements.length; i++) {
-        element = elements[i]
-        if (element.hasAttribute('data-instant-track')) {
-          data = element.getAttribute('href') || element.getAttribute('src') || element.innerHTML
-          for (var j = 0; j < $trackedAssets.length; j++) {
-            if ($trackedAssets[j] == data) {
-              found++
-            }
+    var elements = doc.head.children
+      , found = 0
+      , element
+      , data
+
+    for (var i = 0; i < elements.length; i++) {
+      element = elements[i]
+      if (element.hasAttribute('data-instant-track')) {
+        data = element.getAttribute('href') || element.getAttribute('src') || element.innerHTML
+        for (var j = 0; j < $trackedAssets.length; j++) {
+          if ($trackedAssets[j] == data) {
+            found++
           }
         }
       }
-      if (found != $trackedAssets.length) {
-        $mustRedirect = true // Assets have changed
-      }
     }
-    else {
-      $mustRedirect = true // Not an HTML document
+    if (found != $trackedAssets.length) {
+      $mustRedirect = true // Assets have changed
     }
 
     if ($isWaitingForCompletion) {
