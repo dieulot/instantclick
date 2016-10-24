@@ -15,7 +15,8 @@ var instantClick
     , $xhr
     , $url = false
     , $title = false
-    , $mustRedirect = false
+    , $isContentTypeNotHTML
+    , $areTrackedAssetsDifferent
     , $body = false
     , $timing = {}
     , $isPreloading = false
@@ -312,7 +313,7 @@ var instantClick
     if ($xhr.readyState == 2) { // headers received
       var contentType = $xhr.getResponseHeader('Content-Type')
       if (!contentType || !/^text\/html/i.test(contentType)) {
-        $mustRedirect = true
+        $isContentTypeNotHTML = true
       }
     }
 
@@ -320,7 +321,7 @@ var instantClick
       return
     }
 
-    if ($mustRedirect) {
+    if ($isContentTypeNotHTML) {
       if ($isWaitingForCompletion) {
         triggerPageEvent('exit', $url, 'non-html content-type')
         location.href = $url
@@ -378,7 +379,7 @@ var instantClick
       }
     }
     if (found != $trackedAssets.length) {
-      $mustRedirect = true // Assets have changed
+      $areTrackedAssetsDifferent = true
     }
 
     if ($isWaitingForCompletion) {
@@ -510,7 +511,8 @@ var instantClick
 
     $url = url
     $body = false
-    $mustRedirect = false
+    $isContentTypeNotHTML = false
+    $areTrackedAssetsDifferent = false
     $timing = {
       start: +new Date
     }
@@ -570,8 +572,13 @@ var instantClick
       location.href = url
       return
     }
-    if ($mustRedirect) {
-      triggerPageEvent('exit', $url, 'not html or changed assets')
+    if ($isContentTypeNotHTML) {
+      triggerPageEvent('exit', $url, 'non-html content-type')
+      location.href = $url
+      return
+    }
+    if ($areTrackedAssetsDifferent) {
+      triggerPageEvent('exit', $url, 'different assets')
       location.href = $url
       return
     }
