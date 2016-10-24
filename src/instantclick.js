@@ -321,18 +321,18 @@ var instantClick
       return
     }
 
-    if ($isContentTypeNotHTML) {
+    if ($xhr.status == 0) {
+      /* Request error/timeout/abort */
       if ($isWaitingForCompletion) {
-        triggerPageEvent('exit', $url, 'non-html content-type')
+        triggerPageEvent('exit', $url, 'network problem')
         location.href = $url
       }
       return
     }
 
-    if ($xhr.status == 0) {
-      /* Request error/timeout/abort */
+    if ($isContentTypeNotHTML) {
       if ($isWaitingForCompletion) {
-        triggerPageEvent('exit', $url, 'network problem')
+        triggerPageEvent('exit', $url, 'non-html content-type')
         location.href = $url
       }
       return
