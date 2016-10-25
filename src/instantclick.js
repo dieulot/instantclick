@@ -599,6 +599,7 @@ var instantClick
   if ('pushState' in history
       && location.protocol != "file:") {
     supported = true
+
     var indexOfAndroid = $userAgent.indexOf('Android ')
     if (indexOfAndroid > -1) {
       /* The stock browsers in Android 4.0.3 through 4.3.1 support pushState,
@@ -608,13 +609,24 @@ var instantClick
          back from a page not displayed through InstantClick: `location.href`
          is undefined and `location.reload()` doesn't work.
 
-         Android < 4.4 is therefore blacklisted unless the browser is Chrome.
+         Android < 4.4 is therefore blacklisted unless the browser is known
+         not to have that bug.
       */
 
       var androidVersion = parseFloat($userAgent.substr(indexOfAndroid + 'Android '.length))
-      if (androidVersion < 4.4
-          && !/Mozilla\/5.0 \(Linux; .+\) AppleWebKit\/.+ \(KHTML, like Gecko\) Chrome\/.+ (?:Mobile )?Safari\/.+/.test($userAgent)) {
+      if (androidVersion < 4.4) {
         supported = false
+        var whitelistedBrowsersUserAgentsOnAndroid4 = [
+          / Chrome\//, // Chrome, Opera, Puffin, QQ, Yandex
+          / UCBrowser\//,
+          / Firefox\//,
+        ]
+        for (var i = 0; i < whitelistedBrowsersUserAgentsOnAndroid4.length; i++) {
+          if (whitelistedBrowsersUserAgentsOnAndroid4[i].test($userAgent)) {
+            supported = true
+            break
+          }
+        }
       }
     }
   }
