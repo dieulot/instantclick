@@ -595,36 +595,29 @@ var instantClick
 
   ////////// PUBLIC VARIABLE AND FUNCTIONS //////////
 
-  var supported = 'pushState' in history
-                  && (!$userAgent.match('Android') || $userAgent.match('Chrome/'))
-                  && location.protocol != "file:"
+  var supported
+  if ('pushState' in history
+      && location.protocol != "file:") {
+    supported = true
+    var indexOfAndroid = $userAgent.indexOf('Android ')
+    if (indexOfAndroid > -1) {
+      /* The stock browsers in Android 4.0.3 through 4.3.1 support pushState,
+         though they don't update the address bar.
 
-  /* The (sad) state of Android's AOSP browsers:
+         More problematic is that they have a bug on `popstate` when coming
+         back from a page not displayed through InstantClick: `location.href`
+         is undefined and `location.reload()` doesn't work.
 
-     2.3.7: pushState appears to work correctly, but
-            `doc.documentElement.innerHTML = body` is buggy.
-            Update: InstantClick doesn't use that anymore, but it may
-            fail where 3.0 do, this needs testing again.
+         Android < 4.4 is therefore blacklisted unless the browser is Chrome.
+      */
 
-     3.0:   pushState appears to work correctly (though the address bar is
-            only updated on focus), but
-            `document.documentElement.replaceChild(doc.body, document.body)`
-            throws DOMException: WRONG_DOCUMENT_ERR.
-
-     4.0.2: Doesn't support pushState.
-
-     4.0.4,
-     4.1.1,
-     4.2,
-     4.3:   Claims support for pushState, but doesn't update the address bar.
-
-     4.4:   Works correctly. Claims to be 'Chrome/30.0.0.0'.
-
-     All androids tested with Android SDK's Emulator.
-     Version numbers are from the browser's user agent.
-
-     Because of this mess, the only whitelisted browser on Android is Chrome.
-  */
+      var androidVersion = parseFloat($userAgent.substr(indexOfAndroid + 'Android '.length))
+      if (androidVersion < 4.4
+          && !/Mozilla\/5.0 \(Linux; .+\) AppleWebKit\/.+ \(KHTML, like Gecko\) Chrome\/.+ (?:Mobile )?Safari\/.+/.test($userAgent)) {
+        supported = false
+      }
+    }
+  }
 
   function init(preloadingMode) {
     if ($hasBeenInitialized) {
