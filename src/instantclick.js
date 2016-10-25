@@ -616,15 +616,17 @@ var instantClick
       var androidVersion = parseFloat($userAgent.substr(indexOfAndroid + 'Android '.length))
       if (androidVersion < 4.4) {
         supported = false
-        var whitelistedBrowsersUserAgentsOnAndroid4 = [
-          / Chrome\//, // Chrome, Opera, Puffin, QQ, Yandex
-          / UCBrowser\//,
-          / Firefox\//,
-        ]
-        for (var i = 0; i < whitelistedBrowsersUserAgentsOnAndroid4.length; i++) {
-          if (whitelistedBrowsersUserAgentsOnAndroid4[i].test($userAgent)) {
-            supported = true
-            break
+        if (androidVersion >= 4) {
+          var whitelistedBrowsersUserAgentsOnAndroid4 = [
+            / Chrome\//, // Chrome, Opera, Puffin, QQ, Yandex
+            / UCBrowser\//,
+            / Firefox\//,
+          ]
+          for (var i = 0; i < whitelistedBrowsersUserAgentsOnAndroid4.length; i++) {
+            if (whitelistedBrowsersUserAgentsOnAndroid4[i].test($userAgent)) {
+              supported = true
+              break
+            }
           }
         }
       }
