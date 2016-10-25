@@ -323,8 +323,9 @@ var instantClick
 
     if ($xhr.status == 0) {
       /* Request error/timeout/abort */
+      $gotANetworkError = true
       if ($isWaitingForCompletion) {
-        triggerPageEvent('exit', $url, 'network problem')
+        triggerPageEvent('exit', $url, 'network error')
         location.href = $url
       }
       return
@@ -512,6 +513,7 @@ var instantClick
     $url = url
     $body = false
     $isContentTypeNotHTML = false
+    $gotANetworkError = false
     $areTrackedAssetsDifferent = false
     $timing = {
       start: +new Date
@@ -574,6 +576,11 @@ var instantClick
     }
     if ($isContentTypeNotHTML) {
       triggerPageEvent('exit', $url, 'non-html content-type')
+      location.href = $url
+      return
+    }
+    if ($gotANetworkError) {
+      triggerPageEvent('exit', $url, 'network error')
       location.href = $url
       return
     }
