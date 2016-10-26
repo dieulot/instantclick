@@ -56,7 +56,7 @@
 
   function hide() {
     clearTimeout($timer)
-    $element.className = ''
+    $element.className = '' // Doesn't work (has no visible effect) in Safari on `exit`
   }
 
 
