@@ -36,7 +36,7 @@
     }
 
     var styleElement = document.createElement('style')
-    styleElement.innerHTML = '#instantclick{color:#29d;position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;' + transitionProperty + ":opacity 1s .5s}\n"
+    styleElement.innerHTML = '#instantclick{color:#29d;position:' + ($hasTouch ? 'absolute' : 'fixed') + ';top:0;left:0;width:100%;pointer-events:none;z-index:2147483647;opacity:0;' + transitionProperty + ":opacity 1s .5s}\n"
       + '#instantclick-bar{background:currentColor;width:100%;margin-left:-100%;height:2px;' + transitionProperty + ':all 1s}'
     document.head.insertBefore(styleElement, document.head.firstChild)
 
@@ -45,6 +45,8 @@
       addEventListener('resize', updatePositionAndScale)
       addEventListener('scroll', updatePositionAndScale)
     }
+
+    document.body.appendChild($container)
   }
 
   function start() {
@@ -79,9 +81,6 @@
 
   function update() {
     $element.style[$transformProperty] = 'translate(' + $progress + '%)'
-    if (!document.getElementById($container.id)) {
-      document.body.appendChild($container)
-    }
   }
 
   function done() {
