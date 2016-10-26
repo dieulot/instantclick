@@ -170,6 +170,10 @@ InstantClick.on('restore', function() {
   addDebugMessage('Event: restore')
 })
 
+InstantClick.on('exit', function(url, status) {
+  addDebugMessage('Event: exit (' + status + ')')
+})
+
 InstantClick.on('change', function(isInitialLoad) {
   addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
 })
