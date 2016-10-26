@@ -609,15 +609,15 @@ var instantClick
 
     var indexOfAndroid = $userAgent.indexOf('Android ')
     if (indexOfAndroid > -1) {
-      /* The stock browsers in Android 4.0.3 through 4.3.1 support pushState,
-         though they don't update the address bar.
+      /* The stock browser in Android 4.0.3 through 4.3.1 supports pushState,
+         though it doesn't update the address bar.
 
-         More problematic is that they have a bug on `popstate` when coming
-         back from a page not displayed through InstantClick: `location.href`
-         is undefined and `location.reload()` doesn't work.
+         More problematic is that it has a bug on `popstate` when coming back
+         from a page not displayed through InstantClick: `location.href` is
+         undefined and `location.reload()` doesn't work.
 
-         Android < 4.4 is therefore blacklisted unless the browser is known
-         not to have that bug.
+         Android < 4.4 is therefore blacklisted, unless it's a browser known
+         not to have that latter bug.
       */
 
       var androidVersion = parseFloat($userAgent.substr(indexOfAndroid + 'Android '.length))
