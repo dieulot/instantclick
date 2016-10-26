@@ -395,6 +395,11 @@ var instantClick
       return
     }
 
+    if ($isWaitingForCompletion) {
+      setPreloadingAsHalted()
+      $xhr.abort()
+    }
+
     if (!(loc in $history)) {
       triggerPageEvent('exit', location.href, 'not in history')
       if (loc == location.href) { // no location.hash
