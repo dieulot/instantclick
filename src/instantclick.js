@@ -602,7 +602,7 @@ var instantClick
 
   ////////// PUBLIC VARIABLE AND FUNCTIONS //////////
 
-  var supported
+  var supported = false
   if ('pushState' in history
       && location.protocol != "file:") {
     supported = true
