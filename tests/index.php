@@ -166,6 +166,10 @@ InstantClick.on('wait', function() {
   addDebugMessage('Event: wait')
 })
 
+InstantClick.on('restore', function() {
+  addDebugMessage('Event: restore')
+})
+
 InstantClick.on('change', function(isInitialLoad) {
   addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
 })
