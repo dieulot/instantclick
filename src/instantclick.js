@@ -641,15 +641,15 @@ var instantClick
   }
 
   function init(preloadingMode) {
-    if ($hasBeenInitialized) {
-      return
-    }
-    $hasBeenInitialized = true
-
     if (!supported) {
       triggerPageEvent('change', true)
       return
     }
+
+    if ($hasBeenInitialized) {
+      return
+    }
+    $hasBeenInitialized = true
 
     if (preloadingMode == 'mousedown') {
       $preloadOnMousedown = true
