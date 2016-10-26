@@ -12,23 +12,12 @@
           Webkit: true,
           Moz: true
         }
-      , vendorsPrefixes = {
-          animation: '',
-          transform: ''
-        }
+      , vendorPrefix = ''
 
-    function camelCase(str) {
-      return str.replace(/^(.)/, function(firstChar) {
-        return firstChar.toUpperCase()
-      })
-    }
-
-    for (var property in vendorsPrefixes) {
-      if (!(property in $element.style)) {
-        for (var vendor in vendors) {
-          if (vendor + camelCase(property) in $element.style) {
-            vendorsPrefixes[property] = '-' + vendor.toLowerCase() + '-'
-          }
+    if (!('transform' in $element.style)) {
+      for (var vendor in vendors) {
+        if (vendor + 'Transform' in $element.style) {
+          vendorPrefix = '-' + vendor.toLowerCase() + '-'
         }
       }
     }
@@ -36,8 +25,8 @@
     var styleElement = document.createElement('style')
     styleElement.setAttribute('instantclick', '') // So that this style element doesn't surprise developers in the browser DOM inspector.
     styleElement.innerHTML = '#instantclick {pointer-events:none; z-index:2147483647; position:fixed; top:0; left:0; width:100%; height:3px; border-radius:2px; color:hsl(192,100%,50%); background:currentColor; box-shadow: 0 -1px 4px currentColor; opacity: 0;}' +
-                             '#instantclick.visible {opacity:1; ' + vendorsPrefixes.animation + 'animation:instantclick .6s linear infinite;}' +
-                             '@' + vendorsPrefixes.animation + 'keyframes instantclick {0%,5% {' + vendorsPrefixes.transform + 'transform:translateX(-100%);} 45%,55% {' + vendorsPrefixes.transform + 'transform:translateX(0%);} 95%,100% {' + vendorsPrefixes.transform + 'transform:translateX(100%);}}'
+                             '#instantclick.visible {opacity:1; ' + vendorPrefix + 'animation:instantclick .6s linear infinite;}' +
+                             '@' + vendorPrefix + 'keyframes instantclick {0%,5% {' + vendorPrefix + 'transform:translateX(-100%);} 45%,55% {' + vendorPrefix + 'transform:translateX(0%);} 95%,100% {' + vendorPrefix + 'transform:translateX(100%);}}'
     document.head.appendChild(styleElement)
   }
 
@@ -66,8 +55,8 @@
   }
 
   function hide() {
-    $element.className = ''
     clearTimeout($timer)
+    $element.className = ''
   }
 
 
