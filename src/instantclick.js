@@ -88,25 +88,26 @@ var instantClick
     return true
   }
 
-  function triggerPageEvent(eventType, arg1, arg2, arg3) {
-    var returnValue = false
+  function triggerPageEvent(eventType) {
+    var argumentsToApply = Array.prototype.slice.call(arguments, 1)
+      , returnValue = false
     for (var i = 0; i < $eventsCallbacks[eventType].length; i++) {
       if (eventType == 'receive') {
-        var altered = $eventsCallbacks[eventType][i](arg1, arg2, arg3)
+        var altered = $eventsCallbacks[eventType][i].apply(window, argumentsToApply)
         if (altered) {
-          /* Update args for the next iteration of the loop. */
+          /* Update arguments for the next iteration of the loop. */
           if ('body' in altered) {
-            arg2 = altered.body
+            argumentsToApply[1] = altered.body
           }
           if ('title' in altered) {
-            arg3 = altered.title
+            argumentsToApply[2] = altered.title
           }
 
           returnValue = altered
         }
       }
       else {
-        $eventsCallbacks[eventType][i](arg1, arg2, arg3)
+        $eventsCallbacks[eventType][i].apply(window, argumentsToApply)
       }
     }
     return returnValue
