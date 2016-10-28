@@ -78,5 +78,8 @@
   ////////////////////
 
 
-  instantClick.showLoadingIndicator = show
+  instantClick.loadingIndicator = {
+    show: show,
+    hide: hide
+  }
 })();
