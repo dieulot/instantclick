@@ -91,6 +91,7 @@ var instantClick
 
   function triggerPageEvent(eventType) {
     var argumentsToApply = Array.prototype.slice.call(arguments, 1)
+      , returnValue = false
     for (var i = 0; i < $eventsCallbacks[eventType].length; i++) {
       if (eventType == 'receive') {
         var altered = $eventsCallbacks[eventType][i].apply(window, argumentsToApply)
@@ -102,12 +103,15 @@ var instantClick
           if ('title' in altered) {
             argumentsToApply[2] = altered.title
           }
+
+          returnValue = altered
         }
       }
       else {
         $eventsCallbacks[eventType][i].apply(window, argumentsToApply)
       }
     }
+    return returnValue
   }
 
   function changePage(title, body, newUrl, scrollY, pop) {
