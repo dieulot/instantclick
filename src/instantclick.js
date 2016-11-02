@@ -27,7 +27,7 @@ var instantClick
     , $preloadOnMousedown
     , $delayBeforePreload
     , $eventsCallbacks = {
-        fetch: [],
+        preload: [],
         receive: [],
         wait: [],
         change: [],
@@ -520,7 +520,7 @@ var instantClick
     $timing = {
       start: +new Date
     }
-    triggerPageEvent('fetch')
+    triggerPageEvent('preload')
     $xhr.open('GET', url)
     $xhr.timeout = 90000 // Must be set after `open()` with IE
     $xhr.send()
