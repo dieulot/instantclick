@@ -225,6 +225,11 @@ var instantClick
       return // Otherwise, click doesn't fire
     }
 
+    if (getParentLinkElement(event.target) == getParentLinkElement(event.relatedTarget)) {
+      /* Happens when mouseout-ing and mouseover-ing child elements of the same link element */
+      return
+    }
+
     var linkElement = getParentLinkElement(event.target)
 
     if (!linkElement || !isPreloadable(linkElement)) {
