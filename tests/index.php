@@ -22,14 +22,16 @@ else {
 
 $delays = [200, 500, 1000, 5000];
 
-if (isset($_GET['on']) && (int)$_GET['on'] != 0) {
-  $preload_on = (int)$_GET['on'];
-}
-elseif (isset($_GET['on']) && $_GET['on'] == 'mousedown') {
-  $preload_on = 'mousedown';
+if (isset($_GET['on'])) {
+  if (in_array($_GET['on'], ['default', 'mousedown'])) {
+    $preload_on = $_GET['on'];
+  }
+  else {
+    $preload_on = (int)$_GET['on'];
+  }
 }
 else {
-  $preload_on = 'hover';
+  $preload_on = 'default';
 }
 
 $nocache = '&amp;nocache=' . microtime(true) * 10000;
@@ -78,9 +80,10 @@ if ($page == 'minimal'): ?>
 endif ?>
 
 <div id="preloading-level">
-  <a data-no-instant href="?<?= $nocache ?>" class="<?= $preload_on == 'hover' ? 'selected' : '' ?>">↻ On hover</a>
-  <a data-no-instant href="?on=100<?= $nocache ?>" class="<?= $preload_on === (int)$preload_on ? 'selected' : '' ?>">↻ On hover + 100 ms delay</a>
-  <a data-no-instant href="?on=mousedown<?= $nocache ?>" class="<?= $preload_on == 'mousedown' ? 'selected' : '' ?>">↻ On mousedown</a>
+  <a data-no-instant href="?<?= $nocache ?>" class="<?= $preload_on === 'default' ? 'selected' : '' ?>">↻ Default</a>
+  <a data-no-instant href="?on=0<?= $nocache ?>" class="<?= $preload_on === 0 ? 'selected' : '' ?>">↻ 0 ms</a>
+  <a data-no-instant href="?on=1000<?= $nocache ?>" class="<?= $preload_on === 1000 ? 'selected' : '' ?>">↻ 1000 ms</a>
+  <a data-no-instant href="?on=mousedown<?= $nocache ?>" class="<?= $preload_on === 'mousedown' ? 'selected' : '' ?>">↻ Mousedown</a>
 </div>
 
 <hr>
@@ -183,10 +186,10 @@ InstantClick.on('change', function(isInitialLoad) {
 })
 
 InstantClick.init(<?php
-if ($preload_on == 'mousedown') {
+if ($preload_on === 'mousedown') {
   echo "'mousedown'";
 }
-elseif ((int)$preload_on != 0) {
+elseif ($preload_on !== 'default') {
   echo $preload_on;
 }
 ?>)

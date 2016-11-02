@@ -25,7 +25,7 @@ var instantClick
 
   // Variables defined by public functions
     , $preloadOnMousedown
-    , $delayBeforePreload = 0
+    , $delayBeforePreload = 65
     , $eventsCallbacks = {
         hover: [],
         preload: [],
