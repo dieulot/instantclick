@@ -58,7 +58,7 @@ if (location.pathname.substr(0, 6) == '/tests' && location.pathname[6] != '/') {
 }
 </script>
 <link rel="stylesheet" href="style.css?<?= $append ?>">
-<meta name="viewport" content="width=600">
+<meta name="viewport" content="width=500">
 
 <link rel="stylesheet" href="trackme.css?<?= filemtime('trackme.css') ?>" data-instant-track>
 <script src="trackme.js?<?= filemtime('trackme.js') ?>" data-instant-track></script>
