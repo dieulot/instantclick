@@ -1,4 +1,4 @@
-/* InstantClick's loading indicator | (C) 2014-2015 Alexandre Dieulot | http://instantclick.io/license */
+/* InstantClick's loading indicator | (C) 2014-2016 Alexandre Dieulot | http://instantclick.io/license */
 
 ;(function() {
   var $element
