@@ -141,8 +141,8 @@ function addDebugMessage(message) {
   divDebug.innerHTML = $debugMessages
 }
 
-InstantClick.on('fetch', function() {
-  addDebugMessage('<small><small>Event: fetch</small></small>')
+InstantClick.on('preload', function() {
+  addDebugMessage('<small><small>Event: preload</small></small>')
 })
 
 InstantClick.on('receive', function(url, body, title) {
