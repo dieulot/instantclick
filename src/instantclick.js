@@ -31,8 +31,8 @@ var instantClick
         receive: [],
         wait: [],
         change: [],
-        exit: [],
-        restore: []
+        restore: [],
+        exit: []
       }
     , $currentPageTimers = []
     , $currentPageXhrs = []
