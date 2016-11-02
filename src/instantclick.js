@@ -25,7 +25,7 @@ var instantClick
 
   // Variables defined by public functions
     , $preloadOnMousedown
-    , $delayBeforePreload
+    , $delayBeforePreload = 0
     , $eventsCallbacks = {
         hover: [],
         preload: [],
@@ -241,13 +241,8 @@ var instantClick
 
     linkElement.addEventListener('mouseout', mouseoutListener)
 
-    if (!$delayBeforePreload) {
-      preload(linkElement.href)
-    }
-    else {
-      $urlToPreload = linkElement.href
-      $preloadTimer = setTimeout(preload, $delayBeforePreload)
-    }
+    $urlToPreload = linkElement.href
+    $preloadTimer = setTimeout(preload, $delayBeforePreload)
   }
 
   function touchstartListener(event) {
