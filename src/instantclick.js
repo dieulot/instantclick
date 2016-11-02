@@ -27,6 +27,7 @@ var instantClick
     , $preloadOnMousedown
     , $delayBeforePreload
     , $eventsCallbacks = {
+        hover: [],
         preload: [],
         receive: [],
         wait: [],
@@ -235,6 +236,8 @@ var instantClick
     if (!linkElement || !isPreloadable(linkElement)) {
       return
     }
+
+    triggerPageEvent('hover', linkElement.href)
 
     linkElement.addEventListener('mouseout', mouseoutListener)
 
