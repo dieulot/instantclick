@@ -712,7 +712,11 @@ var instantClick
   }
 
   function xhr(xhr) {
+    if (!xhr) {
+      xhr = new XMLHttpRequest()
+    }
     $currentPageXhrs.push(xhr)
+    return xhr
   }
 
 
