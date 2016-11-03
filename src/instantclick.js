@@ -524,9 +524,7 @@ var instantClick
     $isContentTypeNotHTML = false
     $gotANetworkError = false
     $areTrackedAssetsDifferent = false
-    $timing = {
-      start: +new Date
-    }
+    $timing = {}
     triggerPageEvent('preload')
     $xhr.open('GET', url)
     $xhr.timeout = 90000 // Must be set after `open()` with IE
