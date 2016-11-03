@@ -213,7 +213,7 @@ var instantClick
 
   function mousedownListener(event) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      return // Otherwise, click doesn't fire
+      return // Lets click fire
     }
 
     var linkElement = getParentLinkElement(event.target)
@@ -227,7 +227,7 @@ var instantClick
 
   function mouseoverListener(event) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      return // Otherwise, click doesn't fire
+      return // Lets click fire
     }
 
     if (getParentLinkElement(event.target) == getParentLinkElement(event.relatedTarget)) {
