@@ -18,7 +18,7 @@ var instantClick
     , $isContentTypeNotHTML
     , $areTrackedAssetsDifferent
     , $body = false
-    , $timing = {}
+    , $lastDisplayTimestamp = 0
     , $isPreloading = false
     , $isWaitingForCompletion = false
     , $trackedAssets = []
@@ -481,8 +481,7 @@ var instantClick
 
   function preload(url, calledOnDisplay) {
     if (!$preloadOnMousedown
-        && 'display' in $timing
-        && +new Date - $timing.display < 100
+        && +new Date - $lastDisplayTimestamp < 100
         && !calledOnDisplay) {
       /* After a page is displayed, if the user's cursor happens to be above
          a link a mouseover event will be in most browsers triggered
@@ -524,7 +523,6 @@ var instantClick
     $isContentTypeNotHTML = false
     $gotANetworkError = false
     $areTrackedAssetsDifferent = false
-    $timing = {}
     triggerPageEvent('preload')
     $xhr.open('GET', url)
     $xhr.timeout = 90000 // Must be set after `open()` with IE
@@ -532,9 +530,7 @@ var instantClick
   }
 
   function display(url) {
-    if (!('display' in $timing)) {
-      $timing.display = +new Date
-    }
+    $lastDisplayTimestamp = +new Date
     if ($preloadTimer || !$isPreloading) {
       /* $preloadTimer:
          Happens when there's a delay before preloading and that delay
