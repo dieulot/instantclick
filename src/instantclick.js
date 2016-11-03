@@ -345,8 +345,6 @@ var instantClick
       return
     }
 
-    $timing.ready = +new Date - $timing.start
-
     var doc = document.implementation.createHTMLDocument('')
     doc.documentElement.innerHTML = removeNoscriptTags($xhr.responseText)
     $title = doc.title
