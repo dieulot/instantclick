@@ -230,6 +230,28 @@ var instantClick
       return // Lets click fire
     }
 
+    if (+new Date - $lastDisplayTimestamp < 100) {
+      /* After a page is displayed, if the user's cursor happens to be above
+         a link a mouseover event will be in most browsers triggered
+         automatically, and in other browsers it will be triggered when the
+         user moves his mouse by 1px.
+
+         Here are the behavior I noticed, all on Windows:
+         - Safari 5.1: auto-triggers after 0 ms
+         - IE 11: auto-triggers after 30-80 ms (depends on page's size?)
+         - Firefox: auto-triggers after 10 ms
+         - Opera 18: auto-triggers after 10 ms
+
+         - Chrome: triggers when cursor moved
+         - Opera 12.16: triggers when cursor moved
+
+         To remedy to this, we do nothing if the last display occurred less
+         than 100 ms ago.
+      */
+
+      return
+    }
+
     if (getParentLinkElement(event.target) == getParentLinkElement(event.relatedTarget)) {
       /* Happens when mouseout-ing and mouseover-ing child elements of the same link element */
       return
@@ -479,30 +501,7 @@ var instantClick
     }
   }
 
-  function preload(url, calledOnDisplay) {
-    if (!$preloadOnMousedown
-        && +new Date - $lastDisplayTimestamp < 100
-        && !calledOnDisplay) {
-      /* After a page is displayed, if the user's cursor happens to be above
-         a link a mouseover event will be in most browsers triggered
-         automatically, and in other browsers it will be triggered when the
-         user moves his mouse by 1px.
-
-         Here are the behavior I noticed, all on Windows:
-         - Safari 5.1: auto-triggers after 0 ms
-         - IE 11: auto-triggers after 30-80 ms (depends on page's size?)
-         - Firefox: auto-triggers after 10 ms
-         - Opera 18: auto-triggers after 10 ms
-
-         - Chrome: triggers when cursor moved
-         - Opera 12.16: triggers when cursor moved
-
-         To remedy to this, we do not start preloading if last display
-         occurred less than 100 ms ago.
-      */
-
-      return
-    }
+  function preload(url, play) {
     if ($preloadTimer) {
       clearTimeout($preloadTimer)
       $preloadTimer = false
@@ -560,7 +559,7 @@ var instantClick
         return
       }
 
-      preload(url, true)
+      preload(url)
       triggerPageEvent('wait')
       $isWaitingForCompletion = true // Must be set *after* calling `preload`
       return
