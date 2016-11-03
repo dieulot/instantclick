@@ -696,7 +696,7 @@ var instantClick
     $eventsCallbacks[eventType].push(callback)
 
     if ($hasBeenInitialized && eventType == 'change') {
-      callback(true)
+      callback(!$lastDisplayTimestamp)
     }
   }
 
