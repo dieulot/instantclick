@@ -252,14 +252,18 @@ var instantClick
       return
     }
 
-    if (getParentLinkElement(event.target) == getParentLinkElement(event.relatedTarget)) {
+    var linkElement = getParentLinkElement(event.target)
+
+    if (!linkElement) {
+      return
+    }
+
+    if (linkElement == getParentLinkElement(event.relatedTarget)) {
       /* Happens when mouseout-ing and mouseover-ing child elements of the same link element */
       return
     }
 
-    var linkElement = getParentLinkElement(event.target)
-
-    if (!linkElement || !isPreloadable(linkElement)) {
+    if (!isPreloadable(linkElement)) {
       return
     }
 
