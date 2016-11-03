@@ -482,7 +482,7 @@ var instantClick
   function preload(url, calledOnDisplay) {
     if (!$preloadOnMousedown
         && 'display' in $timing
-        && +new Date - ($timing.start + $timing.display) < 100
+        && +new Date - $timing.display < 100
         && !calledOnDisplay) {
       /* After a page is displayed, if the user's cursor happens to be above
          a link a mouseover event will be in most browsers triggered
@@ -535,7 +535,7 @@ var instantClick
 
   function display(url) {
     if (!('display' in $timing)) {
-      $timing.display = +new Date - $timing.start
+      $timing.display = +new Date
     }
     if ($preloadTimer || !$isPreloading) {
       /* $preloadTimer:
