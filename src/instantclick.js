@@ -245,8 +245,10 @@ var instantClick
 
     linkElement.addEventListener('mouseout', mouseoutListener)
 
-    $urlToPreload = linkElement.href
-    $preloadTimer = setTimeout(preload, $delayBeforePreload)
+    if (!$isWaitingForCompletion) {
+      $urlToPreload = linkElement.href
+      $preloadTimer = setTimeout(preload, $delayBeforePreload)
+    }
   }
 
   function touchstartListener(event) {
