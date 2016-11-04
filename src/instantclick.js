@@ -212,10 +212,6 @@ var instantClick
 
 
   function mousedownListener(event) {
-    if ($lastTouchTimestamp > (+new Date - 500)) {
-      return // Lets click fire
-    }
-
     var linkElement = getParentLinkElement(event.target)
 
     if (!linkElement || !isPreloadable(linkElement)) {
@@ -227,7 +223,14 @@ var instantClick
 
   function mouseoverListener(event) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      return // Lets click fire
+      /* On a touch device, if the content of the page change on mouseover
+       * click is never fired and the user will need to tap a second time.
+       * https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html#//apple_ref/doc/uid/TP40006511-SW4
+       *
+       * Content change could happen in the `hover` or `preload` event,
+       * so we stop there.
+       */
+      return
     }
 
     if (+new Date - $lastDisplayTimestamp < 100) {
@@ -542,11 +545,9 @@ var instantClick
          !$isPreloading:
          A link has been clicked, and preloading hasn't been initiated.
          It happens with touch devices when a user taps *near* the link,
-         Safari/Chrome will trigger mousedown, mouseover, click (and others),
-         but when that happens we ignore mousedown/mouseover (otherwise click
-         doesn't fire). Maybe there's a way to make the click event fire, but
-         that's not worth it as mousedown/over happen just 1ms before click
-         in this situation.
+         causing `touchstart` not to be fired. Safari/Chrome will trigger
+         `mouseover`, `mousedown`, `click` (and others), but when that happens
+         we ignore `mouseover` (otherwise `click` doesn't fire).
 
          It also happens when a user uses his keyboard to navigate (with Tab
          and Return), and possibly in other non-mainstream ways to navigate
