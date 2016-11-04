@@ -508,7 +508,7 @@ var instantClick
     }
   }
 
-  function preload(url, play) {
+  function preload(url) {
     if ($preloadTimer) {
       clearTimeout($preloadTimer)
       $preloadTimer = false
