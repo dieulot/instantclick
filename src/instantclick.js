@@ -547,7 +547,8 @@ var instantClick
          It happens with touch devices when a user taps *near* the link,
          causing `touchstart` not to be fired. Safari/Chrome will trigger
          `mouseover`, `mousedown`, `click` (and others), but when that happens
-         we ignore `mouseover` (otherwise `click` doesn't fire).
+         we do nothing in `mouseover` as it may cause `click` not to fire (see
+         comment in `mouseoverListener`).
 
          It also happens when a user uses his keyboard to navigate (with Tab
          and Return), and possibly in other non-mainstream ways to navigate
