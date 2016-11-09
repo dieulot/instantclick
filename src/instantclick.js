@@ -145,6 +145,11 @@ var instantClick
       $currentLocationWithoutHash = removeHash(urlToPush)
     }
     else {
+      /* On popstate, browsers scroll by themselves, but at least Firefox
+       * scrolls BEFORE popstate is fired and thus before we can replace the
+       * page. If the page before popstate is too short the user won't be
+       * scrolled at the right position as a result. We need to scroll again.
+       */
       scrollTo(0, scrollPosition)
     }
 
