@@ -114,7 +114,7 @@ var instantClick
     return returnValue
   }
 
-  function changePage(title, body, newUrl, scrollY, pop) {
+  function changePage(title, body, newUrl, scrollY) {
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
@@ -163,7 +163,11 @@ var instantClick
     }
 
     instantanize()
-    if (pop) {
+
+    if (newUrl) {
+      triggerPageEvent('change', false)
+    }
+    else {
       /* iOS's gesture to go back by swiping from the left edge of the screen
        * will start a preloading if the user touches a link, it needs to be
        * cancelled otherwise the page behind the touched link will be
@@ -173,9 +177,6 @@ var instantClick
       setPreloadingAsHalted()
 
       triggerPageEvent('restore')
-    }
-    else {
-      triggerPageEvent('change', false)
     }
   }
 
@@ -451,7 +452,7 @@ var instantClick
 
     $history[$currentLocationWithoutHash].scrollY = pageYOffset
     $currentLocationWithoutHash = loc
-    changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY, true)
+    changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
   }
 
 
