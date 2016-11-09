@@ -114,7 +114,7 @@ var instantClick
     return returnValue
   }
 
-  function changePage(title, body, urlToPush, scrollY) {
+  function changePage(title, body, urlToPush, scrollPosition) {
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
@@ -145,7 +145,7 @@ var instantClick
       $currentLocationWithoutHash = removeHash(urlToPush)
     }
     else {
-      scrollTo(0, scrollY)
+      scrollTo(0, scrollPosition)
     }
 
     if ($isChromeForIOS && document.title == title) {
@@ -394,7 +394,7 @@ var instantClick
     $history[urlWithoutHash] = {
       body: $body,
       title: $title,
-      scrollY: urlWithoutHash in $history ? $history[urlWithoutHash].scrollY : 0
+      scrollPosition: urlWithoutHash in $history ? $history[urlWithoutHash].scrollPosition : 0
     }
 
     var elements = doc.head.children
@@ -450,9 +450,9 @@ var instantClick
       return
     }
 
-    $history[$currentLocationWithoutHash].scrollY = pageYOffset
+    $history[$currentLocationWithoutHash].scrollPosition = pageYOffset
     $currentLocationWithoutHash = loc
-    changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollY)
+    changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollPosition)
   }
 
 
@@ -603,7 +603,7 @@ var instantClick
       $isWaitingForCompletion = true
       return
     }
-    $history[$currentLocationWithoutHash].scrollY = pageYOffset
+    $history[$currentLocationWithoutHash].scrollPosition = pageYOffset
     setPreloadingAsHalted()
     changePage($title, $body, $url)
   }
@@ -671,7 +671,7 @@ var instantClick
     $history[$currentLocationWithoutHash] = {
       body: document.body,
       title: document.title,
-      scrollY: pageYOffset
+      scrollPosition: pageYOffset
     }
 
     var elements = document.head.children
