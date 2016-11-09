@@ -140,7 +140,21 @@ var instantClick
           offsetElement = offsetElement.offsetParent
         }
       }
-      scrollTo(0, offset)
+      if ('requestAnimationFrame' in window) {
+        /* Safari on macOS doesn't immediately visually change the page on
+         * `document.documentElement.replaceChild`, so if `scrollTo` is called
+         * without `requestAnimationFrame` it often scrolls before the page
+         * is displayed.
+         */
+        requestAnimationFrame(function() {
+          scrollTo(0, offset)
+        })
+      }
+      else {
+        scrollTo(0, offset)
+        /* Safari on macOS scrolls before the page is visually changed, but
+         * adding `requestAnimationFrame` doesn't fix it in this case. */
+      }
 
       $currentLocationWithoutHash = removeHash(urlToPush)
     }
