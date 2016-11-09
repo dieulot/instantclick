@@ -129,15 +129,15 @@ var instantClick
       }
 
       var hashIndex = newUrl.indexOf('#')
-        , hashElement = hashIndex > -1
+        , offsetElement = hashIndex > -1
                      && document.getElementById(newUrl.substr(hashIndex + 1))
         , offset = 0
 
-      if (hashElement) {
-        while (hashElement.offsetParent) {
-          offset += hashElement.offsetTop
+      if (offsetElement) {
+        while (offsetElement.offsetParent) {
+          offset += offsetElement.offsetTop
 
-          hashElement = hashElement.offsetParent
+          offsetElement = offsetElement.offsetParent
         }
       }
       scrollTo(0, offset)
