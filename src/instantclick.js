@@ -114,7 +114,7 @@ var instantClick
     return returnValue
   }
 
-  function changePage(title, body, newUrl, scrollY) {
+  function changePage(title, body, urlToPush, scrollY) {
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
@@ -123,14 +123,14 @@ var instantClick
     killTimers()
     killXhrs()
 
-    if (newUrl) {
-      if (newUrl != location.href) {
-        history.pushState(null, null, newUrl)
+    if (urlToPush) {
+      if (urlToPush != location.href) {
+        history.pushState(null, null, urlToPush)
       }
 
-      var hashIndex = newUrl.indexOf('#')
+      var hashIndex = urlToPush.indexOf('#')
         , offsetElement = hashIndex > -1
-                     && document.getElementById(newUrl.substr(hashIndex + 1))
+                     && document.getElementById(urlToPush.substr(hashIndex + 1))
         , offset = 0
 
       if (offsetElement) {
@@ -142,7 +142,7 @@ var instantClick
       }
       scrollTo(0, offset)
 
-      $currentLocationWithoutHash = removeHash(newUrl)
+      $currentLocationWithoutHash = removeHash(urlToPush)
     }
     else {
       scrollTo(0, scrollY)
@@ -164,7 +164,7 @@ var instantClick
 
     instantanize()
 
-    if (newUrl) {
+    if (urlToPush) {
       triggerPageEvent('change', false)
     }
     else {
