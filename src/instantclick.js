@@ -417,7 +417,7 @@ var instantClick
     for (var i = 0; i < elements.length; i++) {
       element = elements[i]
       if (!element.hasAttribute('data-instant-track')) {
-        return
+        continue
       }
       data = element.getAttribute('href') || element.getAttribute('src') || element.textContent
       for (var j = 0; j < $trackedAssets.length; j++) {
