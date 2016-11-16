@@ -179,6 +179,10 @@ InstantClick.on('exit', function(url, status) {
 })
 
 InstantClick.on('change', function(isInitialLoad) {
+  if (!instantClick.supported) {
+    addDebugMessage('<span style="color: crimson">Unsupported</span>')
+    return
+  }
   addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
 })
 
