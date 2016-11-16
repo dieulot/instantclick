@@ -644,6 +644,7 @@ var instantClick
             / Chrome\//, // Chrome, Opera, Puffin, QQ, Yandex
             / UCBrowser\//,
             / Firefox\//,
+            / Windows Phone /, // WP 8.1+ pretends to be Android
           ]
           for (var i = 0; i < whitelistedBrowsersUserAgentsOnAndroid4.length; i++) {
             if (whitelistedBrowsersUserAgentsOnAndroid4[i].test($userAgent)) {
