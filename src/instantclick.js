@@ -123,23 +123,27 @@ var instantClick
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
     */
 
-    if ($isChromeForIOS && document.title == title) {
-      /* Chrome for iOS:
-       *
-       * 1. Removes title on pushState, so the title needs to be set after.
-       *
-       * 2. Will not set the title if it's identical when trimmed, so
-       *    appending a space won't do; but a non-breaking space works.
-       */
-      document.title = title + String.fromCharCode(160)
-    }
-    else {
-      document.title = title
-    }
+    document.title = title
 
     if (urlToPush) {
       if (urlToPush != location.href) {
         history.pushState(null, null, urlToPush)
+
+        if ($isChromeForIOS) {
+          /* Chrome for iOS:
+           *
+           * 1. Removes title in tab on pushState, so it needs to be set after.
+           *
+           * 2. Will not set the title if it's identical after trimming, so we
+           *    add a non-breaking space.
+           */
+          if (document.title == title) {
+            document.title = title + String.fromCharCode(160)
+          }
+          else {
+            document.title = title
+          }
+        }
       }
 
       var hashIndex = urlToPush.indexOf('#')
