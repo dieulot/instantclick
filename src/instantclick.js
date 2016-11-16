@@ -3,8 +3,7 @@
 var instantClick
   , InstantClick = instantClick = function(document, location, $userAgent) {
   // Internal variables
-  var $isChromeForIOS = $userAgent.indexOf(' CriOS/') > -1
-    , $currentLocationWithoutHash
+  var $currentLocationWithoutHash
     , $urlToPreload
     , $preloadTimer
     , $lastTouchTimestamp
@@ -129,7 +128,7 @@ var instantClick
       if (urlToPush != location.href) {
         history.pushState(null, null, urlToPush)
 
-        if ($isChromeForIOS) {
+        if ($userAgent.indexOf(' CriOS/') > -1) {
           /* Chrome for iOS:
            *
            * 1. Removes title in tab on pushState, so it needs to be set after.
