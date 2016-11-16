@@ -181,9 +181,9 @@ var instantClick
       document.title = title
     }
 
-    instantanize()
-
     if (urlToPush) {
+      instantanize(false)
+
       triggerPageEvent('change', false)
     }
     else {
