@@ -302,12 +302,6 @@ var instantClick
       return
     }
 
-    if ($preloadOnMousedown) {
-      linkElement.removeEventListener('mousedown', mousedownListener)
-    }
-    else {
-      linkElement.removeEventListener('mouseover', mouseoverListener)
-    }
     preload(linkElement.href)
   }
 
