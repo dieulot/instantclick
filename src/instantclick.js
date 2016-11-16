@@ -486,41 +486,41 @@ var instantClick
     document.body.addEventListener('click', clickListenerPrelude, true)
 
     if (!isInitializing) {
-      var scriptsInDOM = document.body.getElementsByTagName('script')
-        , scriptsToCopy = []
-        , script
-        , copy
+      var scriptElementsInDOM = document.body.getElementsByTagName('script')
+        , scriptElementsToCopy = []
+        , originalElement
+        , copyElement
         , parentNode
         , nextSibling
         , i
 
-      /* `scriptsInDOM` will change during the copy of scripts if a script add
-         or delete scripts, so we need to put scripts in an array to loop
-         through them correctly.
+      /* `scriptElementsInDOM` will change during the copy of scripts if
+         a script add or delete script elements, so we need to put script
+         elements in an array to loop through them correctly.
       */
-      for (i = 0; i < scriptsInDOM.length; i++) {
-        scriptsToCopy.push(scriptsInDOM[i])
+      for (i = 0; i < scriptElementsInDOM.length; i++) {
+        scriptElementsToCopy.push(scriptElementsInDOM[i])
       }
 
-      for (i = 0; i < scriptsToCopy.length; i++) {
-        script = scriptsToCopy[i]
-        if (!script) { // Might have disappeared, see previous comment
+      for (i = 0; i < scriptElementsToCopy.length; i++) {
+        originalElement = scriptElementsToCopy[i]
+        if (!originalElement) { // Might have disappeared, see previous comment
           continue
         }
-        if (script.hasAttribute('data-no-instant')) {
+        if (originalElement.hasAttribute('data-no-instant')) {
           continue
         }
-        copy = document.createElement('script')
-        if (script.src) {
-          copy.src = script.src
+        copyElement = document.createElement('script')
+        if (originalElement.src) {
+          copyElement.src = originalElement.src
         }
-        if (script.innerHTML) {
-          copy.innerHTML = script.innerHTML
+        if (originalElement.innerHTML) {
+          copyElement.innerHTML = originalElement.innerHTML
         }
-        parentNode = script.parentNode
-        nextSibling = script.nextSibling
-        parentNode.removeChild(script)
-        parentNode.insertBefore(copy, nextSibling)
+        parentNode = originalElement.parentNode
+        nextSibling = originalElement.nextSibling
+        parentNode.removeChild(originalElement)
+        parentNode.insertBefore(copyElement, nextSibling)
       }
     }
   }
