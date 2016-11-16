@@ -27,7 +27,6 @@ var instantClick
     , $preloadOnMousedown
     , $delayBeforePreload = 65
     , $eventsCallbacks = {
-        hover: [],
         preload: [],
         receive: [],
         wait: [],
@@ -244,8 +243,7 @@ var instantClick
        * click is never fired and the user will need to tap a second time.
        * https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html#//apple_ref/doc/uid/TP40006511-SW4
        *
-       * Content change could happen in the `hover` or `preload` event,
-       * so we stop there.
+       * Content change could happen in the `preload` event, so we stop there.
        */
       return
     }
@@ -286,8 +284,6 @@ var instantClick
     if (!isPreloadable(linkElement)) {
       return
     }
-
-    triggerPageEvent('hover', linkElement.href)
 
     linkElement.addEventListener('mouseout', mouseoutListener)
 

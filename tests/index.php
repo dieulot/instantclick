@@ -144,10 +144,6 @@ function addDebugMessage(message) {
   divDebug.innerHTML = $debugMessages
 }
 
-InstantClick.on('hover', function() {
-  addDebugMessage('<small><small>Event: hover</small></small>')
-})
-
 InstantClick.on('preload', function() {
   addDebugMessage('<small><small>Event: preload</small></small>')
 })
