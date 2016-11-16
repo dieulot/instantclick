@@ -420,12 +420,13 @@ var instantClick
 
     for (var i = 0; i < elements.length; i++) {
       element = elements[i]
-      if (element.hasAttribute('data-instant-track')) {
-        data = element.getAttribute('href') || element.getAttribute('src') || element.innerHTML
-        for (var j = 0; j < $trackedAssets.length; j++) {
-          if ($trackedAssets[j] == data) {
-            found++
-          }
+      if (!element.hasAttribute('data-instant-track')) {
+        return
+      }
+      data = element.getAttribute('href') || element.getAttribute('src') || element.textContent
+      for (var j = 0; j < $trackedAssets.length; j++) {
+        if ($trackedAssets[j] == data) {
+          found++
         }
       }
     }
@@ -510,13 +511,13 @@ var instantClick
         if (originalElement.hasAttribute('data-no-instant')) {
           continue
         }
+
         copyElement = document.createElement('script')
         for (var j = 0; j < originalElement.attributes.length; j++) {
           copyElement.setAttribute(originalElement.attributes[j].name, originalElement.attributes[j].value)
         }
-        if (originalElement.innerHTML) {
-          copyElement.innerHTML = originalElement.innerHTML
-        }
+        copyElement.textContent = originalElement.textContent
+
         parentNode = originalElement.parentNode
         nextSibling = originalElement.nextSibling
         parentNode.removeChild(originalElement)
@@ -696,7 +697,7 @@ var instantClick
     for (var i = 0; i < elements.length; i++) {
       element = elements[i]
       if (element.hasAttribute('data-instant-track')) {
-        data = element.getAttribute('href') || element.getAttribute('src') || element.innerHTML
+        data = element.getAttribute('href') || element.getAttribute('src') || element.textContent
         /* We can't use just `element.href` and `element.src` because we can't
            retrieve `href`s and `src`s from the Ajax response.
         */
