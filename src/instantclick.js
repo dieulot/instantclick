@@ -115,13 +115,27 @@ var instantClick
   }
 
   function changePage(title, body, urlToPush, scrollPosition) {
+    killTimers()
+    killXhrs()
+
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
        5.1, 6.0 and Mobile 7.0) to execute script tags directly.
     */
 
-    killTimers()
-    killXhrs()
+    if ($isChromeForIOS && document.title == title) {
+      /* Chrome for iOS:
+       *
+       * 1. Removes title on pushState, so the title needs to be set after.
+       *
+       * 2. Will not set the title if it's identical when trimmed, so
+       *    appending a space won't do; but a non-breaking space works.
+       */
+      document.title = title + String.fromCharCode(160)
+    }
+    else {
+      document.title = title
+    }
 
     if (urlToPush) {
       if (urlToPush != location.href) {
@@ -157,6 +171,10 @@ var instantClick
       }
 
       $currentLocationWithoutHash = removeHash(urlToPush)
+
+      instantanize(false)
+
+      triggerPageEvent('change', false)
     }
     else {
       /* On popstate, browsers scroll by themselves, but at least Firefox
@@ -165,28 +183,7 @@ var instantClick
        * scrolled at the right position as a result. We need to scroll again.
        */
       scrollTo(0, scrollPosition)
-    }
 
-    if ($isChromeForIOS && document.title == title) {
-      /* Chrome for iOS:
-       *
-       * 1. Removes title on pushState, so the title needs to be set after.
-       *
-       * 2. Will not set the title if it's identical when trimmed, so
-       *    appending a space won't do; but a non-breaking space works.
-       */
-      document.title = title + String.fromCharCode(160)
-    }
-    else {
-      document.title = title
-    }
-
-    if (urlToPush) {
-      instantanize(false)
-
-      triggerPageEvent('change', false)
-    }
-    else {
       /* iOS's gesture to go back by swiping from the left edge of the screen
        * will start a preloading if the user touches a link, it needs to be
        * cancelled otherwise the page behind the touched link will be
