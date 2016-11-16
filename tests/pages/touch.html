@@ -1,0 +1,15 @@
+<a id="element" style="padding: 20px 30px; margin: 50px auto; background: lightblue; display: inline-block;" href="?page=index&amp;wait=500<?= $append ?>">Hello</a>
+
+<script>
+var element = document.getElementById('element')
+
+function handleElementEvent(event) {
+  addDebugMessage(event.type)
+}
+
+element.addEventListener('touchstart', handleElementEvent)
+//element.addEventListener('touchmove', handleElementEvent)
+element.addEventListener('touchend', handleElementEvent)
+element.addEventListener('touchcancel', handleElementEvent)
+element.addEventListener('click', handleElementEvent)
+</script>

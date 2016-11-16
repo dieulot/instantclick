@@ -11,6 +11,7 @@ $pages = [
   'Alter on receive' => 'alter-receive',
   'Childs and blacklist' => 'child-n-blacklist',
   'Non-HTML file' => 'non-html',
+  'Touch events' => 'touch',
 ];
 
 if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
