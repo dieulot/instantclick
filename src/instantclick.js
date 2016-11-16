@@ -9,6 +9,7 @@ var instantClick
     , $preloadTimer
     , $lastTouchTimestamp
     , $hasBeenInitialized
+    , $touchEndedWithoutClickTimer
 
   // Preloading-related variables
     , $history = {}
@@ -223,6 +224,11 @@ var instantClick
     $currentPageXhrs = []
   }
 
+  function handleTouchendWithoutClick() {
+    $xhr.abort()
+    setPreloadingAsHalted()
+  }
+
 
   ////////// EVENT LISTENERS //////////
 
@@ -302,6 +308,9 @@ var instantClick
       return
     }
 
+    linkElement.addEventListener('touchend', touchendAndTouchcancelListener)
+    linkElement.addEventListener('touchcancel', touchendAndTouchcancelListener)
+
     preload(linkElement.href)
   }
 
@@ -314,6 +323,12 @@ var instantClick
 
   function clickListener(event) {
     document.body.removeEventListener('click', clickListener)
+
+    if ($touchEndedWithoutClickTimer) {
+      clearTimeout($touchEndedWithoutClickTimer)
+      $touchEndedWithoutClickTimer = false
+    }
+
     if (event.defaultPrevented) {
       return
     }
@@ -347,8 +362,17 @@ var instantClick
     if (!$isPreloading || $isWaitingForCompletion) {
       return
     }
+
     $xhr.abort()
     setPreloadingAsHalted()
+  }
+
+  function touchendAndTouchcancelListener(event) {
+    if (!$isPreloading || $isWaitingForCompletion) {
+      return
+    }
+
+    $touchEndedWithoutClickTimer = setTimeout(handleTouchendWithoutClick, 500)
   }
 
   function readystatechangeListener() {
