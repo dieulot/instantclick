@@ -511,8 +511,8 @@ var instantClick
           continue
         }
         copyElement = document.createElement('script')
-        if (originalElement.src) {
-          copyElement.src = originalElement.src
+        for (var j = 0; j < originalElement.attributes.length; j++) {
+          copyElement.setAttribute(originalElement.attributes[j].name, originalElement.attributes[j].value)
         }
         if (originalElement.innerHTML) {
           copyElement.innerHTML = originalElement.innerHTML
