@@ -1,4 +1,9 @@
-<a id="element" style="padding: 20px 30px; margin: 50px auto; background: lightblue; display: inline-block;" href="?page=index&amp;wait=500<?= $append ?>">Hello</a>
+<?php for ($wait = 0; $wait <= 1200; $wait += 600): ?>
+<a id="element" style="padding: 20px 30px; margin: 25px auto; background: lightblue; display: inline-block;" href="?page=index&amp;wait=<?= $wait ?><?= $append ?>">
+  <span style="background: lightpink; padding: 10px;"><?= $wait ?></span>
+  <span style="background: lightgreen; padding: 10px;">ms</span>
+</a>
+<?php endfor ?>
 
 <script>
 var element = document.getElementById('element')
