@@ -221,6 +221,7 @@ var instantClick
   function killXhrs() {
     for (var i = 0; i < $currentPageXhrs.length; i++) {
       if (typeof $currentPageXhrs[i] == 'object' && 'abort' in $currentPageXhrs[i]) {
+        $currentPageXhrs[i].instantKilled = true
         $currentPageXhrs[i].abort()
       }
     }
