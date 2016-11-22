@@ -729,15 +729,13 @@ var instantClick
 
     instantanize(true)
 
-    triggerPageEvent('change', true)
-
     addEventListener('popstate', popstateListener)
   }
 
   function on(eventType, callback) {
     $eventsCallbacks[eventType].push(callback)
 
-    if ($hasBeenInitialized && eventType == 'change') {
+    if (eventType == 'change') {
       callback(!$lastDisplayTimestamp)
     }
   }
