@@ -36,6 +36,7 @@ var instantClick
       }
     , $currentPageTimers = []
     , $currentPageXhrs = []
+    , $currentPageWindowEventListeners = []
 
 
   ////////// HELPERS //////////
@@ -114,8 +115,7 @@ var instantClick
   }
 
   function changePage(title, body, urlToPush, scrollPosition) {
-    killTimers()
-    killXhrs()
+    killTrackedCurrentPageStuff()
 
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
@@ -211,14 +211,14 @@ var instantClick
     return html.replace(/<noscript[\s\S]+?<\/noscript>/gi, '')
   }
 
-  function killTimers() {
+  function killTrackedCurrentPageStuff() {
+    /* Timers */
     for (var i = 0; i < $currentPageTimers.length; i++) {
       clearTimeout($currentPageTimers[i])
     }
     $currentPageTimers = []
-  }
 
-  function killXhrs() {
+    /* XHRs */
     for (var i = 0; i < $currentPageXhrs.length; i++) {
       if (typeof $currentPageXhrs[i] == 'object' && 'abort' in $currentPageXhrs[i]) {
         $currentPageXhrs[i].instantKilled = true
@@ -226,6 +226,12 @@ var instantClick
       }
     }
     $currentPageXhrs = []
+
+    /* Window event listeners */
+    for (var i = 0; i < $currentPageWindowEventListeners.length; i++) {
+      removeEventListener.apply(window, $currentPageWindowEventListeners[i])
+    }
+    $currentPageWindowEventListeners = []
   }
 
   function handleTouchendWithoutClick() {
@@ -760,6 +766,11 @@ var instantClick
     return xhr
   }
 
+  function _addEventListener() {
+    $currentPageWindowEventListeners.push(arguments)
+    addEventListener.apply(window, arguments)
+  }
+
 
   ////////////////////
 
@@ -770,7 +781,8 @@ var instantClick
     on: on,
     setTimeout: setTimeout,
     setInterval: setInterval,
-    xhr: xhr
+    xhr: xhr,
+    addEventListener: _addEventListener
   }
 
 }(document, location, navigator.userAgent);
