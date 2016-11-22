@@ -36,7 +36,7 @@ var instantClick
       }
     , $currentPageTimers = []
     , $currentPageXhrs = []
-    , $currentPageWindowEventListeners = []
+    , $windowEventListeners = {}
 
 
   ////////// HELPERS //////////
@@ -125,6 +125,7 @@ var instantClick
     document.title = title
 
     if (urlToPush) {
+      addOrRemoveWindowEventListeners('remove')
       if (urlToPush != location.href) {
         history.pushState(null, null, urlToPush)
 
@@ -174,6 +175,7 @@ var instantClick
       }
 
       $currentLocationWithoutHash = removeHash(urlToPush)
+      $windowEventListeners[$currentLocationWithoutHash] = []
 
       instantanize(false)
 
@@ -226,17 +228,19 @@ var instantClick
       }
     }
     $currentPageXhrs = []
-
-    /* Window event listeners */
-    for (var i = 0; i < $currentPageWindowEventListeners.length; i++) {
-      removeEventListener.apply(window, $currentPageWindowEventListeners[i])
-    }
-    $currentPageWindowEventListeners = []
   }
 
   function handleTouchendWithoutClick() {
     $xhr.abort()
     setPreloadingAsHalted()
+  }
+
+  function addOrRemoveWindowEventListeners(addOrRemove) {
+    if ($currentLocationWithoutHash in $windowEventListeners) {
+      for (var i = 0; i < $windowEventListeners[$currentLocationWithoutHash].length; i++) {
+        window[addOrRemove + 'EventListener'].apply(window, $windowEventListeners[$currentLocationWithoutHash][i])
+      }
+    }
   }
 
 
@@ -492,8 +496,10 @@ var instantClick
     }
 
     $history[$currentLocationWithoutHash].scrollPosition = pageYOffset
+    addOrRemoveWindowEventListeners('remove')
     $currentLocationWithoutHash = loc
     changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollPosition)
+    addOrRemoveWindowEventListeners('add')
   }
 
 
@@ -767,7 +773,10 @@ var instantClick
   }
 
   function _addEventListener() {
-    $currentPageWindowEventListeners.push(arguments)
+    if (!($currentLocationWithoutHash in $windowEventListeners)) {
+      $windowEventListeners[$currentLocationWithoutHash] = []
+    }
+    $windowEventListeners[$currentLocationWithoutHash].push(arguments)
     addEventListener.apply(window, arguments)
   }
 
