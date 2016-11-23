@@ -322,6 +322,11 @@ var instantClick
       return
     }
 
+    if ($touchEndedWithoutClickTimer) {
+      clearTimeout($touchEndedWithoutClickTimer)
+      $touchEndedWithoutClickTimer = false
+    }
+
     linkElement.addEventListener('touchend', touchendAndTouchcancelListener)
     linkElement.addEventListener('touchcancel', touchendAndTouchcancelListener)
 
