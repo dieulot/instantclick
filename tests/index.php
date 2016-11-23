@@ -184,6 +184,9 @@ InstantClick.on('change', function(isInitialLoad) {
     return
   }
   addDebugMessage('Event: change' + (isInitialLoad ? ' (initial load)' : ''))
+  if (!isInitialLoad) {
+    document.documentElement.setAttribute('instantclick-has-displayed', '')
+  }
 })
 
 InstantClick.init(<?php
