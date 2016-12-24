@@ -12,6 +12,7 @@ $pages = [
   'Childs and blacklist' => 'child-n-blacklist',
   'Non-HTML file' => 'non-html',
   'Touch events' => 'touch',
+  'Event delegation' => 'event-delegation',
 ];
 
 if (isset($_GET['page']) && in_array($_GET['page'], $pages)) {
@@ -197,4 +198,11 @@ elseif ($preload_on !== 'default') {
   echo $preload_on;
 }
 ?>)
+
+if (document.querySelectorAll) {
+  var scriptsQueued = document.querySelectorAll('script[type="queued"]')
+  for (var i = 0; i < scriptsQueued.length; i++) {
+    eval(scriptsQueued[i].innerHTML)
+  }
+}
 </script>

@@ -1,0 +1,55 @@
+<h1>Event delegation</h1>
+
+<style>
+.d1 {
+  background: #ddd;
+  padding: 20px;
+  margin: 10px 0;
+}
+
+.d2 {
+  background: #bbb;
+  padding: 20px;
+}
+</style>
+
+<div class="d1">
+  <div class="d2">
+    Hey
+  </div>
+</div>
+
+
+<div class="d1">
+  <div class="d2">
+    Hey
+  </div>
+</div>
+
+<a class="js-ic-website" href="http://instantclick.io">Link with preventDefault</a>
+
+<script type="queued">
+instantClick.addEvent('.d2', 'click', function(event) {
+  var target = event.target || event.srcElement
+  alert('target: ' + target.className + "\nthis: " + this.className)
+})
+
+instantClick.addEvent('.d1', 'click', function(event) {
+  var target = event.target || event.srcElement
+  alert('target: ' + target.className + "\nthis: " + this.className)
+})
+
+instantClick.addEvent('.d1', 'click', function(event) {
+  var target = event.target || event.srcElement
+  alert(".d1 bis\n" + 'target: ' + target.className + "\nthis: " + this.className)
+})
+
+instantClick.addEvent('.js-ic-website', 'click', function(event) {
+  if (event.preventDefault) {
+    event.preventDefault()
+  }
+  else {
+    event.returnValue = false
+  }
+})
+</script>

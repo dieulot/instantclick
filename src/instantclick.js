@@ -42,6 +42,22 @@ var instantClick
   ////////// HELPERS //////////
 
 
+  /* Polyfill for `addEvent` */
+  if (!Element.prototype.matches) {
+    Element.prototype.matches =
+      Element.prototype.webkitMatchesSelector ||
+      Element.prototype.msMatchesSelector ||
+      function (selectors) {
+        var matches = document.querySelectorAll(selectors)
+        for (var i = 0; i < matches.length; i++) {
+          if (matches[i] == this) {
+            return true
+          }
+        }
+        return false
+      }
+  }
+
   function removeHash(url) {
     var index = url.indexOf('#')
     if (index == -1) {
@@ -795,6 +811,29 @@ var instantClick
     addEventListener.apply(window, arguments)
   }
 
+  function addEvent(selectors, type, listener) {
+    // IE 8 uses attachEvent('on' + type, func)
+    var addEventFunction = window.addEventListener ? 'addEventListener' : 'attachEvent'
+      , type = window.addEventListener ? type : ('on' + type)
+    document.documentElement[addEventFunction](type, function(event_) {
+      var element
+      if (event_) {
+        element = event_.target
+      }
+      else {
+        event_ = event
+        element = event_.srcElement
+      }
+      while (element.nodeType == 1) {
+        if (element.matches(selectors)) {
+          listener.call(element, event_)
+          break
+        }
+        element = element.parentNode
+      }
+    }, false) // addEventListener's third parameter isn't optional in Firefox < 6
+  }
+
 
   ////////////////////
 
@@ -806,7 +845,8 @@ var instantClick
     setTimeout: setTimeout,
     setInterval: setInterval,
     xhr: xhr,
-    addEventListener: _addEventListener
+    addEventListener: _addEventListener,
+    addEvent: addEvent
   }
 
 }(document, location, navigator.userAgent);
