@@ -48,8 +48,8 @@ var instantClick
     Element.prototype.matches =
       Element.prototype.webkitMatchesSelector ||
       Element.prototype.msMatchesSelector ||
-      function (selectors) {
-        var matches = document.querySelectorAll(selectors)
+      function (selector) {
+        var matches = document.querySelectorAll(selector)
         for (var i = 0; i < matches.length; i++) {
           if (matches[i] == this) {
             return true
@@ -812,7 +812,7 @@ var instantClick
     addEventListener.apply(window, arguments)
   }
 
-  function addEvent(selectors, type, listener) {
+  function addEvent(selector, type, listener) {
     if (!(type in $delegatedEvents)) {
       $delegatedEvents[type] = {}
 
@@ -822,10 +822,10 @@ var instantClick
       document.documentElement[addEventFunction](typeParam, function(event) {
         var element = event.target ? event.target : event.srcElement
         while (element.nodeType == 1) {
-          for (var selectors in $delegatedEvents[type]) {
-            if (element.matches(selectors)) {
-              for (var i = 0; i < $delegatedEvents[type][selectors].length; i++) { // IE 8 doesn't support indexOf
-                $delegatedEvents[type][selectors][i].call(element, event)
+          for (var selector in $delegatedEvents[type]) {
+            if (element.matches(selector)) {
+              for (var i = 0; i < $delegatedEvents[type][selector].length; i++) { // IE 8 doesn't support indexOf
+                $delegatedEvents[type][selector][i].call(element, event)
               }
               break
             }
@@ -834,20 +834,20 @@ var instantClick
         }
       }, false) // addEventListener's third parameter isn't optional in Firefox < 6
     }
-    if (!(selectors in $delegatedEvents[type])) {
-      $delegatedEvents[type][selectors] = []
+    if (!(selector in $delegatedEvents[type])) {
+      $delegatedEvents[type][selector] = []
     }
 
     // Run removeEvent beforehand so that it can't be added twice
-    removeEvent(selectors, type, listener)
+    removeEvent(selector, type, listener)
 
-    $delegatedEvents[type][selectors].push(listener)
+    $delegatedEvents[type][selector].push(listener)
   }
 
-  function removeEvent(selectors, type, listener) {
-    for (var i = 0; i < $delegatedEvents[type][selectors].length; i++) {
-      if ($delegatedEvents[type][selectors][i] == listener) {
-        $delegatedEvents[type][selectors].splice(i, 1)
+  function removeEvent(selector, type, listener) {
+    for (var i = 0; i < $delegatedEvents[type][selector].length; i++) {
+      if ($delegatedEvents[type][selector][i] == listener) {
+        $delegatedEvents[type][selector].splice(i, 1)
         break
       }
     }
