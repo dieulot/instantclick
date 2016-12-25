@@ -804,7 +804,7 @@ var instantClick
     return xhr
   }
 
-  function _addEventListener() {
+  function addPageEvent() {
     if (!($currentLocationWithoutHash in $windowEventListeners)) {
       $windowEventListeners[$currentLocationWithoutHash] = []
     }
@@ -864,7 +864,7 @@ var instantClick
     setTimeout: setTimeout,
     setInterval: setInterval,
     xhr: xhr,
-    addEventListener: _addEventListener,
+    addPageEvent: addPageEvent,
     addEvent: addEvent,
     removeEvent: removeEvent
   }
