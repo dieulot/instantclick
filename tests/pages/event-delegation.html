@@ -39,10 +39,14 @@ instantClick.addEvent('.d1', 'click', function(event) {
   alert('target: ' + target.className + "\nthis: " + this.className)
 })
 
-instantClick.addEvent('.d1', 'click', function(event) {
+function x(event) {
   var target = event.target || event.srcElement
   alert(".d1 bis\n" + 'target: ' + target.className + "\nthis: " + this.className)
-})
+}
+
+instantClick.addEvent('.d1', 'click', x)
+instantClick.addEvent('.d1', 'click', x)
+//instantClick.removeEvent('.d1', 'click', x)
 
 instantClick.addEvent('.js-ic-website', 'click', function(event) {
   if (event.preventDefault) {

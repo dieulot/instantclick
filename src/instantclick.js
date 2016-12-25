@@ -37,12 +37,13 @@ var instantClick
     , $currentPageTimers = []
     , $currentPageXhrs = []
     , $windowEventListeners = {}
+    , $delegatedEvents = {}
 
 
   ////////// HELPERS //////////
 
 
-  /* Polyfill for `addEvent` */
+  /* Polyfill needed for `addEvent` */
   if (!Element.prototype.matches) {
     Element.prototype.matches =
       Element.prototype.webkitMatchesSelector ||
@@ -812,26 +813,44 @@ var instantClick
   }
 
   function addEvent(selectors, type, listener) {
-    // IE 8 uses attachEvent('on' + type, func)
-    var addEventFunction = window.addEventListener ? 'addEventListener' : 'attachEvent'
-      , type = window.addEventListener ? type : ('on' + type)
-    document.documentElement[addEventFunction](type, function(event_) {
-      var element
-      if (event_) {
-        element = event_.target
-      }
-      else {
-        event_ = event
-        element = event_.srcElement
-      }
-      while (element.nodeType == 1) {
-        if (element.matches(selectors)) {
-          listener.call(element, event_)
-          break
+    if (!(type in $delegatedEvents)) {
+      $delegatedEvents[type] = {}
+
+      // IE 8 uses attachEvent('on' + type, func)
+      var addEventFunction = window.addEventListener ? 'addEventListener' : 'attachEvent'
+        , typeParam = window.addEventListener ? type : ('on' + type)
+      document.documentElement[addEventFunction](typeParam, function(event) {
+        var element = event.target ? event.target : event.srcElement
+        while (element.nodeType == 1) {
+          for (var selectors in $delegatedEvents[type]) {
+            if (element.matches(selectors)) {
+              for (var i = 0; i < $delegatedEvents[type][selectors].length; i++) { // IE 8 doesn't support indexOf
+                $delegatedEvents[type][selectors][i].call(element, event)
+              }
+              break
+            }
+          }
+          element = element.parentNode
         }
-        element = element.parentNode
+      }, false) // addEventListener's third parameter isn't optional in Firefox < 6
+    }
+    if (!(selectors in $delegatedEvents[type])) {
+      $delegatedEvents[type][selectors] = []
+    }
+
+    // Run removeEvent beforehand so that it can't be added twice
+    removeEvent(selectors, type, listener)
+
+    $delegatedEvents[type][selectors].push(listener)
+  }
+
+  function removeEvent(selectors, type, listener) {
+    for (var i = 0; i < $delegatedEvents[type][selectors].length; i++) {
+      if ($delegatedEvents[type][selectors][i] == listener) {
+        $delegatedEvents[type][selectors].splice(i, 1)
+        break
       }
-    }, false) // addEventListener's third parameter isn't optional in Firefox < 6
+    }
   }
 
 
@@ -846,7 +865,8 @@ var instantClick
     setInterval: setInterval,
     xhr: xhr,
     addEventListener: _addEventListener,
-    addEvent: addEvent
+    addEvent: addEvent,
+    removeEvent: removeEvent
   }
 
 }(document, location, navigator.userAgent);
