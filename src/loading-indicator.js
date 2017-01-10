@@ -30,18 +30,18 @@
     document.head.appendChild(styleElement)
   }
 
-  function changeListener(isInitialPage) {
+  function apply(isInitialPageOnChange) {
     if (!instantClick.supported) {
       return
     }
 
-    if (isInitialPage) {
+    if (isInitialPageOnChange) {
       init()
     }
 
     document.body.appendChild($element)
 
-    if (!isInitialPage) {
+    if (!isInitialPageOnChange) {
       hide()
     }
   }
@@ -69,10 +69,10 @@
   ////////////////////
 
 
-  instantClick.on('change', changeListener)
+  instantClick.on('change', apply)
+  instantClick.on('restore', apply)
   instantClick.on('wait', waitListener)
   instantClick.on('exit', hide)
-  instantClick.on('restore', hide)
 
 
   ////////////////////
