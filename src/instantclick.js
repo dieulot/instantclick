@@ -334,7 +334,7 @@ var instantClick
          automatically, and in other browsers it will be triggered when the
          user moves his mouse by 1px.
 
-         Here are the behavior I noticed, all on Windows:
+         Here are the behaviors I noticed, all on Windows:
          - Safari 5.1: auto-triggers after 0 ms
          - IE 11: auto-triggers after 30-80 ms (depends on page's size?)
          - Firefox: auto-triggers after 10 ms
