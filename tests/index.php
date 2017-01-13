@@ -62,11 +62,6 @@ if (location.pathname.substr(0, 6) == '/tests' && location.pathname[6] != '/') {
 <link rel="stylesheet" href="style.css?<?= $append ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="trackme.css?<?= filemtime('trackme.css') ?>" data-instant-track>
-<script src="trackme.js?<?= filemtime('trackme.js') ?>" data-instant-track></script>
-<style data-instant-track>body { overflow-y: scroll; }</style>
-<script data-instant-track>if (window.lol) { lol() }</script>
-
 <?php // NProgress specific code
 if ($page == 'nprogress'): ?>
 <style>#instantclick { display: none; }</style>
