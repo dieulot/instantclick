@@ -419,11 +419,11 @@ var instantClick
     /* Makes clickListener be fired after everyone else, so that we can respect
      * event.preventDefault.
      */
-    document.body.addEventListener('click', clickListener)
+    document.addEventListener('click', clickListener)
   }
 
   function clickListener(event) {
-    document.body.removeEventListener('click', clickListener)
+    document.removeEventListener('click', clickListener)
 
     if ($touchEndedWithoutClickTimer) {
       clearTimeout($touchEndedWithoutClickTimer)
@@ -825,7 +825,7 @@ var instantClick
       // IE 8 uses attachEvent('on' + type, func)
       var addEventFunction = window.addEventListener ? 'addEventListener' : 'attachEvent'
         , typeParam = window.addEventListener ? type : ('on' + type)
-      document.documentElement[addEventFunction](typeParam, function(event) {
+      document[addEventFunction](typeParam, function(event) {
         var element = event.target ? event.target : event.srcElement
         while (element.nodeType == 1) {
           for (var selector in $delegatedEvents[type]) {
