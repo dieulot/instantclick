@@ -194,7 +194,10 @@ var instantClick
       $currentLocationWithoutHash = removeHash(urlToPush)
       $windowEventListeners[$currentLocationWithoutHash] = []
 
-      instantanize(false)
+      instantanize()
+      applyScriptElements(function(element) {
+        return !element.hasAttribute('data-instant-track')
+      })
 
       triggerPageEvent('change', false)
     }
@@ -581,7 +584,7 @@ var instantClick
   ////////// MAIN FUNCTIONS //////////
 
 
-  function instantanize(isInitializing) {
+  function instantanize() {
     document.body.addEventListener('touchstart', touchstartListener, true)
     if ($preloadOnMousedown) {
       document.body.addEventListener('mousedown', mousedownListener, true)
@@ -590,12 +593,6 @@ var instantClick
       document.body.addEventListener('mouseover', mouseoverListener, true)
     }
     document.body.addEventListener('click', clickListenerPrelude, true)
-
-    if (!isInitializing) {
-      applyScriptElements(function(element) {
-        return !element.hasAttribute('data-instant-track')
-      })
-    }
   }
 
   function preload(url) {
@@ -774,7 +771,7 @@ var instantClick
     $xhr = new XMLHttpRequest()
     $xhr.addEventListener('readystatechange', readystatechangeListener)
 
-    instantanize(true)
+    instantanize()
 
     addEventListener('popstate', popstateListener)
   }
