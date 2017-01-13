@@ -59,7 +59,7 @@ if (location.pathname.substr(0, 6) == '/tests' && location.pathname[6] != '/') {
   location.href = location.href.replace('/tests', '/tests/')
 }
 </script>
-<link rel="stylesheet" href="style.css?<?= $append ?>">
+<link rel="stylesheet" href="style.css?<?= filemtime('style.css') ?>" data-instant-track>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <?php // NProgress specific code
