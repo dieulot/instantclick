@@ -303,6 +303,20 @@ var instantClick
     }
   }
 
+  function addTrackedElements() {
+    var trackedElements = document.querySelectorAll('[data-instant-track]')
+      , element
+      , elementData
+    for (var i = 0; i < trackedElements.length; i++) {
+      element = trackedElements[i]
+      elementData = element.getAttribute('href') || element.getAttribute('src') || element.textContent
+      /* We can't use just `element.href` and `element.src` because we can't
+         retrieve `href`s and `src`s from the Ajax response.
+      */
+      $trackedElementsData.push(elementData)
+    }
+  }
+
 
   ////////// EVENT LISTENERS //////////
 
@@ -750,16 +764,11 @@ var instantClick
       scrollPosition: pageYOffset
     }
 
-    var trackedElements = document.querySelectorAll('[data-instant-track]')
-      , element
-      , elementData
-    for (var i = 0; i < trackedElements.length; i++) {
-      element = trackedElements[i]
-      elementData = element.getAttribute('href') || element.getAttribute('src') || element.textContent
-      /* We can't use just `element.href` and `element.src` because we can't
-         retrieve `href`s and `src`s from the Ajax response.
-      */
-      $trackedElementsData.push(elementData)
+    if (document.readyState == 'loading') {
+      document.addEventListener('DOMContentLoaded', addTrackedElements)
+    }
+    else {
+      addTrackedElements()
     }
 
     $xhr = new XMLHttpRequest()
