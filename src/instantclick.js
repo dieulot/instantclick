@@ -579,7 +579,7 @@ var instantClick
 
     if (!isInitializing) {
       applyScriptElements(function(element) {
-        return !element.hasAttribute('data-no-instant')
+        return !element.hasAttribute('data-instant-track')
       })
     }
   }
