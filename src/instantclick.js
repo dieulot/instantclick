@@ -132,7 +132,7 @@ var instantClick
   }
 
   function changePage(title, body, urlToPush, scrollPosition) {
-    killTrackedCurrentPageStuff()
+    killCurrentPageTimersAndXhrs()
 
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
@@ -238,7 +238,7 @@ var instantClick
     return html.replace(/<noscript[\s\S]+?<\/noscript>/gi, '')
   }
 
-  function killTrackedCurrentPageStuff() {
+  function killCurrentPageTimersAndXhrs() {
     /* Timers */
     for (var i = 0; i < $currentPageTimers.length; i++) {
       clearTimeout($currentPageTimers[i])
