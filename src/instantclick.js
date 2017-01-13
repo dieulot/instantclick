@@ -16,12 +16,12 @@ var instantClick
     , $url = false
     , $title = false
     , $isContentTypeNotHTML
-    , $areTrackedAssetsDifferent
+    , $areTrackedElementsDifferent
     , $body = false
     , $lastDisplayTimestamp = 0
     , $isPreloading = false
     , $isWaitingForCompletion = false
-    , $trackedAssets = []
+    , $trackedElementsData = []
 
   // Variables defined by public functions
     , $preloadOnMousedown
@@ -506,25 +506,22 @@ var instantClick
       scrollPosition: urlWithoutHash in $history ? $history[urlWithoutHash].scrollPosition : 0
     }
 
-    var elements = doc.head.children
-      , found = 0
+    var trackedElements = doc.querySelectorAll('[data-instant-track]')
       , element
-      , data
+      , elementData
+      , trackedElementsFound = 0
 
-    for (var i = 0; i < elements.length; i++) {
-      element = elements[i]
-      if (!element.hasAttribute('data-instant-track')) {
-        continue
-      }
-      data = element.getAttribute('href') || element.getAttribute('src') || element.textContent
-      for (var j = 0; j < $trackedAssets.length; j++) {
-        if ($trackedAssets[j] == data) {
-          found++
+    for (var i = 0; i < trackedElements.length; i++) {
+      element = trackedElements[i]
+      elementData = element.getAttribute('href') || element.getAttribute('src') || element.textContent
+      for (var j = 0; j < $trackedElementsData.length; j++) {
+        if ($trackedElementsData[j] == elementData) {
+          trackedElementsFound++
         }
       }
     }
-    if (found != $trackedAssets.length) {
-      $areTrackedAssetsDifferent = true
+    if (trackedElementsFound != $trackedElementsData.length) {
+      $areTrackedElementsDifferent = true
     }
 
     if ($isWaitingForCompletion) {
@@ -608,7 +605,7 @@ var instantClick
     $body = false
     $isContentTypeNotHTML = false
     $gotANetworkError = false
-    $areTrackedAssetsDifferent = false
+    $areTrackedElementsDifferent = false
     triggerPageEvent('preload')
     $xhr.open('GET', url)
     $xhr.timeout = 90000 // Must be set after `open()` with IE
@@ -672,7 +669,7 @@ var instantClick
       location.href = $url
       return
     }
-    if ($areTrackedAssetsDifferent) {
+    if ($areTrackedElementsDifferent) {
       triggerPageEvent('exit', $url, 'different assets')
       location.href = $url
       return
@@ -754,18 +751,16 @@ var instantClick
       scrollPosition: pageYOffset
     }
 
-    var elements = document.head.children
+    var trackedElements = document.querySelectorAll('[data-instant-track]')
       , element
-      , data
-    for (var i = 0; i < elements.length; i++) {
-      element = elements[i]
-      if (element.hasAttribute('data-instant-track')) {
-        data = element.getAttribute('href') || element.getAttribute('src') || element.textContent
-        /* We can't use just `element.href` and `element.src` because we can't
-           retrieve `href`s and `src`s from the Ajax response.
-        */
-        $trackedAssets.push(data)
-      }
+      , elementData
+    for (var i = 0; i < trackedElements.length; i++) {
+      element = trackedElements[i]
+      elementData = element.getAttribute('href') || element.getAttribute('src') || element.textContent
+      /* We can't use just `element.href` and `element.src` because we can't
+         retrieve `href`s and `src`s from the Ajax response.
+      */
+      $trackedElementsData.push(elementData)
     }
 
     $xhr = new XMLHttpRequest()
