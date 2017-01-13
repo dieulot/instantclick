@@ -115,12 +115,12 @@ endforeach ?>
 
 
 
-<script src="instantclick.js.php?<?= $nocache ?>" data-no-instant></script>
+<script src="instantclick.js.php?<?= filemtime('../src/instantclick.js') + filemtime('../src/loading-indicator.js') ?>" data-instant-track></script>
 
 
 <?php // NProgress specific code
 if ($page == 'nprogress'): ?>
-<script data-no-instant>
+<script data-instant-track>
 InstantClick.on('wait', function() {
   NProgress.start()
 })
@@ -134,7 +134,7 @@ InstantClick.on('change', function(isInitialLoad) {
 </script>
 <?php endif ?>
 
-<script data-no-instant>
+<script data-instant-track>
 var $debugMessages = ''
 
 function addDebugMessage(message) {
