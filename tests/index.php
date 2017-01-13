@@ -54,11 +54,6 @@ Entities in the &#8249;title&rsaquo;
 <?php endif ?>
 </title>
 <?php endif ?>
-<script>
-if (location.pathname.substr(0, 6) == '/tests' && location.pathname[6] != '/') {
-  location.href = location.href.replace('/tests', '/tests/')
-}
-</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css?<?= filemtime('style.css') ?>" data-instant-track>
 
