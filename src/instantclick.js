@@ -40,10 +40,10 @@ var instantClick
     , $delegatedEvents = {}
 
 
-  ////////// HELPERS //////////
+  ////////// POLYFILL //////////
 
 
-  /* Polyfill needed for `addEvent` */
+  /* Needed for `addEvent` */
   if (!Element.prototype.matches) {
     Element.prototype.matches =
       Element.prototype.webkitMatchesSelector ||
@@ -58,6 +58,10 @@ var instantClick
         return false
       }
   }
+
+
+  ////////// HELPERS //////////
+
 
   function removeHash(url) {
     var index = url.indexOf('#')
@@ -697,6 +701,7 @@ var instantClick
 
 
   ////////// PUBLIC VARIABLE AND FUNCTIONS //////////
+
 
   var supported = false
   if ('pushState' in history
