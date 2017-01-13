@@ -509,19 +509,18 @@ var instantClick
     var trackedElements = doc.querySelectorAll('[data-instant-track]')
       , element
       , elementData
-      , trackedElementsFound = 0
 
-    for (var i = 0; i < trackedElements.length; i++) {
-      element = trackedElements[i]
-      elementData = element.getAttribute('href') || element.getAttribute('src') || element.textContent
-      for (var j = 0; j < $trackedElementsData.length; j++) {
-        if ($trackedElementsData[j] == elementData) {
-          trackedElementsFound++
+    if (trackedElements.length != $trackedElementsData.length) {
+      $areTrackedElementsDifferent = true
+    }
+    else {
+      for (var i = 0; i < trackedElements.length; i++) {
+        element = trackedElements[i]
+        elementData = element.getAttribute('href') || element.getAttribute('src') || element.textContent
+        if ($trackedElementsData.indexOf(elementData) == -1) {
+          $areTrackedElementsDifferent = true
         }
       }
-    }
-    if (trackedElementsFound != $trackedElementsData.length) {
-      $areTrackedElementsDifferent = true
     }
 
     if ($isWaitingForCompletion) {
