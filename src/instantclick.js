@@ -824,7 +824,7 @@ var instantClick
 
       document.addEventListener(type, function(event) {
         var element = event.target ? event.target : event.srcElement
-        while (element.nodeType == 1) {
+        while (element && element.nodeType == 1) {
           for (var selector in $delegatedEvents[type]) {
             if (element.matches(selector)) {
               for (var i = 0; i < $delegatedEvents[type][selector].length; i++) { // IE 8 doesn't support indexOf
