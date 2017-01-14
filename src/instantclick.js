@@ -822,10 +822,7 @@ var instantClick
     if (!(type in $delegatedEvents)) {
       $delegatedEvents[type] = {}
 
-      // IE 8 uses attachEvent('on' + type, func)
-      var addEventFunction = window.addEventListener ? 'addEventListener' : 'attachEvent'
-        , typeParam = window.addEventListener ? type : ('on' + type)
-      document[addEventFunction](typeParam, function(event) {
+      document.addEventListener(type, function(event) {
         var element = event.target ? event.target : event.srcElement
         while (element.nodeType == 1) {
           for (var selector in $delegatedEvents[type]) {
@@ -838,7 +835,7 @@ var instantClick
           }
           element = element.parentNode
         }
-      }, false) // addEventListener's third parameter isn't optional in Firefox < 6
+      }, false) // Third parameter isn't optional in Firefox < 6
     }
     if (!(selector in $delegatedEvents[type])) {
       $delegatedEvents[type][selector] = []
