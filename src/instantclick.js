@@ -848,11 +848,9 @@ var instantClick
   }
 
   function removeEvent(selector, type, listener) {
-    for (var i = 0; i < $delegatedEvents[type][selector].length; i++) {
-      if ($delegatedEvents[type][selector][i] == listener) {
-        $delegatedEvents[type][selector].splice(i, 1)
-        break
-      }
+    var index = $delegatedEvents[type][selector].indexOf(listener)
+    if (index > -1) {
+      $delegatedEvents[type][selector].splice(index, 1)
     }
   }
 
