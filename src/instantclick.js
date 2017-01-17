@@ -196,7 +196,10 @@ var instantClick
       }
 
       $currentLocationWithoutHash = removeHash(urlToPush)
-      $windowEventListeners[$currentLocationWithoutHash] = []
+
+      if ($currentLocationWithoutHash in $windowEventListeners) {
+        $windowEventListeners[$currentLocationWithoutHash] = []
+      }
 
       applyScriptElements(function(element) {
         return !element.hasAttribute('data-instant-track')
