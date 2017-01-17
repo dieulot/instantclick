@@ -815,6 +815,24 @@ var instantClick
     addEventListener.apply(window, arguments)
   }
 
+  function removePageEvent() {
+    if (!($currentLocationWithoutHash in $windowEventListeners)) {
+      return
+    }
+    firstLoop:
+    for (var i = 0; i < $windowEventListeners[$currentLocationWithoutHash].length; i++) {
+      if (arguments.length != $windowEventListeners[$currentLocationWithoutHash][i].length) {
+        continue
+      }
+      for (var j = 0; j < $windowEventListeners[$currentLocationWithoutHash][i].length; j++) {
+        if (arguments[j] != $windowEventListeners[$currentLocationWithoutHash][i][j]) {
+          continue firstLoop
+        }
+      }
+      $windowEventListeners[$currentLocationWithoutHash].splice(i, 1)
+    }
+  }
+
   function addEvent(selector, type, listener) {
     if (!(type in $delegatedEvents)) {
       $delegatedEvents[type] = {}
@@ -863,6 +881,7 @@ var instantClick
     setInterval: setInterval,
     xhr: xhr,
     addPageEvent: addPageEvent,
+    removePageEvent: removePageEvent,
     addEvent: addEvent,
     removeEvent: removeEvent
   }
