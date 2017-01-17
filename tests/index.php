@@ -5,7 +5,6 @@ $pages = [
   'Page with anchors #2' => 'anchor2',
   'Page without title' => 'no-title',
   'Minimal markup' => 'minimal',
-  'NProgress' => 'nprogress',
   'Entities in the &#8249;title&rsaquo;' => 'entities',
   'Noscript' => 'noscript',
   'Alter on receive' => 'alter-receive',
@@ -57,14 +56,6 @@ Entities in the &#8249;title&rsaquo;
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css?<?= filemtime('style.css') ?>" data-instant-track>
 
-<?php // NProgress specific code
-if ($page == 'nprogress'): ?>
-<style>#instantclick { display: none; }</style>
-<link rel="stylesheet" href="vendors/nprogress/nprogress-0.1.2.css">
-<script src="vendors/jquery/jquery-2.1.0.js"></script>
-<script src="vendors/nprogress/nprogress-0.1.2.js"></script>
-<?php endif ?>
-
 <?php // Minimal specific code
 if ($page == 'minimal'): ?>
 <body>Hiya.
@@ -88,9 +79,6 @@ endif ?>
 <?php foreach ($pages as $name => $row): ?>
   <tr>
     <td><a href="?page=<?= $row . $append ?>"><?= $name ?></a>
-<?php if ($row == 'nprogress'): ?>
-        <a data-no-instant href="?page=<?= $row . $append ?>">↻</a>
-<?php endif ?>
 <?php foreach ($delays as $delay): ?>
     <td><a href="?page=<?= $row ?>&amp;wait=<?= $delay . $append ?>"><small><?= $delay ?></small></a>
 <?php endforeach;
@@ -104,25 +92,8 @@ endforeach ?>
 <div id="divDebug"></div>
 
 
-
 <script src="instantclick.js.php?<?= filemtime('../src/instantclick.js') + filemtime('../src/loading-indicator.js') ?>" data-instant-track></script>
 
-
-<?php // NProgress specific code
-if ($page == 'nprogress'): ?>
-<script data-instant-track>
-InstantClick.on('wait', function() {
-  NProgress.start()
-})
-
-InstantClick.on('change', function(isInitialLoad) {
-  if (isInitialLoad) {
-    addDebugMessage('NProgress on')
-  }
-  NProgress.done(!isInitialLoad)
-})
-</script>
-<?php endif ?>
 
 <script data-instant-track>
 var $debugMessages = ''
