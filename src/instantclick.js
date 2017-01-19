@@ -1,4 +1,4 @@
-/* InstantClick 3.1.0 | (C) 2014-2016 Alexandre Dieulot | http://instantclick.io/license */
+/* InstantClick 3.1.0 | (C) 2014-2017 Alexandre Dieulot | http://instantclick.io/license */
 
 var instantClick
   , InstantClick = instantClick = function(document, location, $userAgent) {
