@@ -31,7 +31,7 @@
   }
 
   function changeListener(isInitialPage) {
-    if (!instantClick.supported) {
+    if (!instantclick.supported) {
       return
     }
 
@@ -53,7 +53,7 @@
   }
 
   function waitListener() {
-    $timer = instantClick.setTimeout(show, 800)
+    $timer = instantclick.setTimeout(show, 800)
   }
 
   function show() {
@@ -75,16 +75,16 @@
   ////////////////////
 
 
-  instantClick.on('change', changeListener)
-  instantClick.on('restore', restoreListener)
-  instantClick.on('wait', waitListener)
-  instantClick.on('exit', hide)
+  instantclick.on('change', changeListener)
+  instantclick.on('restore', restoreListener)
+  instantclick.on('wait', waitListener)
+  instantclick.on('exit', hide)
 
 
   ////////////////////
 
 
-  instantClick.loadingIndicator = {
+  instantclick.loadingIndicator = {
     show: show,
     hide: hide
   }
