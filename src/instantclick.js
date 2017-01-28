@@ -9,6 +9,7 @@ var instantclick
     , $lastTouchTimestamp
     , $hasBeenInitialized
     , $touchEndedWithoutClickTimer
+    , $lastUsedTimeoutId = 0
 
   // Preloading-related variables
     , $history = {}
@@ -34,7 +35,8 @@ var instantclick
         restore: [],
         exit: []
       }
-    , $currentPageTimers = []
+    , $currentPageIntervals = []
+    , $timeouts = {}
     , $currentPageXhrs = []
     , $windowEventListeners = {}
     , $delegatedEvents = {}
@@ -136,7 +138,7 @@ var instantclick
   }
 
   function changePage(title, body, urlToPush, scrollPosition) {
-    killCurrentPageTimersAndXhrs()
+    abortCurrentPageXhrs()
 
     document.documentElement.replaceChild(body, document.body)
     /* We cannot just use `document.body = doc.body`, it causes Safari (tested
@@ -195,11 +197,15 @@ var instantclick
          * adding `requestAnimationFrame` doesn't fix it in this case. */
       }
 
+      clearCurrentPageTimeouts()
+
       $currentLocationWithoutHash = removeHash(urlToPush)
 
       if ($currentLocationWithoutHash in $windowEventListeners) {
         $windowEventListeners[$currentLocationWithoutHash] = []
       }
+
+      $timeouts[$currentLocationWithoutHash] = {}
 
       applyScriptElements(function(element) {
         return !element.hasAttribute('data-instant-track')
@@ -227,6 +233,8 @@ var instantclick
         return element.hasAttribute('data-instant-restore')
       })
 
+      restoreTimeouts()
+
       triggerPageEvent('restore')
     }
   }
@@ -243,14 +251,7 @@ var instantclick
     return html.replace(/<noscript[\s\S]+?<\/noscript>/gi, '')
   }
 
-  function killCurrentPageTimersAndXhrs() {
-    /* Timers */
-    for (var i = 0; i < $currentPageTimers.length; i++) {
-      clearTimeout($currentPageTimers[i])
-    }
-    $currentPageTimers = []
-
-    /* XHRs */
+  function abortCurrentPageXhrs() {
     for (var i = 0; i < $currentPageXhrs.length; i++) {
       if (typeof $currentPageXhrs[i] == 'object' && 'abort' in $currentPageXhrs[i]) {
         $currentPageXhrs[i].instantclickAbort = true
@@ -258,6 +259,38 @@ var instantclick
       }
     }
     $currentPageXhrs = []
+  }
+
+  function clearCurrentPageTimeouts() {
+    for (var i in $timeouts[$currentLocationWithoutHash]) {
+      var timeout = $timeouts[$currentLocationWithoutHash][i]
+      window.clearTimeout(timeout.setTimeoutId)
+      timeout.delayLeft = timeout.delay - +new Date + timeout.timestamp
+    }
+
+    for (var i = 0; i < $currentPageIntervals.length; i++) {
+      window.clearInterval($currentPageIntervals[i])
+    }
+    $currentPageIntervals = []
+  }
+
+  function restoreTimeouts() {
+    for (var i in $timeouts[$currentLocationWithoutHash]) {
+      var timeout = $timeouts[$currentLocationWithoutHash][i]
+      var args = [
+            function(args2) {
+              timeout.callback(args2)
+              delete $timeouts[$currentLocationWithoutHash][i]
+            },
+            timeout.delayLeft
+          ]
+      for (var j = 0; j < timeout.params.length; j++) {
+        args.push(timeout.params[j])
+      }
+      timeout.setTimeoutId = window.setTimeout.apply(window, args)
+      timeout.delay = timeout.delayLeft
+      timeout.timestamp = +new Date
+    }
   }
 
   function handleTouchendWithoutClick() {
@@ -324,6 +357,32 @@ var instantclick
       */
       $trackedElementsData.push(elementData)
     }
+  }
+
+  function addTimeout(args) {
+    var callback = args[0]
+      , delay = args[1]
+      , params = [].slice.call(args, 2)
+
+    $lastUsedTimeoutId++
+    var id = $lastUsedTimeoutId
+
+    var callbackModified = function(args2) {
+      callback(args2)
+      delete $timeouts[$currentLocationWithoutHash][id]
+    }
+
+    args[0] = callbackModified
+
+    var setTimeoutId = window.setTimeout.apply(window, args)
+    $timeouts[$currentLocationWithoutHash][id] = {
+      setTimeoutId: setTimeoutId,
+      timestamp: +new Date,
+      callback: callback,
+      delay: delay,
+      params: params
+    }
+    return -id
   }
 
 
@@ -580,6 +639,7 @@ var instantclick
     }
 
     $history[$currentLocationWithoutHash].scrollPosition = pageYOffset
+    clearCurrentPageTimeouts()
     addOrRemoveWindowEventListeners('remove')
     $currentLocationWithoutHash = loc
     changePage($history[loc].title, $history[loc].body, false, $history[loc].scrollPosition)
@@ -751,6 +811,7 @@ var instantclick
     }
 
     $currentLocationWithoutHash = removeHash(location.href)
+    $timeouts[$currentLocationWithoutHash] = {}
     $history[$currentLocationWithoutHash] = {
       body: document.body,
       title: document.title,
@@ -788,15 +849,27 @@ var instantclick
   }
 
   function setTimeout() {
-    var timer = window.setTimeout.apply(window, arguments)
-    $currentPageTimers.push(timer)
-    return timer
+    return addTimeout(arguments)
   }
 
   function setInterval() {
     var timer = window.setInterval.apply(window, arguments)
-    $currentPageTimers.push(timer)
+    $currentPageIntervals.push(timer)
     return timer
+  }
+
+  function clearTimeout(id) {
+    if (!(id < 0)) { // Non-negative or not a number
+      return window.clearTimeout(id)
+    }
+    id = -id
+
+    for (var loc in $timeouts) {
+      if (id in $timeouts[loc]) {
+        window.clearTimeout($timeouts[loc][id].setTimeoutId)
+        delete $timeouts[loc][id]
+      }
+    }
   }
 
   function xhr(xhr) {
@@ -875,6 +948,7 @@ var instantclick
     on: on,
     setTimeout: setTimeout,
     setInterval: setInterval,
+    clearTimeout: clearTimeout,
     xhr: xhr,
     addPageEvent: addPageEvent,
     removePageEvent: removePageEvent,

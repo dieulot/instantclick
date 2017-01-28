@@ -61,7 +61,7 @@
   }
 
   function hide() {
-    clearTimeout($timer)
+    instantclick.clearTimeout($timer)
 
     $element.className = ''
     /* Doesn't work (has no visible effect) in Safari on `exit`.
