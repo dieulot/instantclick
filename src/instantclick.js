@@ -276,20 +276,15 @@ var instantclick
 
   function restoreTimeouts() {
     for (var i in $timeouts[$currentLocationWithoutHash]) {
-      var timeout = $timeouts[$currentLocationWithoutHash][i]
       var args = [
-            function(args2) {
-              timeout.callback(args2)
-              delete $timeouts[$currentLocationWithoutHash][i]
-            },
-            timeout.delayLeft
-          ]
-      for (var j = 0; j < timeout.params.length; j++) {
-        args.push(timeout.params[j])
+        $timeouts[$currentLocationWithoutHash][i].callback,
+        $timeouts[$currentLocationWithoutHash][i].delayLeft
+      ]
+      for (var j = 0; j < $timeouts[$currentLocationWithoutHash][i].params.length; j++) {
+        args.push($timeouts[$currentLocationWithoutHash][i].params[j])
       }
-      timeout.setTimeoutId = window.setTimeout.apply(window, args)
-      timeout.delay = timeout.delayLeft
-      timeout.timestamp = +new Date
+      delete $timeouts[$currentLocationWithoutHash][i]
+      addTimeout(args)
     }
   }
 
