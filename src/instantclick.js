@@ -265,7 +265,7 @@ var instantclick
   function clearCurrentPageTimeouts() {
     for (var i in $timeouts[$currentLocationWithoutHash]) {
       var timeout = $timeouts[$currentLocationWithoutHash][i]
-      window.clearTimeout(timeout.setTimeoutId)
+      window.clearTimeout(timeout.realId)
       timeout.delayLeft = timeout.delay - +new Date + timeout.timestamp
     }
 
@@ -370,9 +370,9 @@ var instantclick
 
     args[0] = callbackModified
 
-    var setTimeoutId = window.setTimeout.apply(window, args)
+    var realId = window.setTimeout.apply(window, args)
     $timeouts[$currentLocationWithoutHash][id] = {
-      setTimeoutId: setTimeoutId,
+      realId: realId,
       timestamp: +new Date,
       callback: callback,
       delay: delay,
@@ -858,7 +858,7 @@ var instantclick
     id = -id
     for (var loc in $timeouts) {
       if (id in $timeouts[loc]) {
-        window.clearTimeout($timeouts[loc][id].setTimeoutId)
+        window.clearTimeout($timeouts[loc][id].realId)
         delete $timeouts[loc][id]
       }
     }
