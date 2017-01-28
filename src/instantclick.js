@@ -855,11 +855,7 @@ var instantclick
   }
 
   function clearTimeout(id) {
-    if (!(id < 0)) { // Non-negative or not a number
-      return
-    }
     id = -id
-
     for (var loc in $timeouts) {
       if (id in $timeouts[loc]) {
         window.clearTimeout($timeouts[loc][id].setTimeoutId)
