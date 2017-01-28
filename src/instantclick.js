@@ -36,8 +36,7 @@ var instantclick
         restore: [],
         exit: []
       }
-    , $currentPageIntervals = []
-    , $timeouts = {}
+    , $timers = {}
     , $currentPageXhrs = []
     , $windowEventListeners = {}
     , $delegatedEvents = {}
@@ -206,7 +205,7 @@ var instantclick
         $windowEventListeners[$currentLocationWithoutHash] = []
       }
 
-      $timeouts[$currentLocationWithoutHash] = {}
+      $timers[$currentLocationWithoutHash] = {}
 
       applyScriptElements(function(element) {
         return !element.hasAttribute('data-instant-track')
@@ -234,7 +233,7 @@ var instantclick
         return element.hasAttribute('data-instant-restore')
       })
 
-      restoreTimeouts()
+      restoreTimers()
 
       triggerPageEvent('restore')
     }
@@ -263,29 +262,27 @@ var instantclick
   }
 
   function clearCurrentPageTimeouts() {
-    for (var i in $timeouts[$currentLocationWithoutHash]) {
-      var timeout = $timeouts[$currentLocationWithoutHash][i]
+    for (var i in $timers[$currentLocationWithoutHash]) {
+      var timeout = $timers[$currentLocationWithoutHash][i]
       window.clearTimeout(timeout.realId)
       timeout.delayLeft = timeout.delay - +new Date + timeout.timestamp
     }
-
-    for (var i = 0; i < $currentPageIntervals.length; i++) {
-      window.clearInterval($currentPageIntervals[i])
-    }
-    $currentPageIntervals = []
   }
 
-  function restoreTimeouts() {
-    for (var i in $timeouts[$currentLocationWithoutHash]) {
-      var args = [
-        $timeouts[$currentLocationWithoutHash][i].callback,
-        $timeouts[$currentLocationWithoutHash][i].delayLeft
-      ]
-      for (var j = 0; j < $timeouts[$currentLocationWithoutHash][i].params.length; j++) {
-        args.push($timeouts[$currentLocationWithoutHash][i].params[j])
+  function restoreTimers() {
+    for (var i in $timers[$currentLocationWithoutHash]) {
+      if (!('delayLeft' in $timers[$currentLocationWithoutHash][i])) {
+        continue
       }
-      delete $timeouts[$currentLocationWithoutHash][i]
-      addTimeout(args)
+      var args = [
+        $timers[$currentLocationWithoutHash][i].callback,
+        $timers[$currentLocationWithoutHash][i].delayLeft
+      ]
+      for (var j = 0; j < $timers[$currentLocationWithoutHash][i].params.length; j++) {
+        args.push($timers[$currentLocationWithoutHash][i].params[j])
+      }
+      addTimer(args, $timers[$currentLocationWithoutHash][i].isRepeating, $timers[$currentLocationWithoutHash][i].delay)
+      delete $timers[$currentLocationWithoutHash][i]
     }
   }
 
@@ -355,28 +352,45 @@ var instantclick
     }
   }
 
-  function addTimeout(args) {
+  function addTimer(args, isRepeating, realDelay) {
     var callback = args[0]
       , delay = args[1]
       , params = [].slice.call(args, 2)
+      , timestamp = +new Date
 
     $lastUsedTimeoutId++
     var id = $lastUsedTimeoutId
 
-    var callbackModified = function(args2) {
-      callback(args2)
-      delete $timeouts[$currentLocationWithoutHash][id]
+    var callbackModified
+    if (isRepeating) {
+      callbackModified = function(args2) {
+        callback(args2)
+        delete $timers[$currentLocationWithoutHash][id]
+        args[0] = callback
+        args[1] = delay
+        addTimer(args, true)
+      }
+    }
+    else {
+      callbackModified = function(args2) {
+        callback(args2)
+        delete $timers[$currentLocationWithoutHash][id]
+      }
     }
 
     args[0] = callbackModified
-
+    if (realDelay != undefined) {
+      timestamp += delay - realDelay
+      delay = realDelay
+    }
     var realId = window.setTimeout.apply(window, args)
-    $timeouts[$currentLocationWithoutHash][id] = {
+    $timers[$currentLocationWithoutHash][id] = {
       realId: realId,
-      timestamp: +new Date,
+      timestamp: timestamp,
       callback: callback,
       delay: delay,
-      params: params
+      params: params,
+      isRepeating: isRepeating
     }
     return -id
   }
@@ -807,7 +821,7 @@ var instantclick
     }
 
     $currentLocationWithoutHash = removeHash(location.href)
-    $timeouts[$currentLocationWithoutHash] = {}
+    $timers[$currentLocationWithoutHash] = {}
     $history[$currentLocationWithoutHash] = {
       body: document.body,
       title: document.title,
@@ -845,21 +859,19 @@ var instantclick
   }
 
   function setTimeout() {
-    return addTimeout(arguments)
+    return addTimer(arguments, false)
   }
 
   function setInterval() {
-    var timer = window.setInterval.apply(window, arguments)
-    $currentPageIntervals.push(timer)
-    return timer
+    return addTimer(arguments, true)
   }
 
   function clearTimeout(id) {
     id = -id
-    for (var loc in $timeouts) {
-      if (id in $timeouts[loc]) {
-        window.clearTimeout($timeouts[loc][id].realId)
-        delete $timeouts[loc][id]
+    for (var loc in $timers) {
+      if (id in $timers[loc]) {
+        window.clearTimeout($timers[loc][id].realId)
+        delete $timers[loc][id]
       }
     }
   }
