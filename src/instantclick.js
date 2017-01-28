@@ -855,7 +855,7 @@ var instantclick
 
   function clearTimeout(id) {
     if (!(id < 0)) { // Non-negative or not a number
-      return window.clearTimeout(id)
+      return
     }
     id = -id
 
