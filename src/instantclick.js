@@ -22,6 +22,7 @@ var instantclick
     , $lastDisplayTimestamp = 0
     , $isPreloading = false
     , $isWaitingForCompletion = false
+    , $gotANetworkError = false
     , $trackedElementsData = []
 
   // Variables defined by public functions
