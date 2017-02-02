@@ -29,12 +29,12 @@
 <a class="js-ic-website" href="http://instantclick.io">Link with preventDefault</a>
 
 <script type="queued">
-instantClick.addEvent('.d2', 'click', function(event) {
+instantclick.addEvent('.d2', 'click', function(event) {
   var target = event.target || event.srcElement
   alert('target: ' + target.className + "\nthis: " + this.className)
 })
 
-instantClick.addEvent('.d1', 'click', function(event) {
+instantclick.addEvent('.d1', 'click', function(event) {
   var target = event.target || event.srcElement
   alert('target: ' + target.className + "\nthis: " + this.className)
 })
@@ -44,11 +44,11 @@ function x(event) {
   alert(".d1 bis\n" + 'target: ' + target.className + "\nthis: " + this.className)
 }
 
-instantClick.addEvent('.d1', 'click', x)
-instantClick.addEvent('.d1', 'click', x)
-//instantClick.removeEvent('.d1', 'click', x)
+instantclick.addEvent('.d1', 'click', x)
+instantclick.addEvent('.d1', 'click', x)
+//instantclick.removeEvent('.d1', 'click', x)
 
-instantClick.addEvent('.js-ic-website', 'click', function(event) {
+instantclick.addEvent('.js-ic-website', 'click', function(event) {
   if (event.preventDefault) {
     event.preventDefault()
   }
