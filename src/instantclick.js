@@ -510,7 +510,10 @@ var instantclick
       return
     }
 
-    if (event.which > 1 || event.metaKey || event.ctrlKey) { // Opening in new tab
+    /* Check if it's opening in a new tab */
+    if (event.button != 0 // Chrome < 55 fires a click event when the middle mouse button is pressed
+      || event.metaKey
+      || event.ctrlKey) {
       return
     }
     event.preventDefault()
