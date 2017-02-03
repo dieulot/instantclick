@@ -914,11 +914,11 @@ var instantclick
       $delegatedEvents[type] = {}
 
       document.addEventListener(type, function(event) {
-        var element = event.target ? event.target : event.srcElement
+        var element = event.target
         while (element && element.nodeType == 1) {
           for (var selector in $delegatedEvents[type]) {
             if (element.matches(selector)) {
-              for (var i = 0; i < $delegatedEvents[type][selector].length; i++) { // IE 8 doesn't support indexOf
+              for (var i = 0; i < $delegatedEvents[type][selector].length; i++) {
                 $delegatedEvents[type][selector][i].call(element, event)
               }
               break
