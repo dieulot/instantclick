@@ -915,11 +915,19 @@ var instantclick
 
       document.addEventListener(type, function(event) {
         var element = event.target
+        event.originalStopPropagation = event.stopPropagation
+        event.stopPropagation = function() {
+          this.isPropagationStopped = true
+          this.originalStopPropagation()
+        }
         while (element && element.nodeType == 1) {
           for (var selector in $delegatedEvents[type]) {
             if (element.matches(selector)) {
               for (var i = 0; i < $delegatedEvents[type][selector].length; i++) {
                 $delegatedEvents[type][selector][i].call(element, event)
+              }
+              if (event.isPropagationStopped) {
+                return
               }
               break
             }
