@@ -45,7 +45,7 @@ var instantclick
   ////////// POLYFILL //////////
 
 
-  /* Needed for `addEvent` */
+  // Needed for `addEvent`
   if (!Element.prototype.matches) {
     Element.prototype.matches =
       Element.prototype.webkitMatchesSelector ||
@@ -119,7 +119,7 @@ var instantclick
       if (eventType == 'receive') {
         var altered = $eventsCallbacks[eventType][i].apply(window, argumentsToApply)
         if (altered) {
-          /* Update arguments for the next iteration of the loop. */
+          // Update arguments for the next iteration of the loop.
           if ('body' in altered) {
             argumentsToApply[1] = altered.body
           }
@@ -141,9 +141,8 @@ var instantclick
     abortCurrentPageXhrs()
 
     document.documentElement.replaceChild(body, document.body)
-    /* We cannot just use `document.body = doc.body`, it causes Safari (tested
-       5.1, 6.0 and Mobile 7.0) to execute script tags directly.
-    */
+    // We cannot just use `document.body = doc.body`, it causes Safari (tested
+    // 5.1, 6.0 and Mobile 7.0) to execute script tags directly.
 
     document.title = title
 
@@ -153,13 +152,12 @@ var instantclick
         history.pushState(null, null, urlToPush)
 
         if ($userAgent.indexOf(' CriOS/') > -1) {
-          /* Chrome for iOS:
-           *
-           * 1. Removes title in tab on pushState, so it needs to be set after.
-           *
-           * 2. Will not set the title if it's identical after trimming, so we
-           *    add a non-breaking space.
-           */
+          // Chrome for iOS:
+          //
+          // 1. Removes title in tab on pushState, so it needs to be set after.
+          //
+          // 2. Will not set the title if it's identical after trimming, so we
+          //    add a non-breaking space.
           if (document.title == title) {
             document.title = title + String.fromCharCode(160)
           }
@@ -182,19 +180,18 @@ var instantclick
         }
       }
       if ('requestAnimationFrame' in window) {
-        /* Safari on macOS doesn't immediately visually change the page on
-         * `document.documentElement.replaceChild`, so if `scrollTo` is called
-         * without `requestAnimationFrame` it often scrolls before the page
-         * is displayed.
-         */
+        // Safari on macOS doesn't immediately visually change the page on
+        // `document.documentElement.replaceChild`, so if `scrollTo` is called
+        // without `requestAnimationFrame` it often scrolls before the page
+        // is displayed.
         requestAnimationFrame(function() {
           scrollTo(0, offset)
         })
       }
       else {
         scrollTo(0, offset)
-        /* Safari on macOS scrolls before the page is visually changed, but
-         * adding `requestAnimationFrame` doesn't fix it in this case. */
+        // Safari on macOS scrolls before the page is visually changed, but
+        // adding `requestAnimationFrame` doesn't fix it in this case.
       }
 
       clearCurrentPageTimeouts()
@@ -214,18 +211,16 @@ var instantclick
       triggerPageEvent('change', false)
     }
     else {
-      /* On popstate, browsers scroll by themselves, but at least Firefox
-       * scrolls BEFORE popstate is fired and thus before we can replace the
-       * page. If the page before popstate is too short the user won't be
-       * scrolled at the right position as a result. We need to scroll again.
-       */
+      // On popstate, browsers scroll by themselves, but at least Firefox
+      // scrolls BEFORE popstate is fired and thus before we can replace the
+      // page. If the page before popstate is too short the user won't be
+      // scrolled at the right position as a result. We need to scroll again.
       scrollTo(0, scrollPosition)
 
-      /* iOS's gesture to go back by swiping from the left edge of the screen
-       * will start a preloading if the user touches a link, it needs to be
-       * cancelled otherwise the page behind the touched link will be
-       * displayed.
-       */
+      // iOS's gesture to go back by swiping from the left edge of the screen
+      // will start a preloading if the user touches a link, it needs to be
+      // cancelled otherwise the page behind the touched link will be
+      // displayed.
       $xhr.abort()
       setPreloadingAsHalted()
 
@@ -245,9 +240,8 @@ var instantclick
   }
 
   function removeNoscriptTags(html) {
-    /* Must be done on text, not on a node's innerHTML, otherwise strange
-     * things happen with implicitly closed elements (see the Noscript test).
-     */
+    // Must be done on text, not on a node's innerHTML, otherwise strange
+    // things happen with implicitly closed elements (see the Noscript test).
     return html.replace(/<noscript[\s\S]+?<\/noscript>/gi, '')
   }
 
@@ -308,10 +302,9 @@ var instantclick
       , nextSibling
       , i
 
-    /* `scriptElementsInDOM` will change during the copy of scripts if
-       a script add or delete script elements, so we need to put script
-       elements in an array to loop through them correctly.
-    */
+    // `scriptElementsInDOM` will change during the copy of scripts if
+    // a script add or delete script elements, so we need to put script
+    // elements in an array to loop through them correctly.
     for (i = 0; i < scriptElementsInDOM.length; i++) {
       scriptElementsToCopy.push(scriptElementsInDOM[i])
     }
@@ -345,9 +338,8 @@ var instantclick
     for (var i = 0; i < trackedElements.length; i++) {
       element = trackedElements[i]
       elementData = element.getAttribute('href') || element.getAttribute('src') || element.textContent
-      /* We can't use just `element.href` and `element.src` because we can't
-         retrieve `href`s and `src`s from the Ajax response.
-      */
+      // We can't use just `element.href` and `element.src` because we can't
+      // retrieve `href`s and `src`s from the Ajax response.
       $trackedElementsData.push(elementData)
     }
   }
@@ -411,33 +403,31 @@ var instantclick
 
   function mouseoverListener(event) {
     if ($lastTouchTimestamp > (+new Date - 500)) {
-      /* On a touch device, if the content of the page change on mouseover
-       * click is never fired and the user will need to tap a second time.
-       * https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html#//apple_ref/doc/uid/TP40006511-SW4
-       *
-       * Content change could happen in the `preload` event, so we stop there.
-       */
+      // On a touch device, if the content of the page change on mouseover
+      // click is never fired and the user will need to tap a second time.
+      // https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/HandlingEvents/HandlingEvents.html#//apple_ref/doc/uid/TP40006511-SW4
+      //
+      // Content change could happen in the `preload` event, so we stop there.
       return
     }
 
     if (+new Date - $lastDisplayTimestamp < 100) {
-      /* After a page is displayed, if the user's cursor happens to be above
-         a link a mouseover event will be in most browsers triggered
-         automatically, and in other browsers it will be triggered when the
-         user moves his mouse by 1px.
-
-         Here are the behaviors I noticed, all on Windows:
-         - Safari 5.1: auto-triggers after 0 ms
-         - IE 11: auto-triggers after 30-80 ms (depends on page's size?)
-         - Firefox: auto-triggers after 10 ms
-         - Opera 18: auto-triggers after 10 ms
-
-         - Chrome: triggers when cursor moved
-         - Opera 12.16: triggers when cursor moved
-
-         To remedy to this, we do nothing if the last display occurred less
-         than 100 ms ago.
-      */
+      // After a page is displayed, if the user's cursor happens to be above
+      // a link a mouseover event will be in most browsers triggered
+      // automatically, and in other browsers it will be triggered when the
+      // user moves his mouse by 1px.
+      //
+      // Here are the behaviors I noticed, all on Windows:
+      // - Safari 5.1: auto-triggers after 0 ms
+      // - IE 11: auto-triggers after 30-80 ms (depends on page's size?)
+      // - Firefox: auto-triggers after 10 ms
+      // - Opera 18: auto-triggers after 10 ms
+      //
+      // - Chrome: triggers when cursor moved
+      // - Opera 12.16: triggers when cursor moved
+      //
+      // To remedy to this, we do nothing if the last display occurred less
+      // than 100 ms ago.
 
       return
     }
@@ -449,7 +439,7 @@ var instantclick
     }
 
     if (linkElement == getParentLinkElement(event.relatedTarget)) {
-      /* Happens when mouseout-ing and mouseover-ing child elements of the same link element */
+      // Happens when mouseout-ing and mouseover-ing child elements of the same link element
       return
     }
 
@@ -486,9 +476,8 @@ var instantclick
   }
 
   function clickListenerPrelude() {
-    /* Makes clickListener be fired after everyone else, so that we can respect
-     * event.preventDefault.
-     */
+    // Makes clickListener be fired after everyone else, so that we can respect
+    // event.preventDefault.
     document.addEventListener('click', clickListener)
   }
 
@@ -510,7 +499,7 @@ var instantclick
       return
     }
 
-    /* Check if it's opening in a new tab */
+    // Check if it's opening in a new tab
     if (event.button != 0 // Chrome < 55 fires a click event when the middle mouse button is pressed
       || event.metaKey
       || event.ctrlKey) {
@@ -522,8 +511,8 @@ var instantclick
 
   function mouseoutListener(event) {
     if (getParentLinkElement(event.target) == getParentLinkElement(event.relatedTarget)) {
-      /* Happens when mouseout-ing and mouseover-ing child elements of the same link element,
-         we don't want to stop preloading then. */
+      // Happens when mouseout-ing and mouseover-ing child elements of the same link element,
+      // we don't want to stop preloading then.
       return
     }
 
@@ -562,7 +551,7 @@ var instantclick
     }
 
     if ($xhr.status == 0) {
-      /* Request error/timeout/abort */
+      // Request error/timeout/abort
       $gotANetworkError = true
       if ($isWaitingForCompletion) {
         triggerPageEvent('exit', $url, 'network error')
@@ -639,13 +628,13 @@ var instantclick
       triggerPageEvent('exit', location.href, 'not in history')
       if (loc == location.href) { // no location.hash
         location.href = location.href
-        /* Reloads the page while using cache for scripts, styles and images,
-           unlike `location.reload()` */
+        // Reloads the page while using cache for scripts, styles and images,
+        // unlike `location.reload()`
       }
       else {
-        /* When there's a hash, `location.href = location.href` won't reload
-           the page (but will trigger a popstate event, thus causing an infinite
-           loop), so we need to call `location.reload()` */
+        // When there's a hash, `location.href = location.href` won't reload
+        // the page (but will trigger a popstate event, thus causing an infinite
+        // loop), so we need to call `location.reload()`
         location.reload()
       }
       return
@@ -693,27 +682,25 @@ var instantclick
   function display(url) {
     $lastDisplayTimestamp = +new Date
     if ($preloadTimer || !$isPreloading) {
-      /* $preloadTimer:
-         Happens when there's a delay before preloading and that delay
-         hasn't expired (preloading didn't kick in).
-
-         !$isPreloading:
-         A link has been clicked, and preloading hasn't been initiated.
-         It happens with touch devices when a user taps *near* the link,
-         causing `touchstart` not to be fired. Safari/Chrome will trigger
-         `mouseover`, `mousedown`, `click` (and others), but when that happens
-         we do nothing in `mouseover` as it may cause `click` not to fire (see
-         comment in `mouseoverListener`).
-
-         It also happens when a user uses his keyboard to navigate (with Tab
-         and Return), and possibly in other non-mainstream ways to navigate
-         a website.
-      */
+      // $preloadTimer:
+      // Happens when there's a delay before preloading and that delay
+      // hasn't expired (preloading didn't kick in).
+      //
+      // !$isPreloading:
+      // A link has been clicked, and preloading hasn't been initiated.
+      // It happens with touch devices when a user taps *near* the link,
+      // causing `touchstart` not to be fired. Safari/Chrome will trigger
+      // `mouseover`, `mousedown`, `click` (and others), but when that happens
+      // we do nothing in `mouseover` as it may cause `click` not to fire (see
+      // comment in `mouseoverListener`).
+      //
+      // It also happens when a user uses his keyboard to navigate (with Tab
+      // and Return), and possibly in other non-mainstream ways to navigate
+      // a website.
 
       if ($preloadTimer && $url && $url != url) {
-        /* Happens when the user clicks on a link before preloading
-           kicks in while another link is already preloading.
-        */
+        // Happens when the user clicks on a link before preloading
+        // kicks in while another link is already preloading.
 
         triggerPageEvent('exit', url, 'click occured while preloading planned')
         location.href = url
@@ -726,13 +713,12 @@ var instantclick
       return
     }
     if ($isWaitingForCompletion) {
-      /* The user clicked on a link while a page to display was preloading.
-         Either on the same link or on another link. If it's the same link
-         something might have gone wrong (or he could have double clicked, we
-         don't handle that case), so we send him to the page without pjax.
-         If it's another link, it hasn't been preloaded, so we redirect the
-         user to it.
-      */
+      // The user clicked on a link while a page to display was preloading.
+      // Either on the same link or on another link. If it's the same link
+      // something might have gone wrong (or he could have double clicked, we
+      // don't handle that case), so we send him to the page without pjax.
+      // If it's another link, it hasn't been preloaded, so we redirect the
+      // user to it.
       triggerPageEvent('exit', url, 'clicked on a link while waiting for another page to display')
       location.href = url
       return
@@ -773,16 +759,15 @@ var instantclick
 
     var indexOfAndroid = $userAgent.indexOf('Android ')
     if (indexOfAndroid > -1) {
-      /* The stock browser in Android 4.0.3 through 4.3.1 supports pushState,
-         though it doesn't update the address bar.
-
-         More problematic is that it has a bug on `popstate` when coming back
-         from a page not displayed through InstantClick: `location.href` is
-         undefined and `location.reload()` doesn't work.
-
-         Android < 4.4 is therefore blacklisted, unless it's a browser known
-         not to have that latter bug.
-      */
+      // The stock browser in Android 4.0.3 through 4.3.1 supports pushState,
+      // though it doesn't update the address bar.
+      //
+      // More problematic is that it has a bug on `popstate` when coming back
+      // from a page not displayed through InstantClick: `location.href` is
+      // undefined and `location.reload()` doesn't work.
+      //
+      // Android < 4.4 is therefore blacklisted, unless it's a browser known
+      // not to have that latter bug.
 
       var androidVersion = parseFloat($userAgent.substr(indexOfAndroid + 'Android '.length))
       if (androidVersion < 4.4) {

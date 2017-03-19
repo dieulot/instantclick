@@ -64,11 +64,10 @@
     instantclick.clearTimeout($timer)
 
     $element.className = ''
-    /* Doesn't work (has no visible effect) in Safari on `exit`.
-     *
-     * My guess is that Safari queues styling change for the next frame and
-     * drops that queue on location change.
-     */
+    // Doesn't work (has no visible effect) in Safari on `exit`.
+    //
+    // My guess is that Safari queues styling change for the next frame and
+    // drops that queue on location change.
   }
 
 
