@@ -920,7 +920,17 @@ var instantclick
           element = element.parentNode
         }
       }, false) // Third parameter isn't optional in Firefox < 6
+
+      if (type == 'click' && /iP(?:hone|ad|od)/.test($userAgent)) {
+        // Force Mobile Safari to trigger the click event on document by adding a pointer cursor to body
+
+        var styleElement = document.createElement('style')
+        styleElement.setAttribute('instantclick-mobile-safari-cursor', '') // So that this style element doesn't surprise developers in the browser DOM inspector.
+        styleElement.textContent = 'body { cursor: pointer !important; }'
+        document.head.appendChild(styleElement)
+      }
     }
+
     if (!(selector in $delegatedEvents[type])) {
       $delegatedEvents[type][selector] = []
     }
