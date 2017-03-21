@@ -209,6 +209,11 @@ var instantclick
       })
 
       triggerPageEvent('change', false)
+      
+      // Simulate DOMContentLoaded
+	    var DOMContentLoaded_event = document.createEvent("Event")
+	    DOMContentLoaded_event.initEvent("DOMContentLoaded", true, true)
+	    window.document.dispatchEvent(DOMContentLoaded_event)
     }
     else {
       // On popstate, browsers scroll by themselves, but at least Firefox
