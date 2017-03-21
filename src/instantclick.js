@@ -967,3 +967,8 @@ var instantclick
   }
 
 }(document, location, navigator.userAgent);
+
+// Auto-launch when DOM content is loaded
+document.addEventListener('DOMContentLoaded', function() {
+	InstantClick.init();
+});
