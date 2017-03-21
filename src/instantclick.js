@@ -811,7 +811,7 @@ var instantclick
     $currentLocationWithoutHash = removeHash(location.href)
     $timers[$currentLocationWithoutHash] = {}
     $history[$currentLocationWithoutHash] = {
-      body: document.body,
+      body: (document.body).cloneNode(true),
       title: document.title,
       scrollPosition: pageYOffset
     }
