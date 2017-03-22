@@ -1,0 +1,8 @@
+{
+  "name": "instantclick",
+  "repo": "dieulot/instantclick",
+  "version": "3.1.0",
+  "scripts": ["src/instantclick.js"],
+  "author": "Alex Dieulot",
+  "license": "MIT"
+}
