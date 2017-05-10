@@ -976,6 +976,4 @@ var instantclick
     } else {
         root.returnExports = InstantClick;
   }
-}(this, function () {
-    return InstantClick;
-}));
+}(this, InstantClick));
