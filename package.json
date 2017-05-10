@@ -1,0 +1,25 @@
+{
+  "name": "instantclick",
+  "version": "4.0.0",
+  "description": "InstantClick makes following links in your website instant.",
+  "main": "src/instantclick.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dieulot/instantclick.git"
+  },
+  "keywords": [
+    "pjax"
+  ],
+  "author": "dieulot",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dieulot/instantclick/issues"
+  },
+  "homepage": "http://instantclick.io/"
+}
