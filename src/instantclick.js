@@ -967,3 +967,13 @@ var instantclick
   }
 
 }(document, location, navigator.userAgent);
+
+(function (root, InstantClick) {
+    if (typeof define === 'function' && define.amd) {
+        define([], InstantClick);
+    } else if (typeof module === 'object' && module.exports) {
+        module.exports = InstantClick;
+    } else {
+        root.returnExports = InstantClick;
+  }
+}(this, InstantClick));
