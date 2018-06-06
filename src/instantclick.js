@@ -675,6 +675,7 @@ var instantclick
     $areTrackedElementsDifferent = false
     triggerPageEvent('preload')
     $xhr.open('GET', url)
+	$xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest")
     $xhr.timeout = 90000 // Must be set after `open()` with IE
     $xhr.send()
   }
